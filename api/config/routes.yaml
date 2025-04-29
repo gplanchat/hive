@@ -1,5 +1,7 @@
-controllers:
-    resource:
-        path: ../src/Controller/
-        namespace: App\Controller
-    type: attribute
+api_doc:
+    path: /docs.{_format}
+    methods: ['GET', 'HEAD']
+    defaults:
+        _controller: 'api_platform.action.documentation'
+        _format: ~
+        _api_respond: true

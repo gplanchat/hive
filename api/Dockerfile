@@ -36,6 +36,7 @@ RUN set -eux; \
 		intl \
 		opcache \
 		zip \
+        sockets \
 	;
 
 ###> recipes ###

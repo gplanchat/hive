@@ -9,3 +9,11 @@ api_platform:
         stateless: true
         cache_headers:
             vary: ['Content-Type', 'Authorization', 'Origin']
+            
+    mapping:
+        paths: 
+            - '%kernel.project_dir%/src/Authentication/Domain/FeatureRollout'
+            - '%kernel.project_dir%/src/Authentication/Domain/Organization'
+            - '%kernel.project_dir%/src/Authentication/Domain/User'
+            - '%kernel.project_dir%/src/Authentication/Domain/Role'
+            - '%kernel.project_dir%/src/Authentication/Domain/Workspace'
