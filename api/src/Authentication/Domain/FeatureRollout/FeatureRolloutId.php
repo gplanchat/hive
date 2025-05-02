@@ -9,13 +9,13 @@ use Symfony\Component\Routing\Requirement\Requirement;
 
 final class FeatureRolloutId implements IdInterface
 {
-    const string REQUIREMENT = '\/authentication\/feature-rollout\/'.Requirement::ASCII_SLUG;
-    const string PARSE = '\/authentication\/feature-rollout\/?<reference>'.Requirement::ASCII_SLUG.')';
+    const string REQUIREMENT = '\/authentication\/feature-rollouts\/[A-Za-z0-9]+(?:[-.][A-Za-z0-9]+)*';
+    const string PARSE = '/\/authentication\/feature-rollouts\/(?<reference>[A-Za-z0-9]+(?:[-.][A-Za-z0-9]+)*)/';
 
     private function __construct(
         private readonly string $reference,
     ) {
-        if (!preg_match('/'.Requirement::ASCII_SLUG.'/', $this->reference)) {
+        if (!preg_match('/[A-Za-z0-9]+(?:[-.][A-Za-z0-9]+)*/', $this->reference)) {
             throw new \InvalidArgumentException(\sprintf('<%s> is not a valid Feature Rollout code.', $reference));
         }
     }
@@ -23,7 +23,7 @@ final class FeatureRolloutId implements IdInterface
     public static function fromUri(string $uri): IdInterface
     {
         if (!preg_match(self::PARSE, $uri, $matches)) {
-            throw new \InvalidArgumentException(\sprintf('<%s> is not a valid Feature Rollout code.', $reference));
+            throw new \InvalidArgumentException(\sprintf('<%s> is not a valid Feature Rollout code.', $uri));
         }
 
         return new self($matches['reference']);

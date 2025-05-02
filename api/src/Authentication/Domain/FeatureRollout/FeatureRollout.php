@@ -8,8 +8,6 @@ use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
-use ApiPlatform\Metadata\Post;
-use ApiPlatform\Metadata\Put;
 use ApiPlatform\OpenApi\Model\Operation;
 use ApiPlatform\OpenApi\Model\Parameter;
 use App\Authentication\Domain\FeatureRollout\UseCases\GetOneFeatureRollout;
@@ -47,7 +45,6 @@ use Symfony\Component\Routing\Requirement\Requirement;
             paginationPartial: true,
             input: GetSeveralFeatureRollout::class,
             provider: QuerySeveralFeatureRolloutProvider::class,
-            itemUriTemplate: '/authentication/feature-rollouts/{code}',
         ),
 //        new Put(
 //            uriTemplate: '/authentication/feature-rollouts/{code}',

@@ -17,6 +17,7 @@ use App\Authentication\Domain\Organization\Query\UseCases\GetSeveralOrganization
 use App\Authentication\UserInterface\Organization\GetOneOrganizationProvider;
 use App\Authentication\UserInterface\Organization\GetSeveralOrganizationProvider;
 use Symfony\Component\Routing\Requirement\Requirement;
+use Symfony\Component\Serializer\Attribute\Context;
 
 #[Get(
     uriTemplate: '/authentication/organizations/{uuid}',
@@ -46,7 +47,6 @@ use Symfony\Component\Routing\Requirement\Requirement;
     parameters: [
         'page' => new QueryParameter(),
     ],
-    itemUriTemplate: '/authentication/organizations/{uuid}',
 )]
 final readonly class Organization
 {
@@ -69,13 +69,15 @@ final readonly class Organization
         public string $slug,
         #[ApiProperty(
             description: 'End date of validity of all subscriptions',
-            schema: ['type' => 'string', 'format' => 'date'],
+            schema: ['type' => 'string', 'format' => 'date', 'required' => true, 'nullable' => true],
         )]
+        #[Context(['datetime_format' => 'Y-m-d', 'skip_null_values' => false])]
         public ?\DateTimeInterface $validUntil = null,
         #[ApiProperty(
             description: 'Identifiers of the feature rollouts',
             schema: ['type' => 'list', 'items' => ['type' => 'string', 'pattern' => Requirement::ASCII_SLUG]],
         )]
+        #[Context(['iri_only' => true])]
         public array $featureRolloutIds = [],
         #[ApiProperty(
             description: 'Wether the Organization is enabled or not',
