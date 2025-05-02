@@ -4,13 +4,14 @@ declare(strict_types=1);
 
 namespace App\Authentication\Domain\User;
 
-use App\IdInterface;
-use App\InvalidUuidFormatException;
+use App\Authentication\Domain\IdInterface;
+use App\Authentication\Domain\InvalidUuidFormatException;
 use Symfony\Component\Routing\Requirement\Requirement;
 
 final class UserId implements IdInterface
 {
     const string REQUIREMENT = '\/authentication\/users\/'.Requirement::UUID_V7;
+    const string PARSE = '\/authentication\/users\/(?<reference>'.Requirement::UUID_V7.')';
 
     private function __construct(
         private readonly string $reference,
@@ -28,6 +29,15 @@ final class UserId implements IdInterface
     public static function nil(): IdInterface
     {
         return new self(uuid_create(UUID_TYPE_NULL));
+    }
+
+    public static function fromUri(string $uri): self
+    {
+        if (!preg_match(self::PARSE, $uri, $matches)) {
+            throw new InvalidUuidFormatException(\sprintf('<%s> is not a valid URI.', $uri));
+        }
+
+        return new self($matches['reference']);
     }
 
     public static function fromString(string $reference): self

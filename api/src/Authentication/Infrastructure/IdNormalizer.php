@@ -2,16 +2,17 @@
 
 declare(strict_types=1);
 
-namespace App;
+namespace App\Authentication\Infrastructure;
 
 use ApiPlatform\Metadata\IriConverterInterface;
 use App\Authentication\Domain\FeatureRollout\FeatureRollout;
 use App\Authentication\Domain\FeatureRollout\FeatureRolloutId;
+use App\Authentication\Domain\IdInterface;
 use App\Authentication\Domain\Organization\OrganizationId;
 use App\Authentication\Domain\Organization\Query\Organization;
 use App\Authentication\Domain\Role\Role;
 use App\Authentication\Domain\Role\RoleId;
-use App\Authentication\Domain\User\User;
+use App\Authentication\Domain\User\Query\User;
 use App\Authentication\Domain\User\UserId;
 use App\Authentication\Domain\Workspace\Workspace;
 use App\Authentication\Domain\Workspace\WorkspaceId;
@@ -39,7 +40,7 @@ final readonly class IdNormalizer implements NormalizerInterface, DenormalizerIn
             throw new InvalidArgumentException('The provided data type is not supported for normalization.');
         }
 
-        if ($context['iri_only'] === false) {
+        if (!array_key_exists('iri_only', $context) || $context['iri_only'] === false) {
             return $data->toString();
         }
 
@@ -87,7 +88,11 @@ final readonly class IdNormalizer implements NormalizerInterface, DenormalizerIn
             throw new InvalidArgumentException('The provided data type is not supported for denormalization');
         }
 
-        return $type::fromString($data);
+        if (!array_key_exists('iri_only', $context) || $context['iri_only'] === false) {
+            return $type::fromString($data);
+        }
+
+        return $type::fromUri($data);
     }
 
     public function supportsDenormalization($data, string $type, ?string $format = null, array $context = []): bool
