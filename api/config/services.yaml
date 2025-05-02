@@ -18,7 +18,68 @@ services:
         exclude:
             - '../src/DependencyInjection/'
             - '../src/Authentication/Domain/'
+            - '../src/Authentication/Infrastructure/Organization/DataFixtures'
+            - '../src/Authentication/Infrastructure/User/DataFixtures'
             - '../src/Kernel.php'
 
-    # add more service definitions when explicit configuration is needed
-    # please note that last definitions always *replace* previous ones
+    App\Authentication\Domain\FeatureRollout\UseCases\:
+        resource: '../src/Authentication/Domain/FeatureRollout/UseCases/*{Handler}.php'
+
+    App\Authentication\Domain\Organization\Query\UseCases\:
+        resource: '../src/Authentication/Domain/Organization/Query/UseCases/*{Handler}.php'
+
+    App\Authentication\Domain\Organization\Command\UseCases\:
+        resource: '../src/Authentication/Domain/Organization/Command/UseCases/*{Handler}.php'
+
+    App\Authentication\Domain\User\Command\UseCases\:
+        resource: '../src/Authentication/Domain/User/Command/UseCases/*{Handler}.php'
+
+    App\Authentication\Domain\User\Query\UseCase\:
+        resource: '../src/Authentication/Domain/User/Query/UseCase/*{Handler}.php'
+        
+    App\Authentication\Infrastructure\Keycloak\KeycloakClientInterface: '@App\Authentication\Infrastructure\Keycloak\KeycloakClient'
+
+    App\Authentication\Infrastructure\Keycloak\KeycloakInterface: '@App\Authentication\Infrastructure\Keycloak\Keycloak'
+        
+    App\Authentication\Domain\FeatureRollout\FeatureRolloutRepositoryInterface: '@App\Authentication\Infrastructure\FeatureRollout\InMemoryFeatureRolloutRepository'
+    
+    App\Authentication\Infrastructure\FeatureRollout\InMemoryFeatureRolloutRepository:
+        factory: [ 'App\Authentication\Infrastructure\FeatureRollout\InMemoryFeatureRolloutRepository', 'buildTestRepository' ]
+        
+    App\Authentication\Domain\Organization\Command\OrganizationRepositoryInterface: '@App\Authentication\Infrastructure\Organization\Command\DatabaseOrganizationRepository'
+    
+    App\Authentication\Infrastructure\Organization\Command\DatabaseOrganizationRepository:
+
+    App\Authentication\Domain\Organization\Query\OrganizationRepositoryInterface: '@App\Authentication\Infrastructure\Organization\Query\DatabaseOrganizationRepository'
+    
+    App\Authentication\Infrastructure\Organization\Query\DatabaseOrganizationRepository:
+    
+    App\Authentication\Domain\User\Command\UserRepositoryInterface: '@App\Authentication\Infrastructure\User\Command\DatabaseUserRepository'
+    
+    App\Authentication\Infrastructure\User\Command\DatabaseUserRepository:
+    
+    App\Authentication\Domain\User\Query\UserRepositoryInterface: '@App\Authentication\Infrastructure\User\Query\DatabaseUserRepository'
+    
+    App\Authentication\Infrastructure\User\Query\DatabaseUserRepository:
+
+when@test:
+    services:
+        App\Authentication\Infrastructure\Keycloak\KeycloakClientInterface: '@App\Authentication\Infrastructure\Keycloak\KeycloakClientMock'
+            
+        App\Authentication\Infrastructure\Keycloak\KeycloakInterface: '@App\Authentication\Infrastructure\Keycloak\KeycloakMock'
+        
+        App\Authentication\Domain\Organization\Command\OrganizationRepositoryInterface: '@App\Authentication\Infrastructure\Organization\Command\InMemoryOrganizationRepository'
+
+        App\Authentication\Domain\Organization\Query\OrganizationRepositoryInterface: '@App\Authentication\Infrastructure\Organization\Query\InMemoryOrganizationRepository'
+
+        App\Authentication\Infrastructure\Organization\DataFixtures\OrganizationFixtures:
+            autowire: true
+            public: true
+
+        App\Authentication\Domain\User\Command\UserRepositoryInterface: '@App\Authentication\Infrastructure\User\Command\InMemoryUserRepository'
+
+        App\Authentication\Domain\User\Query\UserRepositoryInterface: '@App\Authentication\Infrastructure\User\Query\InMemoryUserRepository'
+        
+        App\Authentication\Infrastructure\User\DataFixtures\UserFixtures:
+            autowire: true
+            public: true
