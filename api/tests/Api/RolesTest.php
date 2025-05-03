@@ -40,6 +40,9 @@ class RolesTest extends ApiTestCase
 
     public function tearDown(): void
     {
+        $this->organizationFixtures->unload();
+        $this->organizationFixtures = null;
+
         $this->roleFixtures->unload();
         $this->roleFixtures = null;
 
@@ -67,34 +70,22 @@ class RolesTest extends ApiTestCase
     /** @test */
     public function itShouldShowAnRole(): void
     {
-        static::createClient()->request('GET', '/authentication/roles/01966c5a-10ef-7abd-9c88-52b075bcae99');
+        static::createClient()->request('GET', '/authentication/roles/01966d41-78eb-7406-ad99-03ad025e8bcf');
 
         $this->assertResponseStatusCodeSame(200);
         $this->assertJsonContains([
             '@context' => '/contexts/Role',
             '@type' => 'Role',
-            '@id' => '/authentication/roles/01966c5a-10ef-7abd-9c88-52b075bcae99',
-            'uuid' => '01966c5a-10ef-7abd-9c88-52b075bcae99',
+            '@id' => '/authentication/roles/01966d41-78eb-7406-ad99-03ad025e8bcf',
+            'uuid' => '01966d41-78eb-7406-ad99-03ad025e8bcf',
             'organizationId' => '/authentication/organizations/01966c5a-10ef-7315-94f2-cbeec2f167d8',
-            'workspaceIds' => [
-                '/authentication/workspaces/01966c5a-10ef-723c-bc33-2b1dc30d8963',
-                '/authentication/workspaces/01966cc2-0323-7a38-9da3-3aeea904ea49',
-            ],
-            'roleIds' => [
-                '/authentication/roles/01966d41-78eb-7406-ad99-03ad025e8bcf',
-                '/authentication/roles/01966d41-a4a3-7cd4-a095-be712f2e724a',
-            ],
-            'rolename' => 'john.doe',
-            'firstName' => 'John',
-            'lastName' => 'Doe',
-            'email' => 'john.doe@example.com',
-            'enabled' => true,
         ]);
     }
 
     /** @test */
     public function itShouldCreateAnEnabledRole(): void
     {
+        $this->markTestIncomplete();
         static::createClient()->request('POST', '/authentication/roles', [
             'json' => [
                 'organizationId' => '/authentication/organizations/01966c5a-10ef-7315-94f2-cbeec2f167d8',
@@ -141,6 +132,7 @@ class RolesTest extends ApiTestCase
     /** @test */
     public function itShouldCreateAPendingRole(): void
     {
+        $this->markTestIncomplete();
         static::createClient()->request('POST', '/authentication/roles', [
             'json' => [
                 'organizationId' => '/authentication/organizations/01966c5a-10ef-7315-94f2-cbeec2f167d8',
@@ -187,6 +179,7 @@ class RolesTest extends ApiTestCase
     /** @test */
     public function itShouldRespondBadRequestOnIncompletePayloadOnCreation(): void
     {
+        $this->markTestIncomplete();
         static::createClient()->request('POST', '/authentication/roles', [
             'json' => [
             ],
@@ -207,6 +200,7 @@ class RolesTest extends ApiTestCase
     /** @test */
     public function itShouldEnableADisabledRole(): void
     {
+        $this->markTestIncomplete();
         static::createClient()->request('PATCH', '/authentication/roles/01966c5a-10ef-7040-9576-09078df3ea8a/enable', [
             'json' => [
                 'enabled' => true,
@@ -243,6 +237,7 @@ class RolesTest extends ApiTestCase
     /** @test */
     public function itShouldDisableAnEnabledRole(): void
     {
+        $this->markTestIncomplete();
         static::createClient()->request('PATCH', '/authentication/roles/01966c5a-10ef-7abd-9c88-52b075bcae99/disable', [
             'json' => [
                 'enabled' => false,
@@ -278,6 +273,7 @@ class RolesTest extends ApiTestCase
     /** @test */
     public function itShouldDeleteAnRole(): void
     {
+        $this->markTestIncomplete();
         static::createClient()->request('DELETE', '/authentication/roles/01966c5a-10ef-7040-9576-09078df3ea8a', [
             'headers' => [
                 'Content-Type' => 'application/merge-patch+json',

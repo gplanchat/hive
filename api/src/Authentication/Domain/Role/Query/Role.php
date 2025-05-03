@@ -19,6 +19,7 @@ use App\Authentication\Domain\Role\RoleId;
 use App\Authentication\UserInterface\Role\GetOneRoleProvider;
 use App\Authentication\UserInterface\Role\GetSeveralRoleProvider;
 use Symfony\Component\Routing\Requirement\Requirement;
+use Symfony\Component\Serializer\Attribute\Context;
 
 #[Get(
     uriTemplate: '/authentication/roles/{uuid}',
@@ -100,6 +101,7 @@ final readonly class Role
             description: 'Identifier of the Owning Organization',
             schema: ['type' => 'string', 'pattern' => OrganizationId::REQUIREMENT],
         )]
+        #[Context(['iri_only' => true])]
         public OrganizationId $organizationId,
         array $resourceAccesses = []
     ) {

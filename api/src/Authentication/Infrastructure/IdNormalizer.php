@@ -10,7 +10,7 @@ use App\Authentication\Domain\FeatureRollout\FeatureRolloutId;
 use App\Authentication\Domain\IdInterface;
 use App\Authentication\Domain\Organization\OrganizationId;
 use App\Authentication\Domain\Organization\Query\Organization;
-use App\Authentication\Domain\Role\Role;
+use App\Authentication\Domain\Role\Query\Role;
 use App\Authentication\Domain\Role\RoleId;
 use App\Authentication\Domain\User\Query\User;
 use App\Authentication\Domain\User\UserId;

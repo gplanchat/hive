@@ -40,6 +40,9 @@ class UsersTest extends ApiTestCase
 
     public function tearDown(): void
     {
+        $this->organizationFixtures->unload();
+        $this->organizationFixtures = null;
+
         $this->userFixtures->unload();
         $this->userFixtures = null;
 
