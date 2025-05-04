@@ -12,10 +12,10 @@ framework:
         routing:
             # Route your messages to the transports
              'App\Authentication\Domain\FeatureRollout\UseCases\*': sync
-             'App\Authentication\Domain\Organization\UseCase\*': sync
-             'App\Authentication\Domain\User\UseCase\*': sync
-             'App\Authentication\Domain\Role\UseCase\*': sync
-             'App\Authentication\Domain\Workspace\UseCase\*': sync
+             'App\Authentication\Domain\Organization\UseCases\*': sync
+             'App\Authentication\Domain\User\UseCases\*': sync
+             'App\Authentication\Domain\Role\Query\UseCases\*': sync
+             'App\Authentication\Domain\Workspace\UseCases\*': sync
 
 # when@test:
 #    framework:

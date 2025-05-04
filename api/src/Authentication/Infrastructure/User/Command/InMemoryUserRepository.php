@@ -19,7 +19,7 @@ use App\Authentication\Infrastructure\StorageMock;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Contracts\Cache\ItemInterface;
 
-final class InMemoryUserRepository implements UserRepositoryInterface
+final readonly class InMemoryUserRepository implements UserRepositoryInterface
 {
     public function __construct(
         private StorageMock $storage,

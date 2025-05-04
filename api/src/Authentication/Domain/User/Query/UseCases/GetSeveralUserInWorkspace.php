@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Authentication\Domain\User\Query\UseCase;
+namespace App\Authentication\Domain\User\Query\UseCases;
 
 use App\Authentication\Domain\Workspace\WorkspaceId;
 

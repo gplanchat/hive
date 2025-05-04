@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Authentication\Infrastructure\User\Query;
 
-use App\Authentication\Domain\User\Query\UseCase\GetSeveralUserInWorkspace;
+use App\Authentication\Domain\User\Query\UseCases\GetSeveralUserInWorkspace;
 use App\Authentication\Domain\Workspace\WorkspaceId;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 use Symfony\Component\Serializer\Normalizer\DenormalizerAwareInterface;

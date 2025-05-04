@@ -12,7 +12,7 @@ final readonly class ResourceAccess
     /** @var ActionInterface[] */
     #[ApiProperty(
         description: 'Resource allowed actions',
-        schema: ['type' => 'list', 'items' => ['type' => 'string', 'pattern' => Requirement::ASCII_SLUG.'\.'.Requirement::ASCII_SLUG, 'minLength' => 3, 'maxLength' => 100]],
+        schema: ['type' => 'list', 'items' => ['type' => 'string', 'pattern' => Requirement::ASCII_SLUG, 'minLength' => 3, 'maxLength' => 100]],
     )]
     public array $actions;
 

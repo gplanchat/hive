@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Authentication\Domain\User\Query\UseCase;
+namespace App\Authentication\Domain\User\Query\UseCases;
 
 final readonly class GetSeveralUser
 {

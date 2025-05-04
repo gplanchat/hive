@@ -178,10 +178,10 @@ final class User
     public function enable(): void
     {
         if ($this->deleted) {
-            throw new InvalidUserStateException('Cannot enable an already deleted Organization.');
+            throw new InvalidUserStateException('Cannot enable an already deleted User.');
         }
         if ($this->enabled) {
-            throw new InvalidUserStateException('Cannot enable an already enabled Organization.');
+            throw new InvalidUserStateException('Cannot enable an already enabled User.');
         }
 
         $this->recordThat(new EnabledEvent($this->uuid, $this->version + 1));
@@ -195,10 +195,10 @@ final class User
     public function disable(): void
     {
         if ($this->deleted) {
-            throw new InvalidUserStateException('Cannot disable an already deleted Organization.');
+            throw new InvalidUserStateException('Cannot disable an already deleted User.');
         }
         if (!$this->enabled) {
-            throw new InvalidUserStateException('Cannot disable an already disabled Organization.');
+            throw new InvalidUserStateException('Cannot disable an already disabled User.');
         }
 
         $this->recordThat(new DisabledEvent($this->uuid, $this->version + 1));
@@ -212,7 +212,7 @@ final class User
     public function delete(): void
     {
         if ($this->deleted) {
-            throw new InvalidUserStateException('Cannot delete an already deleted Organization.');
+            throw new InvalidUserStateException('Cannot delete an already deleted User.');
         }
 
         $this->recordThat(new DeletedEvent($this->uuid, $this->version + 1));
@@ -220,6 +220,6 @@ final class User
 
     private function applyDeletedEvent(DeletedEvent $event): void
     {
-        $this->enabled = false;
+        $this->deleted = true;
     }
 }

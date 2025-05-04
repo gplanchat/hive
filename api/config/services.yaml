@@ -34,14 +34,17 @@ services:
     App\Authentication\Domain\User\Command\UseCases\:
         resource: '../src/Authentication/Domain/User/Command/UseCases/*{Handler}.php'
 
-    App\Authentication\Domain\User\Query\UseCase\:
-        resource: '../src/Authentication/Domain/User/Query/UseCase/*{Handler}.php'
+    App\Authentication\Domain\User\Query\UseCases\:
+        resource: '../src/Authentication/Domain/User/Query/UseCases/*{Handler}.php'
+        
+    App\Authentication\Domain\Role\Command\UseCases\:
+        resource: '../src/Authentication/Domain/Role/Command/UseCases/*{Handler}.php'
         
     App\Authentication\Domain\Role\Query\UseCases\:
         resource: '../src/Authentication/Domain/Role/Query/UseCases/*{Handler}.php'
 
-    App\Authentication\Domain\Workspace\UseCase\:
-        resource: '../src/Authentication/Domain/Workspace/UseCase/*{Handler}.php'
+    App\Authentication\Domain\Workspace\UseCases\:
+        resource: '../src/Authentication/Domain/Workspace/UseCases/*{Handler}.php'
         
     App\Authentication\Infrastructure\Keycloak\KeycloakClientInterface: '@App\Authentication\Infrastructure\Keycloak\KeycloakClient'
 
@@ -68,10 +71,11 @@ services:
     
     App\Authentication\Infrastructure\User\Query\DatabaseUserRepository:
 
+    App\Authentication\Domain\Role\Command\RoleRepositoryInterface: '@App\Authentication\Infrastructure\Role\Command\InMemoryRoleRepository'
+
     App\Authentication\Domain\Role\Query\RoleRepositoryInterface: '@App\Authentication\Infrastructure\Role\Query\InMemoryRoleRepository'
     
     App\Authentication\Infrastructure\Role\Query\InMemoryRoleRepository:
-        factory: [ 'App\Authentication\Infrastructure\Role\Query\InMemoryRoleRepository', 'buildTestRepository' ]
     
     App\Authentication\Domain\Workspace\WorkspaceRepositoryInterface: '@App\Authentication\Infrastructure\Workspace\InMemoryWorkspaceRepository'
     

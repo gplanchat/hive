@@ -24,7 +24,7 @@ final class RoleFixtures
 
     public function load(): void
     {
-        $adminRoles = [
+        $adminAuthorizations = [
             new ResourceAccess(
                 Resources::Organization,
                 Actions::List,
@@ -56,7 +56,7 @@ final class RoleFixtures
             ),
         ];
 
-        $userRoles = [
+        $userAuthorizations = [
             new ResourceAccess(
                 Resources::Organization,
                 Actions::List,
@@ -80,69 +80,75 @@ final class RoleFixtures
         ];
 
 
-        $this->storage->get('tests.data-fixtures.role.01966d41-78eb-7406-ad99-03ad025e8bcf', function (ItemInterface $item) use ($adminRoles) {
+        $this->storage->get('tests.data-fixtures.role.01966d41-78eb-7406-ad99-03ad025e8bcf', function (ItemInterface $item) use ($adminAuthorizations) {
             $item->tag([self::TAG]);
 
             return new Role(
                 RoleId::fromString('01966d41-78eb-7406-ad99-03ad025e8bcf'),
-                'ROLE_ADMIN',
                 OrganizationId::fromString('01966c5a-10ef-7315-94f2-cbeec2f167d8'),
-                $adminRoles,
+                'administrator',
+                'Administrator',
+                resourceAccesses: $adminAuthorizations,
             );
         });
 
-        $this->storage->get('tests.data-fixtures.role.01969388-78d2-7e96-a08b-ca9e83aee2d9', function (ItemInterface $item) use ($userRoles) {
+        $this->storage->get('tests.data-fixtures.role.01969388-78d2-7e96-a08b-ca9e83aee2d9', function (ItemInterface $item) use ($userAuthorizations) {
             $item->tag([self::TAG]);
 
             return new Role(
                 RoleId::fromString('01969388-78d2-7e96-a08b-ca9e83aee2d9'),
-                'ROLE_USER',
                 OrganizationId::fromString('01966c5a-10ef-7315-94f2-cbeec2f167d8'),
-                $userRoles,
+                'user',
+                'User',
+                resourceAccesses: $userAuthorizations,
             );
         });
 
-        $this->storage->get('tests.data-fixtures.role.01969388-78d2-7f92-9ef2-2322011f4a72', function (ItemInterface $item) use ($adminRoles) {
+        $this->storage->get('tests.data-fixtures.role.01969388-78d2-7f92-9ef2-2322011f4a72', function (ItemInterface $item) use ($adminAuthorizations) {
             $item->tag([self::TAG]);
 
             return new Role(
                 RoleId::fromString('01969388-78d2-7f92-9ef2-2322011f4a72'),
-                'ROLE_ADMIN',
                 OrganizationId::fromString('01966c5a-10ef-77a1-b158-d4356966e1ab'),
-                $adminRoles,
+                'administrator',
+                'Administrator',
+                resourceAccesses: $adminAuthorizations,
             );
         });
 
-        $this->storage->get('tests.data-fixtures.role.01966d41-a4a3-7cd4-a095-be712f2e724a', function (ItemInterface $item) use ($userRoles) {
+        $this->storage->get('tests.data-fixtures.role.01966d41-a4a3-7cd4-a095-be712f2e724a', function (ItemInterface $item) use ($userAuthorizations) {
             $item->tag([self::TAG]);
 
             return new Role(
                 RoleId::fromString('01966d41-a4a3-7cd4-a095-be712f2e724a'),
-                'ROLE_USER',
                 OrganizationId::fromString('01966c5a-10ef-77a1-b158-d4356966e1ab'),
-                $userRoles,
+                'user',
+                'User',
+                resourceAccesses: $userAuthorizations,
             );
         });
 
-        $this->storage->get('tests.data-fixtures.role.01969388-78d2-7fb0-8c61-51ecbf98d41c', function (ItemInterface $item) use ($adminRoles) {
+        $this->storage->get('tests.data-fixtures.role.01969388-78d2-7fb0-8c61-51ecbf98d41c', function (ItemInterface $item) use ($adminAuthorizations) {
             $item->tag([self::TAG]);
 
             return new Role(
                 RoleId::fromString('01969388-78d2-7fb0-8c61-51ecbf98d41c'),
-                'ROLE_ADMIN',
                 OrganizationId::fromString('01966c5a-10ef-76f6-9513-e3b858c22f0a'),
-                $adminRoles,
+                'administrator',
+                'Administrator',
+                resourceAccesses: $adminAuthorizations,
             );
         });
 
-        $this->storage->get('tests.data-fixtures.role.01969388-78d2-7530-bd4d-d7673bce9f34', function (ItemInterface $item) use ($userRoles) {
+        $this->storage->get('tests.data-fixtures.role.01969388-78d2-7530-bd4d-d7673bce9f34', function (ItemInterface $item) use ($userAuthorizations) {
             $item->tag([self::TAG]);
 
             return new Role(
                 RoleId::fromString('01969388-78d2-7530-bd4d-d7673bce9f34'),
-                'ROLE_USER',
                 OrganizationId::fromString('01966c5a-10ef-76f6-9513-e3b858c22f0a'),
-                $userRoles,
+                'user',
+                'User',
+                resourceAccesses: $userAuthorizations,
             );
         });
     }

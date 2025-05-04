@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Authentication\Infrastructure\User\Query;
 
 use App\Authentication\Domain\Organization\OrganizationId;
-use App\Authentication\Domain\User\Query\UseCase\GetSeveralUserInOrganization;
+use App\Authentication\Domain\User\Query\UseCases\GetSeveralUserInOrganization;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 use Symfony\Component\Serializer\Normalizer\DenormalizerAwareInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerAwareTrait;

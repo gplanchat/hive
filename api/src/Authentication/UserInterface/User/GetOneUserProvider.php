@@ -6,7 +6,7 @@ namespace App\Authentication\UserInterface\User;
 
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
-use App\Authentication\Domain\User\Query\UseCase\GetOneUser;
+use App\Authentication\Domain\User\Query\UseCases\GetOneUser;
 use App\Authentication\Domain\User\Query\User;
 use App\Authentication\Domain\User\UserId;
 use Symfony\Component\HttpFoundation\Exception\BadRequestException;

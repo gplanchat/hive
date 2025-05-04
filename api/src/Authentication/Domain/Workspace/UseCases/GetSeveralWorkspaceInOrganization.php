@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace App\Authentication\Domain\User\Query\UseCase;
+namespace App\Authentication\Domain\Workspace\UseCases;
 
 use App\Authentication\Domain\Organization\OrganizationId;
 
-final readonly class GetSeveralUserInOrganization
+final readonly class GetSeveralWorkspaceInOrganization
 {
     public function __construct(
         public OrganizationId $organizationId,

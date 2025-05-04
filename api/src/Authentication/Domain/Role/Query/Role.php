@@ -50,7 +50,6 @@ use Symfony\Component\Serializer\Attribute\Context;
     parameters: [
         'page' => new QueryParameter(),
     ],
-    itemUriTemplate: '/authentication/roles/{uuid}',
 )]
 #[GetCollection(
     uriTemplate: '/authentication/organizations/{organizationId}/roles',
@@ -78,7 +77,6 @@ use Symfony\Component\Serializer\Attribute\Context;
     parameters: [
         'page' => new QueryParameter(),
     ],
-    itemUriTemplate: '/authentication/roles/{uuid}',
 )]
 final readonly class Role
 {
@@ -93,16 +91,25 @@ final readonly class Role
         )]
         public RoleId $uuid,
         #[ApiProperty(
-            description: 'Label of the Role',
-            schema: ['type' => 'string', 'minLength' => 3, 'maxLength' => 150],
-        )]
-        public string $label,
-        #[ApiProperty(
             description: 'Identifier of the Owning Organization',
             schema: ['type' => 'string', 'pattern' => OrganizationId::REQUIREMENT],
         )]
         #[Context(['iri_only' => true])]
         public OrganizationId $organizationId,
+        #[ApiProperty(
+            description: 'Identifier of the Role',
+            schema: ['type' => 'string', 'minLength' => 3, 'maxLength' => 150, 'pattern' => Requirement::ASCII_SLUG],
+        )]
+        public string $identifier,
+        #[ApiProperty(
+            description: 'Label of the Role',
+            schema: ['type' => 'string', 'minLength' => 3, 'maxLength' => 150],
+        )]
+        public string $label,
+        #[ApiProperty(
+            description: 'Resource accesses specifications',
+            schema: ['type' => 'string', 'minLength' => 3, 'maxLength' => 150],
+        )]
         array $resourceAccesses = []
     ) {
         $this->resourceAccesses = $resourceAccesses;
