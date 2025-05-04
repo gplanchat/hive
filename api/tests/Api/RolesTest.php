@@ -68,7 +68,7 @@ class RolesTest extends ApiTestCase
     }
 
     /** @test */
-    public function itShouldShowAnRole(): void
+    public function itShouldShowARole(): void
     {
         static::createClient()->request('GET', '/authentication/roles/01966d41-78eb-7406-ad99-03ad025e8bcf');
 
@@ -83,25 +83,14 @@ class RolesTest extends ApiTestCase
     }
 
     /** @test */
-    public function itShouldCreateAnEnabledRole(): void
+    public function itShouldCreateARole(): void
     {
-        $this->markTestIncomplete();
         static::createClient()->request('POST', '/authentication/roles', [
             'json' => [
                 'organizationId' => '/authentication/organizations/01966c5a-10ef-7315-94f2-cbeec2f167d8',
-                'workspaceIds' => [
-                    '/authentication/workspaces/01966c5a-10ef-723c-bc33-2b1dc30d8963',
-                    '/authentication/workspaces/01966cc2-0323-7a38-9da3-3aeea904ea49',
-                ],
-                'roleIds' => [
-                    '/authentication/roles/01966d41-78eb-7406-ad99-03ad025e8bcf',
-                    '/authentication/roles/01966d41-a4a3-7cd4-a095-be712f2e724a',
-                ],
-                'rolename' => 'wile.coyote',
-                'firstName' => 'Wile',
-                'lastName' => 'E. Coyote',
-                'email' => 'wile.coyote@example.com',
-                'enabled' => true,
+                'identifier' => 'manager',
+                'label' => 'Manager',
+                'resourceAccesses' => [],
             ],
             'headers' => [
                 'Content-Type' => 'application/ld+json',
@@ -113,73 +102,15 @@ class RolesTest extends ApiTestCase
             '@context' => '/contexts/Role',
             '@type' => 'Role',
             'organizationId' => '/authentication/organizations/01966c5a-10ef-7315-94f2-cbeec2f167d8',
-            'workspaceIds' => [
-                '/authentication/workspaces/01966c5a-10ef-723c-bc33-2b1dc30d8963',
-                '/authentication/workspaces/01966cc2-0323-7a38-9da3-3aeea904ea49',
-            ],
-            'roleIds' => [
-                '/authentication/roles/01966d41-78eb-7406-ad99-03ad025e8bcf',
-                '/authentication/roles/01966d41-a4a3-7cd4-a095-be712f2e724a',
-            ],
-            'rolename' => 'wile.coyote',
-            'firstName' => 'Wile',
-            'lastName' => 'E. Coyote',
-            'email' => 'wile.coyote@example.com',
-            'enabled' => true,
-        ]);
-    }
-
-    /** @test */
-    public function itShouldCreateAPendingRole(): void
-    {
-        $this->markTestIncomplete();
-        static::createClient()->request('POST', '/authentication/roles', [
-            'json' => [
-                'organizationId' => '/authentication/organizations/01966c5a-10ef-7315-94f2-cbeec2f167d8',
-                'workspaceIds' => [
-                    '/authentication/workspaces/01966c5a-10ef-723c-bc33-2b1dc30d8963',
-                    '/authentication/workspaces/01966cc2-0323-7a38-9da3-3aeea904ea49',
-                ],
-                'roleIds' => [
-                    '/authentication/roles/01966d41-78eb-7406-ad99-03ad025e8bcf',
-                    '/authentication/roles/01966d41-a4a3-7cd4-a095-be712f2e724a',
-                ],
-                'rolename' => 'wile.coyote',
-                'firstName' => 'Wile',
-                'lastName' => 'E. Coyote',
-                'email' => 'wile.coyote@example.com',
-                'enabled' => false,
-            ],
-            'headers' => [
-                'Content-Type' => 'application/ld+json',
-            ],
-        ]);
-
-        $this->assertResponseStatusCodeSame(201);
-        $this->assertJsonContains([
-            '@context' => '/contexts/Role',
-            '@type' => 'Role',
-            'organizationId' => '/authentication/organizations/01966c5a-10ef-7315-94f2-cbeec2f167d8',
-            'workspaceIds' => [
-                '/authentication/workspaces/01966c5a-10ef-723c-bc33-2b1dc30d8963',
-                '/authentication/workspaces/01966cc2-0323-7a38-9da3-3aeea904ea49',
-            ],
-            'roleIds' => [
-                '/authentication/roles/01966d41-78eb-7406-ad99-03ad025e8bcf',
-                '/authentication/roles/01966d41-a4a3-7cd4-a095-be712f2e724a',
-            ],
-            'rolename' => 'wile.coyote',
-            'firstName' => 'Wile',
-            'lastName' => 'E. Coyote',
-            'email' => 'wile.coyote@example.com',
-            'enabled' => false,
+            'identifier' => 'manager',
+            'label' => 'Manager',
+            'resourceAccesses' => [],
         ]);
     }
 
     /** @test */
     public function itShouldRespondBadRequestOnIncompletePayloadOnCreation(): void
     {
-        $this->markTestIncomplete();
         static::createClient()->request('POST', '/authentication/roles', [
             'json' => [
             ],
@@ -198,83 +129,9 @@ class RolesTest extends ApiTestCase
     }
 
     /** @test */
-    public function itShouldEnableADisabledRole(): void
+    public function itShouldDeleteARole(): void
     {
-        $this->markTestIncomplete();
-        static::createClient()->request('PATCH', '/authentication/roles/01966c5a-10ef-7040-9576-09078df3ea8a/enable', [
-            'json' => [
-                'enabled' => true,
-            ],
-            'headers' => [
-                'Content-Type' => 'application/merge-patch+json',
-            ],
-        ]);
-
-        $this->assertResponseStatusCodeSame(200);
-        $this->assertJsonContains([
-            '@context' => '/contexts/Role',
-            '@type' => 'Role',
-            '@id' => '/authentication/roles/01966c5a-10ef-7040-9576-09078df3ea8a',
-            'uuid' => '01966c5a-10ef-7040-9576-09078df3ea8a',
-            'organizationId' => '/authentication/organizations/01966c5a-10ef-76f6-9513-e3b858c22f0a',
-            'workspaceIds' => [
-                '/authentication/workspaces/01966c5a-10ef-7f9c-8c9f-80657a996b9d',
-                '/authentication/workspaces/01966c5a-10ef-70ce-ab8c-c455e874c3fc',
-                '/authentication/workspaces/01966c5a-10ef-7795-9e13-7359dd58b49c',
-            ],
-            'roleIds' => [
-                '/authentication/roles/01966d41-78eb-7406-ad99-03ad025e8bcf',
-                '/authentication/roles/01966d41-a4a3-7cd4-a095-be712f2e724a',
-            ],
-            'rolename' => 'clara.froelich',
-            'firstName' => 'Clara',
-            'lastName' => 'Froelich',
-            'email' => 'clara.froelich@example.com',
-            'enabled' => true,
-        ]);
-    }
-
-    /** @test */
-    public function itShouldDisableAnEnabledRole(): void
-    {
-        $this->markTestIncomplete();
-        static::createClient()->request('PATCH', '/authentication/roles/01966c5a-10ef-7abd-9c88-52b075bcae99/disable', [
-            'json' => [
-                'enabled' => false,
-            ],
-            'headers' => [
-                'Content-Type' => 'application/merge-patch+json',
-            ],
-        ]);
-
-        $this->assertResponseStatusCodeSame(200);
-        $this->assertJsonContains([
-            '@context' => '/contexts/Role',
-            '@type' => 'Role',
-            '@id' => '/authentication/roles/01966c5a-10ef-7abd-9c88-52b075bcae99',
-            'uuid' => '01966c5a-10ef-7abd-9c88-52b075bcae99',
-            'organizationId' => '/authentication/organizations/01966c5a-10ef-7315-94f2-cbeec2f167d8',
-            'workspaceIds' => [
-                '/authentication/workspaces/01966c5a-10ef-723c-bc33-2b1dc30d8963',
-                '/authentication/workspaces/01966cc2-0323-7a38-9da3-3aeea904ea49',
-            ],
-            'roleIds' => [
-                '/authentication/roles/01966d41-78eb-7406-ad99-03ad025e8bcf',
-                '/authentication/roles/01966d41-a4a3-7cd4-a095-be712f2e724a',
-            ],
-            'rolename' => 'john.doe',
-            'firstName' => 'John',
-            'lastName' => 'Doe',
-            'email' => 'john.doe@example.com',
-            'enabled' => false,
-        ]);
-    }
-
-    /** @test */
-    public function itShouldDeleteAnRole(): void
-    {
-        $this->markTestIncomplete();
-        static::createClient()->request('DELETE', '/authentication/roles/01966c5a-10ef-7040-9576-09078df3ea8a', [
+        static::createClient()->request('DELETE', '/authentication/roles/01969388-78d2-7530-bd4d-d7673bce9f34', [
             'headers' => [
                 'Content-Type' => 'application/merge-patch+json',
             ],
