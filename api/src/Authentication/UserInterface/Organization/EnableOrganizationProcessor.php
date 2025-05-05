@@ -6,20 +6,20 @@ namespace App\Authentication\UserInterface\Organization;
 
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
+use App\Authentication\Domain\CommandBusInterface;
 use App\Authentication\Domain\NotFoundException;
 use App\Authentication\Domain\Organization\Command\InvalidOrganizationStateException;
 use App\Authentication\Domain\Organization\Command\UseCases\EnableOrganization;
 use App\Authentication\Domain\Organization\OrganizationId;
 use App\Authentication\Domain\Organization\Query\Organization;
 use App\Authentication\Domain\Organization\Query\OrganizationRepositoryInterface;
-use Symfony\Component\HttpFoundation\Exception\BadRequestException;
-use Symfony\Component\HttpFoundation\Exception\LogicException;
-use Symfony\Component\Messenger\MessageBusInterface;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 final readonly class EnableOrganizationProcessor implements ProcessorInterface
 {
     public function __construct(
-        private MessageBusInterface $messageBus,
+        private CommandBusInterface $commandBus,
         private OrganizationRepositoryInterface $organizationRepository,
     ) {
     }
@@ -27,7 +27,7 @@ final readonly class EnableOrganizationProcessor implements ProcessorInterface
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []):Organization
     {
         if (!$data instanceof EnableOrganizationInput) {
-            throw new BadRequestException();
+            throw new BadRequestHttpException();
         }
 
         try {
@@ -35,11 +35,11 @@ final readonly class EnableOrganizationProcessor implements ProcessorInterface
                 OrganizationId::fromString($uriVariables['uuid']),
                 $data->validUntil,
             );
-            $this->messageBus->dispatch($command);
+            $this->commandBus->apply($command);
         } catch (InvalidOrganizationStateException $exception) {
-            throw new LogicException($exception->getMessage(), previous: $exception);
+            throw new BadRequestHttpException($exception->getMessage(), previous: $exception);
         } catch (NotFoundException $exception) {
-            throw new LogicException($exception->getMessage(), previous: $exception);
+            throw new NotFoundHttpException($exception->getMessage(), previous: $exception);
         }
 
         return $this->organizationRepository->get($command->uuid);

@@ -8,7 +8,7 @@ use App\Authentication\Domain\Role\Command\Role;
 use App\Authentication\Domain\Role\Command\RoleRepositoryInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
-#[AsMessageHandler]
+#[AsMessageHandler(bus: 'command.bus')]
 final readonly class CreateRoleHandler
 {
     public function __construct(

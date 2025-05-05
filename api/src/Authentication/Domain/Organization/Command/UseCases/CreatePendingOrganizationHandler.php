@@ -8,7 +8,7 @@ use App\Authentication\Domain\Organization\Command\Organization;
 use App\Authentication\Domain\Organization\Command\OrganizationRepositoryInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
-#[AsMessageHandler]
+#[AsMessageHandler(bus: 'command.bus')]
 final readonly class CreatePendingOrganizationHandler
 {
     public function __construct(

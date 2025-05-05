@@ -51,8 +51,8 @@ class OrganizationsTest extends ApiTestCase
         $this->assertJsonContains([
             '@context' => '/contexts/Organization',
             '@id' => '/authentication/organizations',
-            '@type' => 'Collection',
-            'totalItems' => 3,
+            '@type' => 'hydra:Collection',
+            'hydra:totalItems' => 3,
         ]);
     }
 
@@ -171,7 +171,7 @@ class OrganizationsTest extends ApiTestCase
         $this->assertJsonContains([
             '@context' => '/contexts/Error',
             '@id' => '/errors/400',
-            '@type' => 'Error',
+            '@type' => 'hydra:Error',
             'title' => 'An error occurred',
         ]);
     }

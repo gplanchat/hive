@@ -44,13 +44,12 @@ final readonly class CreateOrganizationInput
         public ?\DateTimeInterface $validUntil = null,
         #[ApiProperty(
             description: 'Identifiers of the feature rollouts',
-            schema: ['type' => 'list', 'items' => ['type' => 'string', 'pattern' => FeatureRolloutId::REQUIREMENT]],
+            schema: ['type' => 'list', 'items' => ['type' => 'string', 'pattern' => FeatureRolloutId::URI_REQUIREMENT]],
         )]
         #[Assert\All([
             'constraints' => [
                 new Assert\NotBlank(),
                 new Assert\Type(FeatureRolloutId::class),
-//                new Assert\Regex('/'.FeatureRolloutId::REQUIREMENT.'/'),
             ],
         ])]
         #[Context(['iri_only' => true])]

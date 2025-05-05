@@ -17,36 +17,41 @@ use App\Authentication\UserInterface\Organization\DisableOrganizationInput;
 use App\Authentication\UserInterface\Organization\DisableOrganizationProcessor;
 use App\Authentication\UserInterface\Organization\EnableOrganizationInput;
 use App\Authentication\UserInterface\Organization\EnableOrganizationProcessor;
-use App\Authentication\UserInterface\Organization\GetOneOrganizationProvider;
+use App\Authentication\UserInterface\Organization\QueryOneOrganizationProvider;
 
 #[Post(
     uriTemplate: '/authentication/organizations',
+    class: QueryOrganization::class,
     input: CreateOrganizationInput::class,
     output: QueryOrganization::class,
     processor: CreateOrganizationProcessor::class,
+    itemUriTemplate: '/authentication/organizations/{uuid}',
 )]
 #[Patch(
     uriTemplate: '/authentication/organizations/{uuid}/enable',
     uriVariables: ['uuid'],
+    class: QueryOrganization::class,
     input: EnableOrganizationInput::class,
     output: QueryOrganization::class,
-    provider: GetOneOrganizationProvider::class,
+    provider: QueryOneOrganizationProvider::class,
     processor: EnableOrganizationProcessor::class,
 )]
 #[Patch(
     uriTemplate: '/authentication/organizations/{uuid}/disable',
     uriVariables: ['uuid'],
+    class: QueryOrganization::class,
     input: DisableOrganizationInput::class,
     output: QueryOrganization::class,
-    provider: GetOneOrganizationProvider::class,
+    provider: QueryOneOrganizationProvider::class,
     processor: DisableOrganizationProcessor::class,
 )]
 #[Delete(
     uriTemplate: '/authentication/organizations/{uuid}',
     uriVariables: ['uuid'],
+    class: QueryOrganization::class,
     input: false,
     output: false,
-    provider: GetOneOrganizationProvider::class,
+    provider: QueryOneOrganizationProvider::class,
     processor: DeleteOrganizationProcessor::class,
 )]
 final class Organization

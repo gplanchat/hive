@@ -62,8 +62,8 @@ class UsersTest extends ApiTestCase
         $this->assertJsonContains([
             '@context' => '/contexts/User',
             '@id' => '/authentication/users',
-            '@type' => 'Collection',
-            'totalItems' => 6,
+            '@type' => 'hydra:Collection',
+            'hydra:totalItems' => 6,
         ]);
     }
 
@@ -202,7 +202,7 @@ class UsersTest extends ApiTestCase
         $this->assertJsonContains([
             '@context' => '/contexts/Error',
             '@id' => '/errors/400',
-            '@type' => 'Error',
+            '@type' => 'hydra:Error',
             'title' => 'An error occurred',
         ]);
     }
@@ -210,8 +210,6 @@ class UsersTest extends ApiTestCase
     /** @test */
     public function itShouldCreateAnEnabledUserWithinAnOrganization(): void
     {
-        $this->markTestIncomplete();
-
         static::createClient()->request('POST', '/authentication/organizations/01966c5a-10ef-7315-94f2-cbeec2f167d8/users', [
             'json' => [
                 'workspaceIds' => [
@@ -257,8 +255,6 @@ class UsersTest extends ApiTestCase
     /** @test */
     public function itShouldCreateAPendingUserWithinAnOrganization(): void
     {
-        $this->markTestIncomplete();
-
         static::createClient()->request('POST', '/authentication/organizations/01966c5a-10ef-7315-94f2-cbeec2f167d8/users', [
             'json' => [
                 'workspaceIds' => [
@@ -304,8 +300,6 @@ class UsersTest extends ApiTestCase
     /** @test */
     public function itShouldRespondBadRequestOnIncompletePayloadOnCreationWithinAnOrganization(): void
     {
-        $this->markTestIncomplete();
-
         static::createClient()->request('POST', '/authentication/organizations/01966c5a-10ef-7315-94f2-cbeec2f167d8/users', [
             'json' => [
             ],
@@ -318,7 +312,7 @@ class UsersTest extends ApiTestCase
         $this->assertJsonContains([
             '@context' => '/contexts/Error',
             '@id' => '/errors/400',
-            '@type' => 'Error',
+            '@type' => 'hydra:Error',
             'title' => 'An error occurred',
         ]);
     }

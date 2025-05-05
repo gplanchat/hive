@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Authentication\Infrastructure\Organization\Command;
 
+use App\Authentication\Domain\EventBusInterface;
 use App\Authentication\Domain\FeatureRollout\FeatureRolloutId;
 use App\Authentication\Domain\NotFoundException;
 use App\Authentication\Domain\Organization\Command\DeclaredEvent;
@@ -16,14 +17,13 @@ use App\Authentication\Domain\Organization\OrganizationId;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\ParameterType;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
-use Symfony\Component\Messenger\MessageBusInterface;
 
 final class DatabaseOrganizationRepository implements OrganizationRepositoryInterface
 {
     public function __construct(
         #[Autowire('@db.connection')]
         private Connection $connection,
-        private MessageBusInterface $messageBus,
+        private EventBusInterface $eventBus,
     ) {}
 
     public function get(OrganizationId $organizationId): Organization
@@ -74,7 +74,7 @@ final class DatabaseOrganizationRepository implements OrganizationRepositoryInte
         $this->connection->commit();
 
         foreach ($events as $event) {
-            $this->messageBus->dispatch($event);
+            $this->eventBus->emit($event);
         }
     }
 

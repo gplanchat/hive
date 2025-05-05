@@ -25,8 +25,8 @@ class FeatureRolloutsTest extends ApiTestCase
         $this->assertJsonContains([
             '@context' => '/contexts/FeatureRollout',
             '@id' => '/authentication/feature-rollouts',
-            '@type' => 'Collection',
-            'totalItems' => 36,
+            '@type' => 'hydra:Collection',
+            'hydra:totalItems' => 36,
         ]);
     }
 

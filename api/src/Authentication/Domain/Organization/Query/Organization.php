@@ -12,10 +12,10 @@ use ApiPlatform\OpenApi\Model\Operation;
 use ApiPlatform\OpenApi\Model\Parameter;
 use App\Authentication\Domain\FeatureRollout\FeatureRolloutId;
 use App\Authentication\Domain\Organization\OrganizationId;
-use App\Authentication\Domain\Organization\Query\UseCases\GetOneOrganization;
-use App\Authentication\Domain\Organization\Query\UseCases\GetSeveralOrganization;
-use App\Authentication\UserInterface\Organization\GetOneOrganizationProvider;
-use App\Authentication\UserInterface\Organization\GetSeveralOrganizationProvider;
+use App\Authentication\Domain\Organization\Query\UseCases\QueryOneOrganization;
+use App\Authentication\Domain\Organization\Query\UseCases\QuerySeveralOrganization;
+use App\Authentication\UserInterface\Organization\QueryOneOrganizationProvider;
+use App\Authentication\UserInterface\Organization\QuerySeveralOrganizationProvider;
 use Symfony\Component\Routing\Requirement\Requirement;
 use Symfony\Component\Serializer\Attribute\Context;
 
@@ -29,12 +29,12 @@ use Symfony\Component\Serializer\Attribute\Context;
                 in: 'path',
                 description: 'Identifier of the Organization',
                 required: true,
-                schema: ['pattern' => Requirement::UUID_V7],
+                schema: ['pattern' => OrganizationId::REQUIREMENT],
             ),
         ],
     ),
-    input: GetOneOrganization::class,
-    provider: GetOneOrganizationProvider::class
+    input: QueryOneOrganization::class,
+    provider: QueryOneOrganizationProvider::class
 )]
 #[GetCollection(
     uriTemplate: '/authentication/organizations',
@@ -42,10 +42,12 @@ use Symfony\Component\Serializer\Attribute\Context;
     paginationItemsPerPage: 25,
     paginationMaximumItemsPerPage: 100,
     paginationPartial: true,
-    input: GetSeveralOrganization::class,
-    provider: GetSeveralOrganizationProvider::class,
+    order: ['uuid' => 'ASC'],
+    input: QuerySeveralOrganization::class,
+    provider: QuerySeveralOrganizationProvider::class,
     parameters: [
-        'page' => new QueryParameter(),
+        'page' => new QueryParameter(schema: ['type' => 'integer', 'min' => 1]),
+        'itemsPerPage' => new QueryParameter(schema: ['type' => 'integer', 'min' => 10, 'max' => 100]),
     ],
 )]
 final readonly class Organization
@@ -75,7 +77,7 @@ final readonly class Organization
         public ?\DateTimeInterface $validUntil = null,
         #[ApiProperty(
             description: 'Identifiers of the feature rollouts',
-            schema: ['type' => 'list', 'items' => ['type' => 'string', 'pattern' => Requirement::ASCII_SLUG]],
+            schema: ['type' => 'list', 'items' => ['type' => 'string', 'pattern' => FeatureRolloutId::URI_REQUIREMENT]],
         )]
         #[Context(['iri_only' => true])]
         public array $featureRolloutIds = [],

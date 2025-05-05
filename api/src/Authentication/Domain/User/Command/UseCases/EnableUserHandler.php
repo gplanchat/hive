@@ -7,7 +7,7 @@ namespace App\Authentication\Domain\User\Command\UseCases;
 use App\Authentication\Domain\User\Command\UserRepositoryInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
-#[AsMessageHandler]
+#[AsMessageHandler(bus: 'command.bus')]
 final readonly class EnableUserHandler
 {
     public function __construct(

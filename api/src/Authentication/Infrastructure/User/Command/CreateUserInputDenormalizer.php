@@ -32,6 +32,7 @@ final class CreateUserInputDenormalizer implements DenormalizerInterface, Denorm
             || !array_key_exists('firstName', $data) || !is_string($data['firstName'])
             || !array_key_exists('lastName', $data) || !is_string($data['lastName'])
             || !array_key_exists('email', $data) || !is_string($data['email'])
+            || !array_key_exists('organizationId', $data) || !is_string($data['organizationId'])
         ) {
             throw new UnexpectedValueException();
         }
@@ -40,7 +41,7 @@ final class CreateUserInputDenormalizer implements DenormalizerInterface, Denorm
             OrganizationId::fromUri($data['organizationId']),
             workspaceIds: array_map(fn (string $current) => WorkspaceId::fromUri($current), $data['workspaceIds']),
             roleIds: array_map(fn (string $current) => RoleId::fromUri($current), $data['roleIds']),
-            identifier: $data['username'],
+            username: $data['username'],
             firstName: $data['firstName'],
             lastName: $data['lastName'],
             email: $data['email'],

@@ -14,26 +14,32 @@ use App\Authentication\UserInterface\Role\CreateRoleInput;
 use App\Authentication\UserInterface\Role\CreateRoleProcessor;
 use App\Authentication\UserInterface\Role\CreateRoleWithinOrganizationInput;
 use App\Authentication\UserInterface\Role\DeleteRoleProcessor;
-use App\Authentication\UserInterface\Role\GetOneRoleProvider;
+use App\Authentication\UserInterface\Role\QueryOneRoleProvider;
 
 #[Post(
     uriTemplate: '/authentication/organizations/{organizationId}/roles',
+    uriVariables: ['organizationId'],
+    class: QueryRole::class,
     input: CreateRoleWithinOrganizationInput::class,
     output: QueryRole::class,
     processor: CreateRoleProcessor::class,
+    itemUriTemplate: '/authentication/roles/{uuid}',
 )]
 #[Post(
     uriTemplate: '/authentication/roles',
+    class: QueryRole::class,
     input: CreateRoleInput::class,
     output: QueryRole::class,
     processor: CreateRoleProcessor::class,
+    itemUriTemplate: '/authentication/roles/{uuid}',
 )]
 #[Delete(
     uriTemplate: '/authentication/roles/{uuid}',
     uriVariables: ['uuid'],
+    class: QueryRole::class,
     input: false,
     output: false,
-    provider: GetOneRoleProvider::class,
+    provider: QueryOneRoleProvider::class,
     processor: DeleteRoleProcessor::class,
 )]
 final class Role

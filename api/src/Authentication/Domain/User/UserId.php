@@ -10,7 +10,8 @@ use Symfony\Component\Routing\Requirement\Requirement;
 
 final class UserId implements IdInterface
 {
-    const string REQUIREMENT = '\/authentication\/users\/('.Requirement::UUID_V7.')';
+    const string REQUIREMENT = Requirement::UUID_V7;
+    const string URI_REQUIREMENT = '\/authentication\/users\/('.Requirement::UUID_V7.')';
     const string PARSE = '/\/authentication\/users\/(?<reference>'.Requirement::UUID.')/';
 
     private function __construct(

@@ -19,15 +19,15 @@ final readonly class CreateUserInput
      */
     public function __construct(
         #[ApiProperty(
-            description: 'Organization in which the user is assigned',
-            schema: ['type' => 'string', 'pattern' => OrganizationId::REQUIREMENT],
+            description: 'Organization in which the User is assigned',
+            schema: ['type' => 'string', 'pattern' => OrganizationId::URI_REQUIREMENT],
         )]
         #[Context(['iri_only' => true])]
         #[Assert\NotBlank()]
         public OrganizationId $organizationId,
         #[ApiProperty(
-            description: 'List of workspaces in which the user has access',
-            schema: ['type' => 'array', 'items' => ['type' => 'string', 'pattern' => WorkspaceId::REQUIREMENT]],
+            description: 'List of workspaces in which the User has access',
+            schema: ['type' => 'array', 'items' => ['type' => 'string', 'pattern' => WorkspaceId::URI_REQUIREMENT]],
         )]
         #[Context(['iri_only' => true])]
         #[Assert\All(constraints: [
@@ -36,22 +36,22 @@ final readonly class CreateUserInput
         ])]
         public array $workspaceIds = [],
         #[ApiProperty(
-            description: 'List of roles assigned to the user',
-            schema: ['type' => 'array', 'items' => ['type' => 'string', 'pattern' => RoleId::REQUIREMENT]],
+            description: 'List of roles assigned to the User',
+            schema: ['type' => 'array', 'items' => ['type' => 'string', 'pattern' => RoleId::URI_REQUIREMENT]],
         )]
         #[Context(['iri_only' => true])]
         #[Assert\All(constraints: [
             new Assert\NotBlank(),
             new Assert\Type(RoleId::class),
         ])]
-        public array $roleIds = [],
+        public array   $roleIds = [],
         #[ApiProperty(
             description: 'User\'s display name',
             schema: ['type' => 'string'],
         )]
         #[Assert\Regex('/[A-Za-z0-9]+(?:[-.][A-Za-z0-9]+)*/')]
         #[Assert\Length(min: 3, max: 255)]
-        public ?string $identifier = null,
+        public ?string $username = null,
         #[ApiProperty(
             description: 'User\'s first name',
             schema: ['type' => 'string'],

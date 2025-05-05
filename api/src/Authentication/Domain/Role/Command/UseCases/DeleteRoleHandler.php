@@ -7,7 +7,7 @@ namespace App\Authentication\Domain\Role\Command\UseCases;
 use App\Authentication\Domain\Role\Command\RoleRepositoryInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
-#[AsMessageHandler]
+#[AsMessageHandler(bus: 'command.bus')]
 final readonly class DeleteRoleHandler
 {
     public function __construct(

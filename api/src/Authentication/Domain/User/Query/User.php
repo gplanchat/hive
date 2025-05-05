@@ -12,14 +12,14 @@ use ApiPlatform\OpenApi\Model\Operation;
 use ApiPlatform\OpenApi\Model\Parameter;
 use App\Authentication\Domain\Organization\OrganizationId;
 use App\Authentication\Domain\Role\RoleId;
-use App\Authentication\Domain\User\Query\UseCases\GetOneUser;
-use App\Authentication\Domain\User\Query\UseCases\GetSeveralUser;
-use App\Authentication\Domain\User\Query\UseCases\GetSeveralUserInOrganization;
-use App\Authentication\Domain\User\Query\UseCases\GetSeveralUserInWorkspace;
+use App\Authentication\Domain\User\Query\UseCases\QueryOneUser;
+use App\Authentication\Domain\User\Query\UseCases\QuerySeveralUser;
+use App\Authentication\Domain\User\Query\UseCases\QuerySeveralUserInOrganization;
+use App\Authentication\Domain\User\Query\UseCases\QuerySeveralUserInWorkspace;
 use App\Authentication\Domain\User\UserId;
 use App\Authentication\Domain\Workspace\WorkspaceId;
-use App\Authentication\UserInterface\User\GetOneUserProvider;
-use App\Authentication\UserInterface\User\GetSeveralUserProvider;
+use App\Authentication\UserInterface\User\QueryOneUserProvider;
+use App\Authentication\UserInterface\User\QuerySeveralUserProvider;
 use Symfony\Component\Routing\Requirement\Requirement;
 use Symfony\Component\Serializer\Attribute\Context;
 
@@ -33,12 +33,12 @@ use Symfony\Component\Serializer\Attribute\Context;
                 in: 'path',
                 description: 'Identifier of the User',
                 required: true,
-                schema: ['pattern' => Requirement::UUID_V7],
+                schema: ['pattern' => UserId::REQUIREMENT],
             ),
         ],
     ),
-    input: GetOneUser::class,
-    provider: GetOneUserProvider::class
+    input: QueryOneUser::class,
+    provider: QueryOneUserProvider::class
 )]
 #[GetCollection(
     uriTemplate: '/authentication/users',
@@ -47,10 +47,12 @@ use Symfony\Component\Serializer\Attribute\Context;
     paginationItemsPerPage: 25,
     paginationMaximumItemsPerPage: 100,
     paginationPartial: true,
-    input: GetSeveralUser::class,
-    provider: GetSeveralUserProvider::class,
+    order: ['uuid' => 'ASC'],
+    input: QuerySeveralUser::class,
+    provider: QuerySeveralUserProvider::class,
     parameters: [
-        'page' => new QueryParameter(),
+        'page' => new QueryParameter(schema: ['type' => 'integer', 'min' => 1]),
+        'itemsPerPage' => new QueryParameter(schema: ['type' => 'integer', 'min' => 10, 'max' => 100]),
     ],
 )]
 #[GetCollection(
@@ -66,7 +68,7 @@ use Symfony\Component\Serializer\Attribute\Context;
                 in: 'path',
                 description: 'Identifier of the Organization',
                 required: true,
-                schema: ['pattern' => Requirement::UUID_V7],
+                schema: ['pattern' => OrganizationId::REQUIREMENT],
             ),
         ],
     ),
@@ -74,10 +76,12 @@ use Symfony\Component\Serializer\Attribute\Context;
     paginationItemsPerPage: 25,
     paginationMaximumItemsPerPage: 100,
     paginationPartial: true,
-    input: GetSeveralUserInOrganization::class,
-    provider: GetSeveralUserProvider::class,
+    order: ['uuid' => 'ASC'],
+    input: QuerySeveralUserInOrganization::class,
+    provider: QuerySeveralUserProvider::class,
     parameters: [
-        'page' => new QueryParameter(),
+        'page' => new QueryParameter(schema: ['type' => 'integer', 'min' => 1]),
+        'itemsPerPage' => new QueryParameter(schema: ['type' => 'integer', 'min' => 10, 'max' => 100]),
     ],
 )]
 #[GetCollection(
@@ -93,7 +97,7 @@ use Symfony\Component\Serializer\Attribute\Context;
                 in: 'path',
                 description: 'Identifier of the Workspace',
                 required: true,
-                schema: ['pattern' => Requirement::UUID_V7],
+                schema: ['pattern' => UserId::REQUIREMENT],
             ),
         ],
     ),
@@ -101,10 +105,12 @@ use Symfony\Component\Serializer\Attribute\Context;
     paginationItemsPerPage: 25,
     paginationMaximumItemsPerPage: 100,
     paginationPartial: true,
-    input: GetSeveralUserInWorkspace::class,
-    provider: GetSeveralUserProvider::class,
+    order: ['uuid' => 'ASC'],
+    input: QuerySeveralUserInWorkspace::class,
+    provider: QuerySeveralUserProvider::class,
     parameters: [
-        'page' => new QueryParameter(),
+        'page' => new QueryParameter(schema: ['type' => 'integer', 'min' => 1]),
+        'itemsPerPage' => new QueryParameter(schema: ['type' => 'integer', 'min' => 10, 'max' => 100]),
     ],
 )]
 final class User
@@ -122,19 +128,19 @@ final class User
         public UserId $uuid,
         #[ApiProperty(
             description: 'Identifier of the Owning Organization',
-            schema: ['type' => 'string', 'pattern' => OrganizationId::REQUIREMENT],
+            schema: ['type' => 'string', 'pattern' => OrganizationId::URI_REQUIREMENT],
         )]
         #[Context(['iri_only' => true])]
         public OrganizationId $organizationId,
         #[ApiProperty(
             description: 'Identifier of the Owning Organization',
-            schema: ['type' => 'list', 'items' => ['type' => 'string', 'pattern' => WorkspaceId::REQUIREMENT]],
+            schema: ['type' => 'list', 'items' => ['type' => 'string', 'pattern' => WorkspaceId::URI_REQUIREMENT]],
         )]
         #[Context(['iri_only' => true])]
         public array $workspaceIds,
         #[ApiProperty(
             description: 'Identifiers of the assigned roles',
-            schema: ['type' => 'list', 'items' => ['type' => 'string', 'pattern' => RoleId::REQUIREMENT]],
+            schema: ['type' => 'list', 'items' => ['type' => 'string', 'pattern' => RoleId::URI_REQUIREMENT]],
         )]
         #[Context(['iri_only' => true])]
         public array $roleIds,

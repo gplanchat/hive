@@ -10,7 +10,8 @@ use Symfony\Component\Routing\Requirement\Requirement;
 
 final class OrganizationId implements IdInterface
 {
-    const string REQUIREMENT = '\/authentication\/organizations\/('.Requirement::UUID_V7.')';
+    const string REQUIREMENT = Requirement::UUID_V7;
+    const string URI_REQUIREMENT = '\/authentication\/organizations\/'.Requirement::UUID_V7;
     const string PARSE = '/\/authentication\/organizations\/(?<reference>'.Requirement::UUID.')/';
 
     private function __construct(

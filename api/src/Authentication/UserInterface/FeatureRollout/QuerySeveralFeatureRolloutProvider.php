@@ -9,40 +9,38 @@ use ApiPlatform\State\Pagination\PaginatorInterface;
 use ApiPlatform\State\Pagination\TraversablePaginator;
 use ApiPlatform\State\ProviderInterface;
 use App\Authentication\Domain\FeatureRollout\UseCases\FeatureRolloutPage;
-use Symfony\Component\HttpFoundation\Exception\BadRequestException;
-use Symfony\Component\HttpFoundation\Exception\LogicException;
-use Symfony\Component\Messenger\MessageBusInterface;
-use Symfony\Component\Messenger\Stamp\HandledStamp;
-use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
+use App\Authentication\Domain\FeatureRollout\UseCases\QuerySeveralFeatureRollout;
+use App\Authentication\Domain\NotFoundException;
+use App\Authentication\Domain\QueryBusInterface;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
-final class QuerySeveralFeatureRolloutProvider implements ProviderInterface
+final readonly class QuerySeveralFeatureRolloutProvider implements ProviderInterface
 {
     public function __construct(
-        private readonly DenormalizerInterface $denormalizer,
-        private readonly MessageBusInterface $messageBus,
+        private QueryBusInterface $queryBus,
     ) {
     }
 
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): PaginatorInterface
     {
-        $type = $operation->getInput()['class'];
-        $request = $context['request'];
-        if (!$this->denormalizer->supportsDenormalization($context, $type, $request->getRequestFormat())) {
-            throw new BadRequestException();
+        $query = new QuerySeveralFeatureRollout(
+            max((int) ($data['filters']['page'] ?? 1), 1),
+            min(max((int) ($data['filters']['itemsPerPage'] ?? $operation->getPaginationItemsPerPage() ?? 25), 10), $operation->getPaginationMaximumItemsPerPage()),
+        );
+
+        try {
+            $result = $this->queryBus->query($query);
+        } catch (NotFoundException $exception) {
+            throw new NotFoundHttpException($exception->getMessage(), previous: $exception);
         }
 
-        $input = $this->denormalizer->denormalize($context, $type, $request->getRequestFormat());
-
-        $envelope = $this->messageBus->dispatch($input);
-
-        $result = $envelope->last(HandledStamp::class)->getResult();
-
         if (!$result instanceof FeatureRolloutPage) {
-            throw new LogicException();
+            throw new BadRequestHttpException();
         }
 
         return new TraversablePaginator(
-            $result->getIterator(),
+            $result,
             $result->page,
             $result->pageSize,
             $result->totalItems,

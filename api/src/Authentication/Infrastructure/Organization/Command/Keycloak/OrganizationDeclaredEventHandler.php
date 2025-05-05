@@ -9,7 +9,7 @@ use App\Authentication\Domain\Organization\Query\OrganizationRepositoryInterface
 use App\Authentication\Infrastructure\Keycloak\KeycloakInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
-#[AsMessageHandler]
+#[AsMessageHandler(bus: 'event.bus')]
 final readonly class OrganizationDeclaredEventHandler
 {
     public function __construct(

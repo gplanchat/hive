@@ -14,7 +14,7 @@ use App\Authentication\Domain\Role\Query\Role;
 use App\Authentication\Domain\Role\RoleId;
 use App\Authentication\Domain\User\Query\User;
 use App\Authentication\Domain\User\UserId;
-use App\Authentication\Domain\Workspace\Workspace;
+use App\Authentication\Domain\Workspace\Query\Workspace;
 use App\Authentication\Domain\Workspace\WorkspaceId;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;

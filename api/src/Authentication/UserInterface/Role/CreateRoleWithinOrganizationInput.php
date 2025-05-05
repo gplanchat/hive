@@ -6,6 +6,7 @@ namespace App\Authentication\UserInterface\Role;
 
 use ApiPlatform\Metadata\ApiProperty;
 use App\Authentication\Domain\Organization\OrganizationId;
+use App\Authentication\Domain\Role\ActionInterface;
 use App\Authentication\Domain\Role\ResourceAccess;
 use App\Authentication\Domain\Role\ResourceInterface;
 use App\Authentication\Domain\Role\RoleId;
@@ -22,7 +23,7 @@ final readonly class CreateRoleWithinOrganizationInput
     public function __construct(
         #[ApiProperty(
             description: 'Organization in which the user is assigned',
-            schema: ['type' => 'string', 'pattern' => OrganizationId::REQUIREMENT],
+            schema: ['type' => 'string', 'pattern' => OrganizationId::URI_REQUIREMENT],
         )]
         #[Context(['iri_only' => true])]
         #[Assert\NotBlank()]
@@ -49,13 +50,13 @@ final readonly class CreateRoleWithinOrganizationInput
                     'properties' => [
                         'resource' => [
                             'type' => 'string',
-                            'pattern' => Requirement::ASCII_SLUG,
+                            'pattern' => ResourceInterface::REQUIREMENT,
                         ],
                         'actions' => [
                             'type' => 'array',
                             'items' => [
                                 'type' => 'string',
-                                'pattern' => Requirement::ASCII_SLUG,
+                                'pattern' => ActionInterface::REQUIREMENT,
                             ],
                         ],
                     ],

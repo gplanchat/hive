@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Authentication\Infrastructure\Organization\Command;
 
 use App\Authentication\Domain\ConflictException;
+use App\Authentication\Domain\EventBusInterface;
 use App\Authentication\Domain\NotFoundException;
 use App\Authentication\Domain\Organization\Command\DeclaredEvent;
 use App\Authentication\Domain\Organization\Command\DeletedEvent;
@@ -16,14 +17,13 @@ use App\Authentication\Domain\Organization\OrganizationId;
 use App\Authentication\Domain\Organization\Query\Organization as QueryOrganization;
 use App\Authentication\Infrastructure\Organization\DataFixtures\OrganizationFixtures;
 use App\Authentication\Infrastructure\StorageMock;
-use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Contracts\Cache\ItemInterface;
 
-final class InMemoryOrganizationRepository implements OrganizationRepositoryInterface
+final readonly class InMemoryOrganizationRepository implements OrganizationRepositoryInterface
 {
     public function __construct(
         private StorageMock $storage,
-        private MessageBusInterface $messageBus,
+        private EventBusInterface $eventBus,
     ) {
     }
 
@@ -61,7 +61,7 @@ final class InMemoryOrganizationRepository implements OrganizationRepositoryInte
         }
 
         foreach ($events as $event) {
-            $this->messageBus->dispatch($event);
+            $this->eventBus->emit($event);
         }
     }
 

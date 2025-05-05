@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Authentication\Infrastructure\User\Command;
 
+use App\Authentication\Domain\EventBusInterface;
 use App\Authentication\Domain\NotFoundException;
 use App\Authentication\Domain\Organization\OrganizationId;
 use App\Authentication\Domain\Role\RoleId;
@@ -14,19 +15,17 @@ use App\Authentication\Domain\User\Command\EnabledEvent;
 use App\Authentication\Domain\User\Command\User;
 use App\Authentication\Domain\User\Command\UserRepositoryInterface;
 use App\Authentication\Domain\User\UserId;
-use App\Authentication\Domain\Workspace\Workspace;
 use App\Authentication\Domain\Workspace\WorkspaceId;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\ParameterType;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
-use Symfony\Component\Messenger\MessageBusInterface;
 
-final class DatabaseUserRepository implements UserRepositoryInterface
+final readonly class DatabaseUserRepository implements UserRepositoryInterface
 {
     public function __construct(
         #[Autowire('@db.connection')]
         private Connection $connection,
-        private MessageBusInterface $messageBus,
+        private EventBusInterface $eventBus,
     ) {}
 
     public function get(UserId $userId): User
@@ -82,7 +81,7 @@ final class DatabaseUserRepository implements UserRepositoryInterface
         $this->connection->commit();
 
         foreach ($events as $event) {
-            $this->messageBus->dispatch($event);
+            $this->eventBus->emit($event);
         }
     }
 

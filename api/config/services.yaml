@@ -20,6 +20,8 @@ services:
             - '../src/Authentication/Domain/'
             - '../src/Authentication/Infrastructure/Organization/DataFixtures'
             - '../src/Authentication/Infrastructure/User/DataFixtures'
+            - '../src/Authentication/Infrastructure/Role/DataFixtures'
+            - '../src/Authentication/Infrastructure/Workspace/DataFixtures'
             - '../src/Kernel.php'
 
     App\Authentication\Domain\FeatureRollout\UseCases\:
@@ -43,8 +45,11 @@ services:
     App\Authentication\Domain\Role\Query\UseCases\:
         resource: '../src/Authentication/Domain/Role/Query/UseCases/*{Handler}.php'
 
-    App\Authentication\Domain\Workspace\UseCases\:
-        resource: '../src/Authentication/Domain/Workspace/UseCases/*{Handler}.php'
+    App\Authentication\Domain\Workspace\Command\UseCases\:
+        resource: '../src/Authentication/Domain/Workspace/Command/UseCases/*{Handler}.php'
+
+    App\Authentication\Domain\Workspace\Query\UseCases\:
+        resource: '../src/Authentication/Domain/Workspace/Query/UseCases/*{Handler}.php'
         
     App\Authentication\Infrastructure\Keycloak\KeycloakClientInterface: '@App\Authentication\Infrastructure\Keycloak\KeycloakClient'
 
@@ -76,11 +81,16 @@ services:
     App\Authentication\Domain\Role\Query\RoleRepositoryInterface: '@App\Authentication\Infrastructure\Role\Query\InMemoryRoleRepository'
     
     App\Authentication\Infrastructure\Role\Query\InMemoryRoleRepository:
-    
-    App\Authentication\Domain\Workspace\WorkspaceRepositoryInterface: '@App\Authentication\Infrastructure\Workspace\InMemoryWorkspaceRepository'
-    
-    App\Authentication\Infrastructure\Workspace\InMemoryWorkspaceRepository:
-        factory: [ 'App\Authentication\Infrastructure\Workspace\InMemoryWorkspaceRepository', 'buildTestRepository' ]
+
+    App\Authentication\Domain\Workspace\Command\WorkspaceRepositoryInterface: '@App\Authentication\Infrastructure\Workspace\Command\InMemoryWorkspaceRepository'
+
+    App\Authentication\Domain\Workspace\Query\WorkspaceRepositoryInterface: '@App\Authentication\Infrastructure\Workspace\Query\InMemoryWorkspaceRepository'
+
+    App\Authentication\Infrastructure\Workspace\Query\InMemoryWorkspaceRepository:
+
+    App\Authentication\Domain\QueryBusInterface: '@App\Authentication\Infrastructure\Messenger\QueryBus' 
+    App\Authentication\Domain\CommandBusInterface: '@App\Authentication\Infrastructure\Messenger\CommandBus'
+    App\Authentication\Domain\EventBusInterface: '@App\Authentication\Infrastructure\Messenger\EventBus'
 
 when@test:
     services:
@@ -101,5 +111,9 @@ when@test:
         App\Authentication\Domain\User\Query\UserRepositoryInterface: '@App\Authentication\Infrastructure\User\Query\InMemoryUserRepository'
         
         App\Authentication\Infrastructure\User\DataFixtures\UserFixtures:
+            autowire: true
+            public: true
+        
+        App\Authentication\Infrastructure\Workspace\DataFixtures\WorkspaceFixtures:
             autowire: true
             public: true

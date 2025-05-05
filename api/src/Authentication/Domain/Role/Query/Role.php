@@ -11,13 +11,13 @@ use ApiPlatform\Metadata\QueryParameter;
 use ApiPlatform\OpenApi\Model\Operation;
 use ApiPlatform\OpenApi\Model\Parameter;
 use App\Authentication\Domain\Organization\OrganizationId;
-use App\Authentication\Domain\Role\Query\UseCases\GetOneRole;
-use App\Authentication\Domain\Role\Query\UseCases\GetSeveralRole;
-use App\Authentication\Domain\Role\Query\UseCases\GetSeveralRoleInOrganization;
+use App\Authentication\Domain\Role\Query\UseCases\QueryOneRole;
+use App\Authentication\Domain\Role\Query\UseCases\QuerySeveralRole;
+use App\Authentication\Domain\Role\Query\UseCases\QuerySeveralRoleInOrganization;
 use App\Authentication\Domain\Role\ResourceAccess;
 use App\Authentication\Domain\Role\RoleId;
-use App\Authentication\UserInterface\Role\GetOneRoleProvider;
-use App\Authentication\UserInterface\Role\GetSeveralRoleProvider;
+use App\Authentication\UserInterface\Role\QueryOneRoleProvider;
+use App\Authentication\UserInterface\Role\QuerySeveralRoleProvider;
 use Symfony\Component\Routing\Requirement\Requirement;
 use Symfony\Component\Serializer\Attribute\Context;
 
@@ -31,12 +31,12 @@ use Symfony\Component\Serializer\Attribute\Context;
                 in: 'path',
                 description: 'Identifier of the Role',
                 required: true,
-                schema: ['pattern' => Requirement::UUID_V7],
+                schema: ['pattern' => RoleId::REQUIREMENT],
             ),
         ],
     ),
-    input: GetOneRole::class,
-    provider: GetOneRoleProvider::class
+    input: QueryOneRole::class,
+    provider: QueryOneRoleProvider::class
 )]
 #[GetCollection(
     uriTemplate: '/authentication/roles',
@@ -45,10 +45,11 @@ use Symfony\Component\Serializer\Attribute\Context;
     paginationItemsPerPage: 25,
     paginationMaximumItemsPerPage: 100,
     paginationPartial: true,
-    input: GetSeveralRole::class,
-    provider: GetSeveralRoleProvider::class,
+    input: QuerySeveralRole::class,
+    provider: QuerySeveralRoleProvider::class,
     parameters: [
-        'page' => new QueryParameter(),
+        'page' => new QueryParameter(schema: ['type' => 'integer', 'min' => 1]),
+        'itemsPerPage' => new QueryParameter(schema: ['type' => 'integer', 'min' => 10, 'max' => 100]),
     ],
 )]
 #[GetCollection(
@@ -72,10 +73,11 @@ use Symfony\Component\Serializer\Attribute\Context;
     paginationItemsPerPage: 25,
     paginationMaximumItemsPerPage: 100,
     paginationPartial: true,
-    input: GetSeveralRoleInOrganization::class,
-    provider: GetSeveralRoleProvider::class,
+    input: QuerySeveralRoleInOrganization::class,
+    provider: QuerySeveralRoleProvider::class,
     parameters: [
-        'page' => new QueryParameter(),
+        'page' => new QueryParameter(schema: ['type' => 'integer', 'min' => 1]),
+        'itemsPerPage' => new QueryParameter(schema: ['type' => 'integer', 'min' => 10, 'max' => 100]),
     ],
 )]
 final readonly class Role
@@ -92,7 +94,7 @@ final readonly class Role
         public RoleId $uuid,
         #[ApiProperty(
             description: 'Identifier of the Owning Organization',
-            schema: ['type' => 'string', 'pattern' => OrganizationId::REQUIREMENT],
+            schema: ['type' => 'string', 'pattern' => OrganizationId::URI_REQUIREMENT],
         )]
         #[Context(['iri_only' => true])]
         public OrganizationId $organizationId,

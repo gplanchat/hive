@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Authentication\Infrastructure\Role\Command;
 
+use App\Authentication\Domain\EventBusInterface;
 use App\Authentication\Domain\ConflictException;
 use App\Authentication\Domain\NotFoundException;
 use App\Authentication\Domain\Role\Command\DeclaredEvent;
@@ -14,14 +15,13 @@ use App\Authentication\Domain\Role\RoleId;
 use App\Authentication\Domain\Role\Query\Role as QueryRole;
 use App\Authentication\Infrastructure\Role\DataFixtures\RoleFixtures;
 use App\Authentication\Infrastructure\StorageMock;
-use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Contracts\Cache\ItemInterface;
 
 final readonly class InMemoryRoleRepository implements RoleRepositoryInterface
 {
     public function __construct(
         private StorageMock $storage,
-        private MessageBusInterface $messageBus,
+        private EventBusInterface $eventBus,
     ) {
     }
 
@@ -58,7 +58,7 @@ final readonly class InMemoryRoleRepository implements RoleRepositoryInterface
         }
 
         foreach ($events as $event) {
-            $this->messageBus->dispatch($event);
+            $this->eventBus->emit($event);
         }
     }
 

@@ -2,6 +2,29 @@ framework:
     messenger:
         # Uncomment this (and the failed transport below) to send failed messages to this transport for later handling.
         # failure_transport: failed
+        default_bus:
+            message.bus
+        buses:
+            message.bus:
+                middleware:
+                    - validation
+            command.bus:
+                middleware:
+                    - validation
+            query.bus:
+                middleware:
+                    - validation
+            event.bus:
+                default_middleware:
+                    enabled: true
+                    # set "allow_no_handlers" to true (default is false) to allow having
+                    # no handler configured for this bus without throwing an exception
+                    allow_no_handlers: true
+                    # set "allow_no_senders" to false (default is true) to throw an exception
+                    # if no sender is configured for this bus
+                    allow_no_senders: true
+                middleware:
+                    - validation
 
         transports:
             # https://symfony.com/doc/current/messenger.html#transport-configuration
@@ -11,16 +34,16 @@ framework:
 
         routing:
             # Route your messages to the transports
-             'App\Authentication\Domain\FeatureRollout\UseCases\*': sync
-             'App\Authentication\Domain\Organization\UseCases\*': sync
-             'App\Authentication\Domain\User\UseCases\*': sync
+             'App\Authentication\Domain\FeatureRollout\Query\UseCases\*': sync
+             'App\Authentication\Domain\Organization\Query\UseCases\*': sync
+             'App\Authentication\Domain\User\Query\UseCases\*': sync
              'App\Authentication\Domain\Role\Query\UseCases\*': sync
-             'App\Authentication\Domain\Workspace\UseCases\*': sync
+             'App\Authentication\Domain\Workspace\Query\UseCases\*': sync
 
-# when@test:
-#    framework:
-#        messenger:
-#            transports:
-#                # replace with your transport name here (e.g., my_transport: 'in-memory://')
-#                # For more Messenger testing tools, see https://github.com/zenstruck/messenger-test
-#                async: 'in-memory://'
+when@test:
+    framework:
+        messenger:
+            transports:
+                # replace with your transport name here (e.g., my_transport: 'in-memory://')
+                # For more Messenger testing tools, see https://github.com/zenstruck/messenger-test
+                async: 'in-memory://'

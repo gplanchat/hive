@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Authentication\Infrastructure\User\Command;
 
+use App\Authentication\Domain\EventBusInterface;
 use App\Authentication\Domain\ConflictException;
 use App\Authentication\Domain\NotFoundException;
 use App\Authentication\Domain\User\Command\DeclaredEvent;
@@ -16,14 +17,13 @@ use App\Authentication\Domain\User\UserId;
 use App\Authentication\Domain\User\Query\User as QueryUser;
 use App\Authentication\Infrastructure\User\DataFixtures\UserFixtures;
 use App\Authentication\Infrastructure\StorageMock;
-use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Contracts\Cache\ItemInterface;
 
 final readonly class InMemoryUserRepository implements UserRepositoryInterface
 {
     public function __construct(
         private StorageMock $storage,
-        private MessageBusInterface $messageBus,
+        private EventBusInterface $eventBus,
     ) {
     }
 
@@ -64,7 +64,7 @@ final readonly class InMemoryUserRepository implements UserRepositoryInterface
         }
 
         foreach ($events as $event) {
-            $this->messageBus->dispatch($event);
+            $this->eventBus->emit($event);
         }
     }
 

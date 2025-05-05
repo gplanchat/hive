@@ -10,7 +10,8 @@ use Symfony\Component\Routing\Requirement\Requirement;
 
 final class WorkspaceId implements IdInterface
 {
-    const string REQUIREMENT = '\/authentication\/workspaces\/('.Requirement::UUID_V7.')';
+    const string REQUIREMENT = Requirement::UUID_V7;
+    const string URI_REQUIREMENT = '\/authentication\/workspaces\/('.Requirement::UUID_V7.')';
     const string PARSE = '/\/authentication\/workspaces\/(?<reference>'.Requirement::UUID.')/';
 
     private function __construct(

@@ -21,42 +21,50 @@ use App\Authentication\UserInterface\User\DisableUserInput;
 use App\Authentication\UserInterface\User\DisableUserProcessor;
 use App\Authentication\UserInterface\User\EnableUserInput;
 use App\Authentication\UserInterface\User\EnableUserProcessor;
-use App\Authentication\UserInterface\User\GetOneUserProvider;
+use App\Authentication\UserInterface\User\QueryOneUserProvider;
 
 #[Post(
     uriTemplate: '/authentication/organizations/{organizationId}/users',
+    uriVariables: ['organizationId'],
+    class: QueryUser::class,
     input: CreateUserWithinOrganizationInput::class,
     output: QueryUser::class,
     processor: CreateUserProcessor::class,
+    itemUriTemplate: '/authentication/users/{uuid}',
 )]
 #[Post(
     uriTemplate: '/authentication/users',
+    class: QueryUser::class,
     input: CreateUserInput::class,
     output: QueryUser::class,
     processor: CreateUserProcessor::class,
+    itemUriTemplate: '/authentication/users/{uuid}',
 )]
 #[Patch(
     uriTemplate: '/authentication/users/{uuid}/enable',
     uriVariables: ['uuid'],
+    class: QueryUser::class,
     input: EnableUserInput::class,
     output: QueryUser::class,
-    provider: GetOneUserProvider::class,
+    provider: QueryOneUserProvider::class,
     processor: EnableUserProcessor::class,
 )]
 #[Patch(
     uriTemplate: '/authentication/users/{uuid}/disable',
     uriVariables: ['uuid'],
+    class: QueryUser::class,
     input: DisableUserInput::class,
     output: QueryUser::class,
-    provider: GetOneUserProvider::class,
+    provider: QueryOneUserProvider::class,
     processor: DisableUserProcessor::class,
 )]
 #[Delete(
     uriTemplate: '/authentication/users/{uuid}',
     uriVariables: ['uuid'],
+    class: QueryUser::class,
     input: false,
     output: false,
-    provider: GetOneUserProvider::class,
+    provider: QueryOneUserProvider::class,
     processor: DeleteUserProcessor::class,
 )]
 final class User

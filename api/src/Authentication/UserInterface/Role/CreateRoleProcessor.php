@@ -6,6 +6,7 @@ namespace App\Authentication\UserInterface\Role;
 
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
+use App\Authentication\Domain\CommandBusInterface;
 use App\Authentication\Domain\Organization\OrganizationId;
 use App\Authentication\Domain\Role\Command\UseCases\CreateEnabledRole;
 use App\Authentication\Domain\Role\Command\UseCases\CreatePendingRole;
@@ -13,17 +14,14 @@ use App\Authentication\Domain\Role\Command\UseCases\CreateRole;
 use App\Authentication\Domain\Role\Query\Role;
 use App\Authentication\Domain\Role\Query\RoleRepositoryInterface;
 use App\Authentication\Domain\Role\RoleId;
-use App\Authentication\UserInterface\Role\CreateRoleInput;
-use App\Authentication\UserInterface\Role\CreateRoleWithinOrganizationInput;
 use Symfony\Component\HttpFoundation\Exception\LogicException;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Symfony\Component\Messenger\MessageBusInterface;
 
 final readonly class CreateRoleProcessor implements ProcessorInterface
 {
     public function __construct(
-        private MessageBusInterface $messageBus,
+        private CommandBusInterface $commandBus,
         private RoleRepositoryInterface $userRepository,
     ) {
     }
@@ -59,7 +57,7 @@ final readonly class CreateRoleProcessor implements ProcessorInterface
                 throw new BadRequestHttpException();
             }
 
-            $this->messageBus->dispatch($command);
+            $this->commandBus->apply($command);
         } catch (NotFoundHttpException $exception) {
             throw new LogicException($exception->getMessage(), previous: $exception);
         }

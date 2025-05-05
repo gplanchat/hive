@@ -10,7 +10,7 @@ use App\Authentication\Domain\User\Query\UserRepositoryInterface;
 use App\Authentication\Infrastructure\Keycloak\KeycloakInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
-#[AsMessageHandler]
+#[AsMessageHandler(bus: 'event.bus')]
 final readonly class UserCreatedEventHandler
 {
     public function __construct(

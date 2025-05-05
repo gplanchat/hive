@@ -62,8 +62,8 @@ class RolesTest extends ApiTestCase
         $this->assertJsonContains([
             '@context' => '/contexts/Role',
             '@id' => '/authentication/roles',
-            '@type' => 'Collection',
-            'totalItems' => 6,
+            '@type' => 'hydra:Collection',
+            'hydra:totalItems' => 6,
         ]);
     }
 
@@ -123,7 +123,7 @@ class RolesTest extends ApiTestCase
         $this->assertJsonContains([
             '@context' => '/contexts/Error',
             '@id' => '/errors/400',
-            '@type' => 'Error',
+            '@type' => 'hydra:Error',
             'title' => 'An error occurred',
         ]);
     }

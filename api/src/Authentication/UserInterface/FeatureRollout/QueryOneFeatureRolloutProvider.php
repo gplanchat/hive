@@ -7,17 +7,16 @@ namespace App\Authentication\UserInterface\FeatureRollout;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
 use App\Authentication\Domain\FeatureRollout\FeatureRollout;
+use App\Authentication\Domain\QueryBusInterface;
 use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 use Symfony\Component\HttpFoundation\Exception\LogicException;
-use Symfony\Component\Messenger\MessageBusInterface;
-use Symfony\Component\Messenger\Stamp\HandledStamp;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 final class QueryOneFeatureRolloutProvider implements ProviderInterface
 {
     public function __construct(
         private readonly DenormalizerInterface $denormalizer,
-        private readonly MessageBusInterface $messageBus,
+        private readonly QueryBusInterface $queryBus,
     ) {
     }
 
@@ -31,9 +30,7 @@ final class QueryOneFeatureRolloutProvider implements ProviderInterface
 
         $input = $this->denormalizer->denormalize($context, $type, $request->getRequestFormat());
 
-        $envelope = $this->messageBus->dispatch($input);
-
-        $result = $envelope->last(HandledStamp::class)->getResult();
+        $result = $this->queryBus->query($input);
 
         if (!$result instanceof FeatureRollout) {
             throw new LogicException();
