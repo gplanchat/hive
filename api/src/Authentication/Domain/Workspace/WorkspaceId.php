@@ -6,13 +6,14 @@ namespace App\Authentication\Domain\Workspace;
 
 use App\Authentication\Domain\IdInterface;
 use App\Authentication\Domain\InvalidUuidFormatException;
+use App\Authentication\Domain\Realm\RealmId;
 use Symfony\Component\Routing\Requirement\Requirement;
 
 final class WorkspaceId implements IdInterface
 {
     const string REQUIREMENT = Requirement::UUID_V7;
-    const string URI_REQUIREMENT = '\/authentication\/workspaces\/('.Requirement::UUID_V7.')';
-    const string PARSE = '/\/authentication\/workspaces\/(?<reference>'.Requirement::UUID.')/';
+    const string URI_REQUIREMENT = '\/authentication\/'.RealmId::REQUIREMENT.'\/workspaces\/('.Requirement::UUID_V7.')';
+    const string PARSE = '/\/authentication\/'.RealmId::REQUIREMENT.'\/workspaces\/(?<reference>'.Requirement::UUID.')/';
 
     private function __construct(
         private readonly string $reference,

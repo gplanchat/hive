@@ -4,69 +4,13 @@ declare(strict_types=1);
 
 namespace App\Authentication\Domain\User\Command;
 
-use ApiPlatform\Metadata\Delete;
-use ApiPlatform\Metadata\Patch;
-use ApiPlatform\Metadata\Post;
 use App\Authentication\Domain\FeatureRollout\FeatureRolloutId;
 use App\Authentication\Domain\Organization\OrganizationId;
+use App\Authentication\Domain\Realm\RealmId;
 use App\Authentication\Domain\Role\RoleId;
-use App\Authentication\Domain\User\Query\User as QueryUser;
 use App\Authentication\Domain\User\UserId;
 use App\Authentication\Domain\Workspace\WorkspaceId;
-use App\Authentication\UserInterface\User\CreateUserWithinOrganizationInput;
-use App\Authentication\UserInterface\User\CreateUserInput;
-use App\Authentication\UserInterface\User\CreateUserProcessor;
-use App\Authentication\UserInterface\User\DeleteUserProcessor;
-use App\Authentication\UserInterface\User\DisableUserInput;
-use App\Authentication\UserInterface\User\DisableUserProcessor;
-use App\Authentication\UserInterface\User\EnableUserInput;
-use App\Authentication\UserInterface\User\EnableUserProcessor;
-use App\Authentication\UserInterface\User\QueryOneUserProvider;
 
-#[Post(
-    uriTemplate: '/authentication/organizations/{organizationId}/users',
-    uriVariables: ['organizationId'],
-    class: QueryUser::class,
-    input: CreateUserWithinOrganizationInput::class,
-    output: QueryUser::class,
-    processor: CreateUserProcessor::class,
-    itemUriTemplate: '/authentication/users/{uuid}',
-)]
-#[Post(
-    uriTemplate: '/authentication/users',
-    class: QueryUser::class,
-    input: CreateUserInput::class,
-    output: QueryUser::class,
-    processor: CreateUserProcessor::class,
-    itemUriTemplate: '/authentication/users/{uuid}',
-)]
-#[Patch(
-    uriTemplate: '/authentication/users/{uuid}/enable',
-    uriVariables: ['uuid'],
-    class: QueryUser::class,
-    input: EnableUserInput::class,
-    output: QueryUser::class,
-    provider: QueryOneUserProvider::class,
-    processor: EnableUserProcessor::class,
-)]
-#[Patch(
-    uriTemplate: '/authentication/users/{uuid}/disable',
-    uriVariables: ['uuid'],
-    class: QueryUser::class,
-    input: DisableUserInput::class,
-    output: QueryUser::class,
-    provider: QueryOneUserProvider::class,
-    processor: DisableUserProcessor::class,
-)]
-#[Delete(
-    uriTemplate: '/authentication/users/{uuid}',
-    uriVariables: ['uuid'],
-    class: QueryUser::class,
-    input: false,
-    output: false,
-    provider: QueryOneUserProvider::class,
-    processor: DeleteUserProcessor::class,
-)]
 final class User
 {
     /**
@@ -76,7 +20,8 @@ final class User
      */
     public function __construct(
         public readonly UserId $uuid,
-        private readonly OrganizationId $organizationId,
+        public readonly RealmId $realmId,
+        public readonly OrganizationId $organizationId,
         private array $workspaceIds = [],
         private array $roleIds = [],
         private ?string $username = null,
@@ -118,6 +63,7 @@ final class User
      */
     public static function declareEnabled(
         UserId $uuid,
+        RealmId $realmId,
         OrganizationId $organizationId,
         array $workspaceIds,
         array $roleIds,
@@ -130,6 +76,7 @@ final class User
         $instance->recordThat(new DeclaredEvent(
             $uuid,
             1,
+            $realmId,
             $organizationId,
             $workspaceIds,
             $roleIds,
@@ -148,6 +95,7 @@ final class User
      */
     public static function declareDisabled(
         UserId $uuid,
+        RealmId $realmId,
         OrganizationId $organizationId,
         array $workspaceIds,
         array $roleIds,
@@ -160,6 +108,7 @@ final class User
         $instance->recordThat(new DeclaredEvent(
             $uuid,
             1,
+            $realmId,
             $organizationId,
             $workspaceIds,
             $roleIds,

@@ -19,12 +19,12 @@ class FeatureRolloutsTest extends ApiTestCase
     /** @test */
     public function itShouldListFeatureRollouts(): void
     {
-        static::createClient()->request('GET', '/authentication/feature-rollouts');
+        static::createClient()->request('GET', '/feature-rollouts');
 
         $this->assertResponseStatusCodeSame(200);
         $this->assertJsonContains([
             '@context' => '/contexts/FeatureRollout',
-            '@id' => '/authentication/feature-rollouts',
+            '@id' => '/feature-rollouts',
             '@type' => 'hydra:Collection',
             'hydra:totalItems' => 36,
         ]);
@@ -33,13 +33,13 @@ class FeatureRolloutsTest extends ApiTestCase
     /** @test */
     public function itShouldShowAFeatureRollout(): void
     {
-        static::createClient()->request('GET', '/authentication/feature-rollouts/subscription.enterprise');
+        static::createClient()->request('GET', '/feature-rollouts/subscription.enterprise');
 
         $this->assertResponseStatusCodeSame(200);
         $this->assertJsonContains([
             '@context' => '/contexts/FeatureRollout',
             '@type' => 'FeatureRollout',
-            '@id' => '/authentication/feature-rollouts/subscription.enterprise',
+            '@id' => '/feature-rollouts/subscription.enterprise',
             'code' => 'subscription.enterprise',
         ]);
     }

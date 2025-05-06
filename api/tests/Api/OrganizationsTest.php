@@ -45,12 +45,12 @@ class OrganizationsTest extends ApiTestCase
     {
         $this->organizationFixtures->load();
 
-        static::createClient()->request('GET', '/authentication/organizations');
+        static::createClient()->request('GET', '/authentication/acme-inc/organizations');
 
         $this->assertResponseStatusCodeSame(200);
         $this->assertJsonContains([
             '@context' => '/contexts/Organization',
-            '@id' => '/authentication/organizations',
+            '@id' => '/authentication/acme-inc/organizations',
             '@type' => 'hydra:Collection',
             'hydra:totalItems' => 3,
         ]);
@@ -59,24 +59,24 @@ class OrganizationsTest extends ApiTestCase
     /** @test */
     public function itShouldShowAnOrganization(): void
     {
-        static::createClient()->request('GET', '/authentication/organizations/01966c5a-10ef-7315-94f2-cbeec2f167d8');
+        static::createClient()->request('GET', '/authentication/acme-inc/organizations/01966c5a-10ef-7315-94f2-cbeec2f167d8');
 
         $this->assertResponseStatusCodeSame(200);
         $this->assertJsonContains([
             '@context' => '/contexts/Organization',
             '@type' => 'Organization',
-            '@id' => '/authentication/organizations/01966c5a-10ef-7315-94f2-cbeec2f167d8',
+            '@id' => '/authentication/acme-inc/organizations/01966c5a-10ef-7315-94f2-cbeec2f167d8',
             'uuid' => '01966c5a-10ef-7315-94f2-cbeec2f167d8',
             'name' => 'Gyroscops',
             'slug' => 'gyroscops',
             'enabled' => true,
             'validUntil' => $this->clock->now()->add(new \DateInterval('P3M2D'))->format('Y-m-d'),
             'featureRolloutIds' => [
-                '/authentication/feature-rollouts/role.principal-administrator',
-                '/authentication/feature-rollouts/subscription.enterprise',
-                '/authentication/feature-rollouts/demo.lorem-ipsum',
-                '/authentication/feature-rollouts/demo.dolor-sit-amet',
-                '/authentication/feature-rollouts/demo.consecutir-sid',
+                '/feature-rollouts/role.principal-administrator',
+                '/feature-rollouts/subscription.enterprise',
+                '/feature-rollouts/demo.lorem-ipsum',
+                '/feature-rollouts/demo.dolor-sit-amet',
+                '/feature-rollouts/demo.consecutir-sid',
             ],
         ]);
     }
@@ -86,14 +86,14 @@ class OrganizationsTest extends ApiTestCase
     {
         $validUntil = $this->clock->now()->add(new \DateInterval('P4M12D'));
 
-        static::createClient()->request('POST', '/authentication/organizations', [
+        static::createClient()->request('POST', '/authentication/acme-inc/organizations', [
             'json' => [
                 'name' => 'Wile E. Coyote Ltd.',
                 'slug' => 'wile-e-coyote-ltd',
                 'enabled' => true,
                 'featureRolloutIds' => [
-                    '/authentication/feature-rollouts/subscription.enterprise',
-                    '/authentication/feature-rollouts/demo.lorem-ipsum',
+                    '/feature-rollouts/subscription.enterprise',
+                    '/feature-rollouts/demo.lorem-ipsum',
                 ],
                 'validUntil' => $validUntil->format('Y-m-d'),
             ],
@@ -110,8 +110,8 @@ class OrganizationsTest extends ApiTestCase
             'slug' => 'wile-e-coyote-ltd',
             'enabled' => true,
             'featureRolloutIds' => [
-                '/authentication/feature-rollouts/subscription.enterprise',
-                '/authentication/feature-rollouts/demo.lorem-ipsum',
+                '/feature-rollouts/subscription.enterprise',
+                '/feature-rollouts/demo.lorem-ipsum',
             ],
             'validUntil' => $validUntil->format('Y-m-d'),
         ]);
@@ -120,14 +120,14 @@ class OrganizationsTest extends ApiTestCase
     /** @test */
     public function itShouldCreateAPendingOrganization(): void
     {
-        static::createClient()->request('POST', '/authentication/organizations', [
+        static::createClient()->request('POST', '/authentication/acme-inc/organizations', [
             'json' => [
                 'name' => 'Acme Inc.',
                 'slug' => 'acme-inc',
                 'enabled' => false,
                 'featureRolloutIds' => [
-                    '/authentication/feature-rollouts/subscription.enterprise',
-                    '/authentication/feature-rollouts/demo.lorem-ipsum',
+                    '/feature-rollouts/subscription.enterprise',
+                    '/feature-rollouts/demo.lorem-ipsum',
                 ],
             ],
             'headers' => [
@@ -143,8 +143,8 @@ class OrganizationsTest extends ApiTestCase
             'slug' => 'acme-inc',
             'enabled' => false,
             'featureRolloutIds' => [
-                '/authentication/feature-rollouts/subscription.enterprise',
-                '/authentication/feature-rollouts/demo.lorem-ipsum',
+                '/feature-rollouts/subscription.enterprise',
+                '/feature-rollouts/demo.lorem-ipsum',
             ],
         ]);
     }
@@ -154,11 +154,11 @@ class OrganizationsTest extends ApiTestCase
     {
         $validUntil = $this->clock->now()->add(new \DateInterval('P4M12D'));
 
-        static::createClient()->request('POST', '/authentication/organizations', [
+        static::createClient()->request('POST', '/authentication/acme-inc/organizations', [
             'json' => [
                 'featureRolloutIds' => [
-                    '/authentication/feature-rollouts/subscription.enterprise',
-                    '/authentication/feature-rollouts/demo.lorem-ipsum',
+                    '/feature-rollouts/subscription.enterprise',
+                    '/feature-rollouts/demo.lorem-ipsum',
                 ],
                 'validUntil' => $validUntil->format('Y-m-d'),
             ],
@@ -181,7 +181,7 @@ class OrganizationsTest extends ApiTestCase
     {
         $validUntil = $this->clock->now()->add(new \DateInterval('P4M12D'));
 
-        static::createClient()->request('PATCH', '/authentication/organizations/01966c5a-10ef-76f6-9513-e3b858c22f0a/enable', [
+        static::createClient()->request('PATCH', '/authentication/acme-inc/organizations/01966c5a-10ef-76f6-9513-e3b858c22f0a/enable', [
             'json' => [
                 'enabled' => true,
                 'validUntil' => $validUntil->format('Y-m-d'),
@@ -200,9 +200,9 @@ class OrganizationsTest extends ApiTestCase
             'enabled' => true,
             'validUntil' => $validUntil->format('Y-m-d'),
             'featureRolloutIds' => [
-                '/authentication/feature-rollouts/subscription.enterprise',
-                '/authentication/feature-rollouts/demo.lorem-ipsum',
-                '/authentication/feature-rollouts/demo.dolor-sit-amet',
+                '/feature-rollouts/subscription.enterprise',
+                '/feature-rollouts/demo.lorem-ipsum',
+                '/feature-rollouts/demo.dolor-sit-amet',
             ],
         ]);
     }
@@ -212,7 +212,7 @@ class OrganizationsTest extends ApiTestCase
     {
         $validUntil = $this->clock->now()->add(new \DateInterval('P4M12D'));
 
-        static::createClient()->request('PATCH', '/authentication/organizations/01966c5a-10ef-77a1-b158-d4356966e1ab/disable', [
+        static::createClient()->request('PATCH', '/authentication/acme-inc/organizations/01966c5a-10ef-77a1-b158-d4356966e1ab/disable', [
             'json' => [
                 'enabled' => false,
                 'validUntil' => null,
@@ -231,9 +231,9 @@ class OrganizationsTest extends ApiTestCase
             'enabled' => false,
             'validUntil' => null,
             'featureRolloutIds' => [
-                '/authentication/feature-rollouts/subscription.enterprise',
-                '/authentication/feature-rollouts/demo.lorem-ipsum',
-                '/authentication/feature-rollouts/demo.dolor-sit-amet',
+                '/feature-rollouts/subscription.enterprise',
+                '/feature-rollouts/demo.lorem-ipsum',
+                '/feature-rollouts/demo.dolor-sit-amet',
             ],
         ]);
     }
@@ -241,7 +241,7 @@ class OrganizationsTest extends ApiTestCase
     /** @test */
     public function itShouldDeleteAnOrganization(): void
     {
-        static::createClient()->request('DELETE', '/authentication/organizations/01966c5a-10ef-77a1-b158-d4356966e1ab', [
+        static::createClient()->request('DELETE', '/authentication/acme-inc/organizations/01966c5a-10ef-77a1-b158-d4356966e1ab', [
             'headers' => [
                 'Content-Type' => 'application/merge-patch+json',
             ],

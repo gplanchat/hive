@@ -38,6 +38,9 @@ services:
 
     App\Authentication\Domain\User\Query\UseCases\:
         resource: '../src/Authentication/Domain/User/Query/UseCases/*{Handler}.php'
+
+    App\Authentication\Domain\Realm\Query\UseCases\:
+        resource: '../src/Authentication/Domain/Realm/Query/UseCases/*{Handler}.php'
         
     App\Authentication\Domain\Role\Command\UseCases\:
         resource: '../src/Authentication/Domain/Role/Command/UseCases/*{Handler}.php'
@@ -51,6 +54,18 @@ services:
     App\Authentication\Domain\Workspace\Query\UseCases\:
         resource: '../src/Authentication/Domain/Workspace/Query/UseCases/*{Handler}.php'
         
+    App\Authentication\Infrastructure\Keycloak\Keycloak:
+        factory: [ 'App\Authentication\Infrastructure\Keycloak\Keycloak', 'createFromUri' ]
+        arguments:
+            $baseUri: 'http://keycloak:7080'
+            $allowedRealmIds: ['master', 'acme-inc']
+    
+    App\Shared\Infrastructure\ApiPlatform\DomainResourceNameCollectionFactory:
+        decorates: api_platform.metadata.resource.name_collection_factory.attributes
+        arguments:
+            - '%api_platform.resource_class_directories%'
+            - '@.inner'
+    
     App\Authentication\Infrastructure\Keycloak\KeycloakClientInterface: '@App\Authentication\Infrastructure\Keycloak\KeycloakClient'
 
     App\Authentication\Infrastructure\Keycloak\KeycloakInterface: '@App\Authentication\Infrastructure\Keycloak\Keycloak'
@@ -75,6 +90,10 @@ services:
     App\Authentication\Domain\User\Query\UserRepositoryInterface: '@App\Authentication\Infrastructure\User\Query\DatabaseUserRepository'
     
     App\Authentication\Infrastructure\User\Query\DatabaseUserRepository:
+
+    App\Authentication\Domain\Realm\Query\RealmRepositoryInterface: '@App\Authentication\Infrastructure\Realm\Query\InMemoryRealmRepository'
+    
+    App\Authentication\Infrastructure\Realm\Query\InMemoryRealmRepository:
 
     App\Authentication\Domain\Role\Command\RoleRepositoryInterface: '@App\Authentication\Infrastructure\Role\Command\InMemoryRoleRepository'
 

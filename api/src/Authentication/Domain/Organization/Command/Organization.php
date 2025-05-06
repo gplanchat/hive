@@ -4,56 +4,11 @@ declare(strict_types=1);
 
 namespace App\Authentication\Domain\Organization\Command;
 
-use ApiPlatform\Metadata\Delete;
-use ApiPlatform\Metadata\Patch;
-use ApiPlatform\Metadata\Post;
 use App\Authentication\Domain\FeatureRollout\FeatureRolloutId;
 use App\Authentication\Domain\Organization\OrganizationId;
-use App\Authentication\Domain\Organization\Query\Organization as QueryOrganization;
-use App\Authentication\UserInterface\Organization\CreateOrganizationInput;
-use App\Authentication\UserInterface\Organization\CreateOrganizationProcessor;
-use App\Authentication\UserInterface\Organization\DeleteOrganizationProcessor;
-use App\Authentication\UserInterface\Organization\DisableOrganizationInput;
-use App\Authentication\UserInterface\Organization\DisableOrganizationProcessor;
-use App\Authentication\UserInterface\Organization\EnableOrganizationInput;
-use App\Authentication\UserInterface\Organization\EnableOrganizationProcessor;
-use App\Authentication\UserInterface\Organization\QueryOneOrganizationProvider;
+use App\Authentication\Domain\Realm\RealmId;
+use Webmozart\Assert\Assert;
 
-#[Post(
-    uriTemplate: '/authentication/organizations',
-    class: QueryOrganization::class,
-    input: CreateOrganizationInput::class,
-    output: QueryOrganization::class,
-    processor: CreateOrganizationProcessor::class,
-    itemUriTemplate: '/authentication/organizations/{uuid}',
-)]
-#[Patch(
-    uriTemplate: '/authentication/organizations/{uuid}/enable',
-    uriVariables: ['uuid'],
-    class: QueryOrganization::class,
-    input: EnableOrganizationInput::class,
-    output: QueryOrganization::class,
-    provider: QueryOneOrganizationProvider::class,
-    processor: EnableOrganizationProcessor::class,
-)]
-#[Patch(
-    uriTemplate: '/authentication/organizations/{uuid}/disable',
-    uriVariables: ['uuid'],
-    class: QueryOrganization::class,
-    input: DisableOrganizationInput::class,
-    output: QueryOrganization::class,
-    provider: QueryOneOrganizationProvider::class,
-    processor: DisableOrganizationProcessor::class,
-)]
-#[Delete(
-    uriTemplate: '/authentication/organizations/{uuid}',
-    uriVariables: ['uuid'],
-    class: QueryOrganization::class,
-    input: false,
-    output: false,
-    provider: QueryOneOrganizationProvider::class,
-    processor: DeleteOrganizationProcessor::class,
-)]
 final class Organization
 {
     /**
@@ -62,6 +17,7 @@ final class Organization
      */
     public function __construct(
         public readonly OrganizationId $uuid,
+        public readonly RealmId $realmId,
         private ?string $name = null,
         private ?string $slug = null,
         private ?\DateTimeInterface $validUntil = null,
@@ -100,15 +56,20 @@ final class Organization
      */
     public static function declareEnabled(
         OrganizationId $uuid,
+        RealmId $realmId,
         string $name,
         string $slug,
         \DateTimeInterface $validUntil,
         array $featureRolloutIds = [],
     ): self {
-        $instance = new self($uuid);
+        Assert::lengthBetween($name, 3, 255);
+        Assert::lengthBetween($slug, 3, 255);
+
+        $instance = new self($uuid, $realmId);
         $instance->recordThat(new DeclaredEvent(
             $uuid,
             1,
+            $realmId,
             $name,
             $slug,
             $validUntil,
@@ -124,14 +85,16 @@ final class Organization
      */
     public static function declareDisabled(
         OrganizationId $uuid,
+        RealmId $realmId,
         string $name,
         string $slug,
         array $featureRolloutIds = [],
     ): self {
-        $instance = new self($uuid);
+        $instance = new self($uuid, $realmId);
         $instance->recordThat(new DeclaredEvent(
             $uuid,
             1,
+            $realmId,
             $name,
             $slug,
             null,
@@ -191,7 +154,7 @@ final class Organization
             throw new InvalidOrganizationStateException('Cannot delete an already deleted Organization.');
         }
 
-        $this->recordThat(new DeletedEvent($this->uuid, $this->version + 1));
+        $this->recordThat(new DeletedEvent($this->uuid, $this->version + 1, $this->realmId));
     }
 
     private function applyDeletedEvent(DeletedEvent $event): void

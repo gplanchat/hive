@@ -41,6 +41,7 @@ final readonly class InMemoryRoleRepository implements RoleRepositoryInterface
         return new Role(
             uuid: $value->uuid,
             organizationId: $value->organizationId,
+            realmId: $value->realmId,
             identifier: $value->identifier,
             label: $value->label,
             resourceAccesses: $value->resourceAccesses,
@@ -82,6 +83,7 @@ final readonly class InMemoryRoleRepository implements RoleRepositoryInterface
             return new QueryRole(
                 uuid: $event->uuid,
                 organizationId: $event->organizationId,
+                realmId: $event->realmId,
                 identifier: $event->identifier,
                 label: $event->label,
                 resourceAccesses: $event->resourceAccesses,

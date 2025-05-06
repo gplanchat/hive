@@ -4,18 +4,42 @@ api_platform:
     # Mercure integration, remove if unwanted
     mercure:
         include_type: true
-    # Good defaults for REST APIs
+
+    path_segment_name_generator: api_platform.path_segment_name_generator.dash
+
+    validator:
+        query_parameter_validation: true
+
+    enable_profiler: true
+
+    serializer:
+        hydra_prefix: true
+        
+# Good defaults for REST APIs
     defaults:
         stateless: true
         cache_headers:
             vary: ['Content-Type', 'Authorization', 'Origin']
-        serializer:
-            hydra_prefix: true
-            
+    
     mapping:
-        paths: 
+        paths:
             - '%kernel.project_dir%/src/Authentication/Domain/FeatureRollout'
             - '%kernel.project_dir%/src/Authentication/Domain/Organization'
             - '%kernel.project_dir%/src/Authentication/Domain/User'
+            - '%kernel.project_dir%/src/Authentication/Domain/Realm'
             - '%kernel.project_dir%/src/Authentication/Domain/Role'
             - '%kernel.project_dir%/src/Authentication/Domain/Workspace'
+    
+    doctrine:
+        enabled: false
+
+    doctrine_mongodb_odm:
+        enabled: false
+        
+    graphql:
+        introspection:
+            enabled: true
+    
+    swagger:
+        swagger_ui_extra_configuration:
+            filter: true

@@ -56,12 +56,12 @@ class UsersTest extends ApiTestCase
     {
         $this->userFixtures->load();
 
-        static::createClient()->request('GET', '/authentication/users');
+        static::createClient()->request('GET', '/authentication/acme-inc/users');
 
         $this->assertResponseStatusCodeSame(200);
         $this->assertJsonContains([
             '@context' => '/contexts/User',
-            '@id' => '/authentication/users',
+            '@id' => '/authentication/acme-inc/users',
             '@type' => 'hydra:Collection',
             'hydra:totalItems' => 6,
         ]);
@@ -70,22 +70,22 @@ class UsersTest extends ApiTestCase
     /** @test */
     public function itShouldShowAnUser(): void
     {
-        static::createClient()->request('GET', '/authentication/users/01966c5a-10ef-7abd-9c88-52b075bcae99');
+        static::createClient()->request('GET', '/authentication/acme-inc/users/01966c5a-10ef-7abd-9c88-52b075bcae99');
 
         $this->assertResponseStatusCodeSame(200);
         $this->assertJsonContains([
             '@context' => '/contexts/User',
             '@type' => 'User',
-            '@id' => '/authentication/users/01966c5a-10ef-7abd-9c88-52b075bcae99',
+            '@id' => '/authentication/acme-inc/users/01966c5a-10ef-7abd-9c88-52b075bcae99',
             'uuid' => '01966c5a-10ef-7abd-9c88-52b075bcae99',
-            'organizationId' => '/authentication/organizations/01966c5a-10ef-7315-94f2-cbeec2f167d8',
+            'organizationId' => '/authentication/acme-inc/organizations/01966c5a-10ef-7315-94f2-cbeec2f167d8',
             'workspaceIds' => [
-                '/authentication/workspaces/01966c5a-10ef-723c-bc33-2b1dc30d8963',
-                '/authentication/workspaces/01966cc2-0323-7a38-9da3-3aeea904ea49',
+                '/authentication/acme-inc/workspaces/01966c5a-10ef-723c-bc33-2b1dc30d8963',
+                '/authentication/acme-inc/workspaces/01966cc2-0323-7a38-9da3-3aeea904ea49',
             ],
             'roleIds' => [
-                '/authentication/roles/01966d41-78eb-7406-ad99-03ad025e8bcf',
-                '/authentication/roles/01966d41-a4a3-7cd4-a095-be712f2e724a',
+                '/authentication/acme-inc/organizations/01966d41-78eb-7406-ad99-03ad025e8bcf',
+                '/authentication/acme-inc/organizations/01966d41-a4a3-7cd4-a095-be712f2e724a',
             ],
             'username' => 'john.doe',
             'firstName' => 'John',
@@ -98,16 +98,16 @@ class UsersTest extends ApiTestCase
     /** @test */
     public function itShouldCreateAnEnabledUser(): void
     {
-        static::createClient()->request('POST', '/authentication/users', [
+        static::createClient()->request('POST', '/authentication/acme-inc/users', [
             'json' => [
-                'organizationId' => '/authentication/organizations/01966c5a-10ef-7315-94f2-cbeec2f167d8',
+                'organizationId' => '/authentication/acme-inc/organizations/01966c5a-10ef-7315-94f2-cbeec2f167d8',
                 'workspaceIds' => [
-                    '/authentication/workspaces/01966c5a-10ef-723c-bc33-2b1dc30d8963',
-                    '/authentication/workspaces/01966cc2-0323-7a38-9da3-3aeea904ea49',
+                    '/authentication/acme-inc/workspaces/01966c5a-10ef-723c-bc33-2b1dc30d8963',
+                    '/authentication/acme-inc/workspaces/01966cc2-0323-7a38-9da3-3aeea904ea49',
                 ],
                 'roleIds' => [
-                    '/authentication/roles/01966d41-78eb-7406-ad99-03ad025e8bcf',
-                    '/authentication/roles/01966d41-a4a3-7cd4-a095-be712f2e724a',
+                    '/authentication/acme-inc/organizations/01966d41-78eb-7406-ad99-03ad025e8bcf',
+                    '/authentication/acme-inc/organizations/01966d41-a4a3-7cd4-a095-be712f2e724a',
                 ],
                 'username' => 'wile.coyote',
                 'firstName' => 'Wile',
@@ -124,14 +124,14 @@ class UsersTest extends ApiTestCase
         $this->assertJsonContains([
             '@context' => '/contexts/User',
             '@type' => 'User',
-            'organizationId' => '/authentication/organizations/01966c5a-10ef-7315-94f2-cbeec2f167d8',
+            'organizationId' => '/authentication/acme-inc/organizations/01966c5a-10ef-7315-94f2-cbeec2f167d8',
             'workspaceIds' => [
-                '/authentication/workspaces/01966c5a-10ef-723c-bc33-2b1dc30d8963',
-                '/authentication/workspaces/01966cc2-0323-7a38-9da3-3aeea904ea49',
+                '/authentication/acme-inc/workspaces/01966c5a-10ef-723c-bc33-2b1dc30d8963',
+                '/authentication/acme-inc/workspaces/01966cc2-0323-7a38-9da3-3aeea904ea49',
             ],
             'roleIds' => [
-                '/authentication/roles/01966d41-78eb-7406-ad99-03ad025e8bcf',
-                '/authentication/roles/01966d41-a4a3-7cd4-a095-be712f2e724a',
+                '/authentication/acme-inc/organizations/01966d41-78eb-7406-ad99-03ad025e8bcf',
+                '/authentication/acme-inc/organizations/01966d41-a4a3-7cd4-a095-be712f2e724a',
             ],
             'username' => 'wile.coyote',
             'firstName' => 'Wile',
@@ -144,16 +144,16 @@ class UsersTest extends ApiTestCase
     /** @test */
     public function itShouldCreateAPendingUser(): void
     {
-        static::createClient()->request('POST', '/authentication/users', [
+        static::createClient()->request('POST', '/authentication/acme-inc/users', [
             'json' => [
-                'organizationId' => '/authentication/organizations/01966c5a-10ef-7315-94f2-cbeec2f167d8',
+                'organizationId' => '/authentication/acme-inc/organizations/01966c5a-10ef-7315-94f2-cbeec2f167d8',
                 'workspaceIds' => [
-                    '/authentication/workspaces/01966c5a-10ef-723c-bc33-2b1dc30d8963',
-                    '/authentication/workspaces/01966cc2-0323-7a38-9da3-3aeea904ea49',
+                    '/authentication/acme-inc/workspaces/01966c5a-10ef-723c-bc33-2b1dc30d8963',
+                    '/authentication/acme-inc/workspaces/01966cc2-0323-7a38-9da3-3aeea904ea49',
                 ],
                 'roleIds' => [
-                    '/authentication/roles/01966d41-78eb-7406-ad99-03ad025e8bcf',
-                    '/authentication/roles/01966d41-a4a3-7cd4-a095-be712f2e724a',
+                    '/authentication/acme-inc/organizations/01966d41-78eb-7406-ad99-03ad025e8bcf',
+                    '/authentication/acme-inc/organizations/01966d41-a4a3-7cd4-a095-be712f2e724a',
                 ],
                 'username' => 'wile.coyote',
                 'firstName' => 'Wile',
@@ -170,14 +170,14 @@ class UsersTest extends ApiTestCase
         $this->assertJsonContains([
             '@context' => '/contexts/User',
             '@type' => 'User',
-            'organizationId' => '/authentication/organizations/01966c5a-10ef-7315-94f2-cbeec2f167d8',
+            'organizationId' => '/authentication/acme-inc/organizations/01966c5a-10ef-7315-94f2-cbeec2f167d8',
             'workspaceIds' => [
-                '/authentication/workspaces/01966c5a-10ef-723c-bc33-2b1dc30d8963',
-                '/authentication/workspaces/01966cc2-0323-7a38-9da3-3aeea904ea49',
+                '/authentication/acme-inc/workspaces/01966c5a-10ef-723c-bc33-2b1dc30d8963',
+                '/authentication/acme-inc/workspaces/01966cc2-0323-7a38-9da3-3aeea904ea49',
             ],
             'roleIds' => [
-                '/authentication/roles/01966d41-78eb-7406-ad99-03ad025e8bcf',
-                '/authentication/roles/01966d41-a4a3-7cd4-a095-be712f2e724a',
+                '/authentication/acme-inc/organizations/01966d41-78eb-7406-ad99-03ad025e8bcf',
+                '/authentication/acme-inc/organizations/01966d41-a4a3-7cd4-a095-be712f2e724a',
             ],
             'username' => 'wile.coyote',
             'firstName' => 'Wile',
@@ -190,7 +190,7 @@ class UsersTest extends ApiTestCase
     /** @test */
     public function itShouldRespondBadRequestOnIncompletePayloadOnCreation(): void
     {
-        static::createClient()->request('POST', '/authentication/users', [
+        static::createClient()->request('POST', '/authentication/acme-inc/users', [
             'json' => [
             ],
             'headers' => [
@@ -210,15 +210,15 @@ class UsersTest extends ApiTestCase
     /** @test */
     public function itShouldCreateAnEnabledUserWithinAnOrganization(): void
     {
-        static::createClient()->request('POST', '/authentication/organizations/01966c5a-10ef-7315-94f2-cbeec2f167d8/users', [
+        static::createClient()->request('POST', '/authentication/acme-inc/organizations/01966c5a-10ef-7315-94f2-cbeec2f167d8/users', [
             'json' => [
                 'workspaceIds' => [
-                    '/authentication/workspaces/01966c5a-10ef-723c-bc33-2b1dc30d8963',
-                    '/authentication/workspaces/01966cc2-0323-7a38-9da3-3aeea904ea49',
+                    '/authentication/acme-inc/workspaces/01966c5a-10ef-723c-bc33-2b1dc30d8963',
+                    '/authentication/acme-inc/workspaces/01966cc2-0323-7a38-9da3-3aeea904ea49',
                 ],
                 'roleIds' => [
-                    '/authentication/roles/01966d41-78eb-7406-ad99-03ad025e8bcf',
-                    '/authentication/roles/01966d41-a4a3-7cd4-a095-be712f2e724a',
+                    '/authentication/acme-inc/organizations/01966d41-78eb-7406-ad99-03ad025e8bcf',
+                    '/authentication/acme-inc/organizations/01966d41-a4a3-7cd4-a095-be712f2e724a',
                 ],
                 'username' => 'wile.coyote',
                 'firstName' => 'Wile',
@@ -235,14 +235,14 @@ class UsersTest extends ApiTestCase
         $this->assertJsonContains([
             '@context' => '/contexts/User',
             '@type' => 'User',
-            'organizationId' => '/authentication/organizations/01966c5a-10ef-7315-94f2-cbeec2f167d8',
+            'organizationId' => '/authentication/acme-inc/organizations/01966c5a-10ef-7315-94f2-cbeec2f167d8',
             'workspaceIds' => [
-                '/authentication/workspaces/01966c5a-10ef-723c-bc33-2b1dc30d8963',
-                '/authentication/workspaces/01966cc2-0323-7a38-9da3-3aeea904ea49',
+                '/authentication/acme-inc/workspaces/01966c5a-10ef-723c-bc33-2b1dc30d8963',
+                '/authentication/acme-inc/workspaces/01966cc2-0323-7a38-9da3-3aeea904ea49',
             ],
             'roleIds' => [
-                '/authentication/roles/01966d41-78eb-7406-ad99-03ad025e8bcf',
-                '/authentication/roles/01966d41-a4a3-7cd4-a095-be712f2e724a',
+                '/authentication/acme-inc/organizations/01966d41-78eb-7406-ad99-03ad025e8bcf',
+                '/authentication/acme-inc/organizations/01966d41-a4a3-7cd4-a095-be712f2e724a',
             ],
             'username' => 'wile.coyote',
             'firstName' => 'Wile',
@@ -255,15 +255,15 @@ class UsersTest extends ApiTestCase
     /** @test */
     public function itShouldCreateAPendingUserWithinAnOrganization(): void
     {
-        static::createClient()->request('POST', '/authentication/organizations/01966c5a-10ef-7315-94f2-cbeec2f167d8/users', [
+        static::createClient()->request('POST', '/authentication/acme-inc/organizations/01966c5a-10ef-7315-94f2-cbeec2f167d8/users', [
             'json' => [
                 'workspaceIds' => [
-                    '/authentication/workspaces/01966c5a-10ef-723c-bc33-2b1dc30d8963',
-                    '/authentication/workspaces/01966cc2-0323-7a38-9da3-3aeea904ea49',
+                    '/authentication/acme-inc/workspaces/01966c5a-10ef-723c-bc33-2b1dc30d8963',
+                    '/authentication/acme-inc/workspaces/01966cc2-0323-7a38-9da3-3aeea904ea49',
                 ],
                 'roleIds' => [
-                    '/authentication/roles/01966d41-78eb-7406-ad99-03ad025e8bcf',
-                    '/authentication/roles/01966d41-a4a3-7cd4-a095-be712f2e724a',
+                    '/authentication/acme-inc/organizations/01966d41-78eb-7406-ad99-03ad025e8bcf',
+                    '/authentication/acme-inc/organizations/01966d41-a4a3-7cd4-a095-be712f2e724a',
                 ],
                 'username' => 'wile.coyote',
                 'firstName' => 'Wile',
@@ -280,14 +280,14 @@ class UsersTest extends ApiTestCase
         $this->assertJsonContains([
             '@context' => '/contexts/User',
             '@type' => 'User',
-            'organizationId' => '/authentication/organizations/01966c5a-10ef-7315-94f2-cbeec2f167d8',
+            'organizationId' => '/authentication/acme-inc/organizations/01966c5a-10ef-7315-94f2-cbeec2f167d8',
             'workspaceIds' => [
-                '/authentication/workspaces/01966c5a-10ef-723c-bc33-2b1dc30d8963',
-                '/authentication/workspaces/01966cc2-0323-7a38-9da3-3aeea904ea49',
+                '/authentication/acme-inc/workspaces/01966c5a-10ef-723c-bc33-2b1dc30d8963',
+                '/authentication/acme-inc/workspaces/01966cc2-0323-7a38-9da3-3aeea904ea49',
             ],
             'roleIds' => [
-                '/authentication/roles/01966d41-78eb-7406-ad99-03ad025e8bcf',
-                '/authentication/roles/01966d41-a4a3-7cd4-a095-be712f2e724a',
+                '/authentication/acme-inc/organizations/01966d41-78eb-7406-ad99-03ad025e8bcf',
+                '/authentication/acme-inc/organizations/01966d41-a4a3-7cd4-a095-be712f2e724a',
             ],
             'username' => 'wile.coyote',
             'firstName' => 'Wile',
@@ -300,7 +300,7 @@ class UsersTest extends ApiTestCase
     /** @test */
     public function itShouldRespondBadRequestOnIncompletePayloadOnCreationWithinAnOrganization(): void
     {
-        static::createClient()->request('POST', '/authentication/organizations/01966c5a-10ef-7315-94f2-cbeec2f167d8/users', [
+        static::createClient()->request('POST', '/authentication/acme-inc/organizations/01966c5a-10ef-7315-94f2-cbeec2f167d8/users', [
             'json' => [
             ],
             'headers' => [
@@ -320,7 +320,7 @@ class UsersTest extends ApiTestCase
     /** @test */
     public function itShouldEnableADisabledUser(): void
     {
-        static::createClient()->request('PATCH', '/authentication/users/01966c5a-10ef-7040-9576-09078df3ea8a/enable', [
+        static::createClient()->request('PATCH', '/authentication/acme-inc/users/01966c5a-10ef-7040-9576-09078df3ea8a/enable', [
             'json' => [
                 'enabled' => true,
             ],
@@ -333,17 +333,17 @@ class UsersTest extends ApiTestCase
         $this->assertJsonContains([
             '@context' => '/contexts/User',
             '@type' => 'User',
-            '@id' => '/authentication/users/01966c5a-10ef-7040-9576-09078df3ea8a',
+            '@id' => '/authentication/acme-inc/users/01966c5a-10ef-7040-9576-09078df3ea8a',
             'uuid' => '01966c5a-10ef-7040-9576-09078df3ea8a',
-            'organizationId' => '/authentication/organizations/01966c5a-10ef-76f6-9513-e3b858c22f0a',
+            'organizationId' => '/authentication/acme-inc/organizations/01966c5a-10ef-76f6-9513-e3b858c22f0a',
             'workspaceIds' => [
-                '/authentication/workspaces/01966c5a-10ef-7f9c-8c9f-80657a996b9d',
-                '/authentication/workspaces/01966c5a-10ef-70ce-ab8c-c455e874c3fc',
-                '/authentication/workspaces/01966c5a-10ef-7795-9e13-7359dd58b49c',
+                '/authentication/acme-inc/workspaces/01966c5a-10ef-7f9c-8c9f-80657a996b9d',
+                '/authentication/acme-inc/workspaces/01966c5a-10ef-70ce-ab8c-c455e874c3fc',
+                '/authentication/acme-inc/workspaces/01966c5a-10ef-7795-9e13-7359dd58b49c',
             ],
             'roleIds' => [
-                '/authentication/roles/01966d41-78eb-7406-ad99-03ad025e8bcf',
-                '/authentication/roles/01966d41-a4a3-7cd4-a095-be712f2e724a',
+                '/authentication/acme-inc/organizations/01966d41-78eb-7406-ad99-03ad025e8bcf',
+                '/authentication/acme-inc/organizations/01966d41-a4a3-7cd4-a095-be712f2e724a',
             ],
             'username' => 'clara.froelich',
             'firstName' => 'Clara',
@@ -356,7 +356,7 @@ class UsersTest extends ApiTestCase
     /** @test */
     public function itShouldDisableAnEnabledUser(): void
     {
-        static::createClient()->request('PATCH', '/authentication/users/01966c5a-10ef-7abd-9c88-52b075bcae99/disable', [
+        static::createClient()->request('PATCH', '/authentication/acme-inc/users/01966c5a-10ef-7abd-9c88-52b075bcae99/disable', [
             'json' => [
                 'enabled' => false,
             ],
@@ -369,16 +369,16 @@ class UsersTest extends ApiTestCase
         $this->assertJsonContains([
             '@context' => '/contexts/User',
             '@type' => 'User',
-            '@id' => '/authentication/users/01966c5a-10ef-7abd-9c88-52b075bcae99',
+            '@id' => '/authentication/acme-inc/users/01966c5a-10ef-7abd-9c88-52b075bcae99',
             'uuid' => '01966c5a-10ef-7abd-9c88-52b075bcae99',
-            'organizationId' => '/authentication/organizations/01966c5a-10ef-7315-94f2-cbeec2f167d8',
+            'organizationId' => '/authentication/acme-inc/organizations/01966c5a-10ef-7315-94f2-cbeec2f167d8',
             'workspaceIds' => [
-                '/authentication/workspaces/01966c5a-10ef-723c-bc33-2b1dc30d8963',
-                '/authentication/workspaces/01966cc2-0323-7a38-9da3-3aeea904ea49',
+                '/authentication/acme-inc/workspaces/01966c5a-10ef-723c-bc33-2b1dc30d8963',
+                '/authentication/acme-inc/workspaces/01966cc2-0323-7a38-9da3-3aeea904ea49',
             ],
             'roleIds' => [
-                '/authentication/roles/01966d41-78eb-7406-ad99-03ad025e8bcf',
-                '/authentication/roles/01966d41-a4a3-7cd4-a095-be712f2e724a',
+                '/authentication/acme-inc/organizations/01966d41-78eb-7406-ad99-03ad025e8bcf',
+                '/authentication/acme-inc/organizations/01966d41-a4a3-7cd4-a095-be712f2e724a',
             ],
             'username' => 'john.doe',
             'firstName' => 'John',
@@ -391,7 +391,7 @@ class UsersTest extends ApiTestCase
     /** @test */
     public function itShouldDeleteAnUser(): void
     {
-        static::createClient()->request('DELETE', '/authentication/users/01966c5a-10ef-7040-9576-09078df3ea8a', [
+        static::createClient()->request('DELETE', '/authentication/acme-inc/users/01966c5a-10ef-7040-9576-09078df3ea8a', [
             'headers' => [
                 'Content-Type' => 'application/merge-patch+json',
             ],

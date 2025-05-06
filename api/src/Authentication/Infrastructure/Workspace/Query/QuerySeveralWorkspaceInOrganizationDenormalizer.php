@@ -7,6 +7,7 @@ namespace App\Authentication\Infrastructure\Workspace\Query;
 use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\Operation;
 use App\Authentication\Domain\Organization\OrganizationId;
+use App\Authentication\Domain\Realm\RealmId;
 use App\Authentication\Domain\Workspace\Query\UseCases\QuerySeveralWorkspaceInOrganization;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 use Symfony\Component\Serializer\Normalizer\DenormalizerAwareInterface;
@@ -31,6 +32,7 @@ final class QuerySeveralWorkspaceInOrganizationDenormalizer implements Denormali
         assert($operation instanceof Operation);
 
         return new QuerySeveralWorkspaceInOrganization(
+            $this->denormalizer->denormalize($data['uri_variables']['realm'], RealmId::class, $format, $context),
             $this->denormalizer->denormalize($data['uri_variables']['organizationId'], OrganizationId::class, $format, $context),
             max((int) ($data['filters']['page'] ?? 1), 1),
             min(max((int) ($data['filters']['itemsPerPage'] ?? $operation->getPaginationItemsPerPage() ?? 25), 10), $operation->getPaginationMaximumItemsPerPage()),

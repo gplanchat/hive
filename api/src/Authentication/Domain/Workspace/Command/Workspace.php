@@ -21,25 +21,26 @@ use App\Authentication\UserInterface\Workspace\EnableWorkspaceProcessor;
 use App\Authentication\UserInterface\Workspace\QueryOneWorkspaceProvider;
 
 #[Post(
-    uriTemplate: '/authentication/workspaces',
+    uriTemplate: '/authentication/{realm}/workspaces',
+    uriVariables: ['realm'],
     class: QueryWorkspace::class,
     input: CreateWorkspaceInput::class,
     output: QueryWorkspace::class,
     processor: CreateWorkspaceProcessor::class,
-    itemUriTemplate: '/authentication/workspaces/{uuid}',
+    itemUriTemplate: '/authentication/{realm}/workspaces/{uuid}',
 )]
 #[Post(
-    uriTemplate: '/authentication/organizations/{organizationId}/workspaces',
-    uriVariables: ['organizationId'],
+    uriTemplate: '/authentication/{realm}/organizations/{organizationId}/workspaces',
+    uriVariables: ['realm', 'organizationId'],
     class: QueryWorkspace::class,
     input: CreateWorkspaceWithinOrganizationInput::class,
     output: QueryWorkspace::class,
     processor: CreateWorkspaceProcessor::class,
-    itemUriTemplate: '/authentication/workspaces/{uuid}',
+    itemUriTemplate: '/authentication/{realm}/workspaces/{uuid}',
 )]
 #[Patch(
-    uriTemplate: '/authentication/workspaces/{uuid}/enable',
-    uriVariables: ['uuid'],
+    uriTemplate: '/authentication/{realm}/workspaces/{uuid}/enable',
+    uriVariables: ['realm', 'uuid'],
     class: QueryWorkspace::class,
     input: EnableWorkspaceInput::class,
     output: QueryWorkspace::class,
@@ -47,8 +48,8 @@ use App\Authentication\UserInterface\Workspace\QueryOneWorkspaceProvider;
     processor: EnableWorkspaceProcessor::class,
 )]
 #[Patch(
-    uriTemplate: '/authentication/workspaces/{uuid}/disable',
-    uriVariables: ['uuid'],
+    uriTemplate: '/authentication/{realm}/workspaces/{uuid}/disable',
+    uriVariables: ['realm', 'uuid'],
     class: QueryWorkspace::class,
     input: DisableWorkspaceInput::class,
     output: QueryWorkspace::class,
@@ -56,8 +57,8 @@ use App\Authentication\UserInterface\Workspace\QueryOneWorkspaceProvider;
     processor: DisableWorkspaceProcessor::class,
 )]
 #[Delete(
-    uriTemplate: '/authentication/workspaces/{uuid}',
-    uriVariables: ['uuid'],
+    uriTemplate: '/authentication/{realm}/workspaces/{uuid}',
+    uriVariables: ['realm', 'uuid'],
     class: QueryWorkspace::class,
     input: false,
     output: false,

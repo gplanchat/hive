@@ -19,6 +19,7 @@ final readonly class CreatePendingOrganizationHandler
     {
         $organization = Organization::declareDisabled(
             $command->uuid,
+            $command->realmId,
             $command->name,
             $command->slug,
             $command->featureRolloutIds,

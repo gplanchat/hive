@@ -5,12 +5,16 @@ declare(strict_types=1);
 namespace App\Authentication\Domain\User\Query;
 
 use ApiPlatform\Metadata\ApiProperty;
+use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\QueryParameter;
 use ApiPlatform\OpenApi\Model\Operation;
 use ApiPlatform\OpenApi\Model\Parameter;
 use App\Authentication\Domain\Organization\OrganizationId;
+use App\Authentication\Domain\Realm\RealmId;
 use App\Authentication\Domain\Role\RoleId;
 use App\Authentication\Domain\User\Query\UseCases\QueryOneUser;
 use App\Authentication\Domain\User\Query\UseCases\QuerySeveralUser;
@@ -18,14 +22,24 @@ use App\Authentication\Domain\User\Query\UseCases\QuerySeveralUserInOrganization
 use App\Authentication\Domain\User\Query\UseCases\QuerySeveralUserInWorkspace;
 use App\Authentication\Domain\User\UserId;
 use App\Authentication\Domain\Workspace\WorkspaceId;
+use App\Authentication\UserInterface\User\CreateUserInput;
+use App\Authentication\UserInterface\User\CreateUserProcessor;
+use App\Authentication\UserInterface\User\CreateUserWithinOrganizationInput;
+use App\Authentication\UserInterface\User\DeleteUserProcessor;
+use App\Authentication\UserInterface\User\DisableUserInput;
+use App\Authentication\UserInterface\User\DisableUserProcessor;
+use App\Authentication\UserInterface\User\EnableUserInput;
+use App\Authentication\UserInterface\User\EnableUserProcessor;
 use App\Authentication\UserInterface\User\QueryOneUserProvider;
 use App\Authentication\UserInterface\User\QuerySeveralUserProvider;
-use Symfony\Component\Routing\Requirement\Requirement;
 use Symfony\Component\Serializer\Attribute\Context;
 
 #[Get(
-    uriTemplate: '/authentication/users/{uuid}',
-    uriVariables: ['uuid'],
+    uriTemplate: '/authentication/{realm}/users/{uuid}',
+    uriVariables: [
+        'realm' => 'realmId',
+        'uuid',
+    ],
     openapi: new Operation(
         parameters: [
             new Parameter(
@@ -35,30 +49,45 @@ use Symfony\Component\Serializer\Attribute\Context;
                 required: true,
                 schema: ['pattern' => UserId::REQUIREMENT],
             ),
+            new Parameter(
+                name: 'realm',
+                in: 'path',
+                description: 'Code of the Realm',
+                required: true,
+                schema: ['pattern' => RealmId::REQUIREMENT],
+            ),
         ],
     ),
-    input: QueryOneUser::class,
     provider: QueryOneUserProvider::class
 )]
 #[GetCollection(
-    uriTemplate: '/authentication/users',
-    openapi: new Operation(),
+    uriTemplate: '/authentication/{realm}/users',
+    uriVariables: [
+        'realm' => 'realmId',
+    ],
+    openapi: new Operation(
+        parameters: [
+            new Parameter(
+                name: 'realm',
+                in: 'path',
+                description: 'Code of the Realm',
+                required: true,
+                schema: ['pattern' => RealmId::REQUIREMENT],
+            ),
+        ],
+    ),
     paginationEnabled: true,
     paginationItemsPerPage: 25,
     paginationMaximumItemsPerPage: 100,
     paginationPartial: true,
     order: ['uuid' => 'ASC'],
-    input: QuerySeveralUser::class,
     provider: QuerySeveralUserProvider::class,
-    parameters: [
-        'page' => new QueryParameter(schema: ['type' => 'integer', 'min' => 1]),
-        'itemsPerPage' => new QueryParameter(schema: ['type' => 'integer', 'min' => 10, 'max' => 100]),
-    ],
+    itemUriTemplate: '/authentication/{realm}/users/{uuid}',
 )]
 #[GetCollection(
-    uriTemplate: '/authentication/organizations/{organizationId}/users',
+    uriTemplate: '/authentication/{realm}/organizations/{organizationId}/users',
     uriVariables: [
-//        'organizationId' => new Link('organizationId', fromClass: self::class, toClass: Organization::class),
+        'realm' => 'realmId',
         'organizationId',
     ],
     openapi: new Operation(
@@ -70,6 +99,13 @@ use Symfony\Component\Serializer\Attribute\Context;
                 required: true,
                 schema: ['pattern' => OrganizationId::REQUIREMENT],
             ),
+            new Parameter(
+                name: 'realm',
+                in: 'path',
+                description: 'Code of the Realm',
+                required: true,
+                schema: ['pattern' => RealmId::REQUIREMENT],
+            ),
         ],
     ),
     paginationEnabled: true,
@@ -77,17 +113,13 @@ use Symfony\Component\Serializer\Attribute\Context;
     paginationMaximumItemsPerPage: 100,
     paginationPartial: true,
     order: ['uuid' => 'ASC'],
-    input: QuerySeveralUserInOrganization::class,
     provider: QuerySeveralUserProvider::class,
-    parameters: [
-        'page' => new QueryParameter(schema: ['type' => 'integer', 'min' => 1]),
-        'itemsPerPage' => new QueryParameter(schema: ['type' => 'integer', 'min' => 10, 'max' => 100]),
-    ],
+    itemUriTemplate: '/authentication/{realm}/users/{uuid}',
 )]
 #[GetCollection(
-    uriTemplate: '/authentication/workspaces/{workspaceId}/users',
+    uriTemplate: '/authentication/{realm}/workspaces/{workspaceId}/users',
     uriVariables: [
-//        'workspaceId' => new Link('workspaceId', fromClass: self::class, toClass: Workspace::class),
+        'realm' => 'realmId',
         'workspaceId',
     ],
     openapi: new Operation(
@@ -99,6 +131,13 @@ use Symfony\Component\Serializer\Attribute\Context;
                 required: true,
                 schema: ['pattern' => UserId::REQUIREMENT],
             ),
+            new Parameter(
+                name: 'realm',
+                in: 'path',
+                description: 'Code of the Realm',
+                required: true,
+                schema: ['pattern' => RealmId::REQUIREMENT],
+            ),
         ],
     ),
     paginationEnabled: true,
@@ -106,14 +145,58 @@ use Symfony\Component\Serializer\Attribute\Context;
     paginationMaximumItemsPerPage: 100,
     paginationPartial: true,
     order: ['uuid' => 'ASC'],
-    input: QuerySeveralUserInWorkspace::class,
     provider: QuerySeveralUserProvider::class,
-    parameters: [
-        'page' => new QueryParameter(schema: ['type' => 'integer', 'min' => 1]),
-        'itemsPerPage' => new QueryParameter(schema: ['type' => 'integer', 'min' => 10, 'max' => 100]),
-    ],
+    itemUriTemplate: '/authentication/{realm}/users/{uuid}',
 )]
-final class User
+#[Post(
+    uriTemplate: '/authentication/{realm}/organizations/{organizationId}/users',
+    uriVariables: ['realm', 'organizationId'],
+    input: CreateUserWithinOrganizationInput::class,
+    output: self::class,
+    processor: CreateUserProcessor::class,
+    itemUriTemplate: '/authentication/{realm}/users/{uuid}',
+)]
+#[Post(
+    uriTemplate: '/authentication/{realm}/users',
+    uriVariables: [
+        'realm' => 'realmId',
+    ],
+    input: CreateUserInput::class,
+    output: self::class,
+    processor: CreateUserProcessor::class,
+    itemUriTemplate: '/authentication/{realm}/users/{uuid}',
+)]
+#[Patch(
+    uriTemplate: '/authentication/{realm}/users/{uuid}/enable',
+    uriVariables: [
+        'realm' => 'realmId',
+        'uuid',
+    ],
+    input: EnableUserInput::class,
+    output: self::class,
+    provider: QueryOneUserProvider::class,
+    processor: EnableUserProcessor::class,
+)]
+#[Patch(
+    uriTemplate: '/authentication/{realm}/users/{uuid}/disable',
+    uriVariables: [
+        'realm' => 'realmId',
+        'uuid',
+    ],
+    input: DisableUserInput::class,
+    output: self::class,
+    provider: QueryOneUserProvider::class,
+    processor: DisableUserProcessor::class,
+)]
+#[Delete(
+    uriTemplate: '/authentication/{realm}/users/{uuid}',
+    uriVariables: ['realm', 'uuid'],
+    input: false,
+    output: false,
+    provider: QueryOneUserProvider::class,
+    processor: DeleteUserProcessor::class,
+)]
+final readonly class User
 {
     /**
      * @param WorkspaceId[] $workspaceIds
@@ -132,6 +215,12 @@ final class User
         )]
         #[Context(['iri_only' => true])]
         public OrganizationId $organizationId,
+        #[ApiProperty(
+            description: 'Realm of the User',
+            identifier: true,
+            schema: ['type' => 'string', 'pattern' => RealmId::REQUIREMENT],
+        )]
+        public RealmId $realmId,
         #[ApiProperty(
             description: 'Identifier of the Owning Organization',
             schema: ['type' => 'list', 'items' => ['type' => 'string', 'pattern' => WorkspaceId::URI_REQUIREMENT]],

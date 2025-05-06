@@ -56,12 +56,12 @@ class RolesTest extends ApiTestCase
     {
         $this->roleFixtures->load();
 
-        static::createClient()->request('GET', '/authentication/roles');
+        static::createClient()->request('GET', '/authentication/acme-inc/roles');
 
         $this->assertResponseStatusCodeSame(200);
         $this->assertJsonContains([
             '@context' => '/contexts/Role',
-            '@id' => '/authentication/roles',
+            '@id' => '/authentication/acme-inc/roles',
             '@type' => 'hydra:Collection',
             'hydra:totalItems' => 6,
         ]);
@@ -70,24 +70,24 @@ class RolesTest extends ApiTestCase
     /** @test */
     public function itShouldShowARole(): void
     {
-        static::createClient()->request('GET', '/authentication/roles/01966d41-78eb-7406-ad99-03ad025e8bcf');
+        static::createClient()->request('GET', '/authentication/acme-inc/roles/01966d41-78eb-7406-ad99-03ad025e8bcf');
 
         $this->assertResponseStatusCodeSame(200);
         $this->assertJsonContains([
             '@context' => '/contexts/Role',
             '@type' => 'Role',
-            '@id' => '/authentication/roles/01966d41-78eb-7406-ad99-03ad025e8bcf',
+            '@id' => '/authentication/acme-inc/roles/01966d41-78eb-7406-ad99-03ad025e8bcf',
             'uuid' => '01966d41-78eb-7406-ad99-03ad025e8bcf',
-            'organizationId' => '/authentication/organizations/01966c5a-10ef-7315-94f2-cbeec2f167d8',
+            'organizationId' => '/authentication/acme-inc/organizations/01966c5a-10ef-7315-94f2-cbeec2f167d8',
         ]);
     }
 
     /** @test */
     public function itShouldCreateARole(): void
     {
-        static::createClient()->request('POST', '/authentication/roles', [
+        static::createClient()->request('POST', '/authentication/acme-inc/roles', [
             'json' => [
-                'organizationId' => '/authentication/organizations/01966c5a-10ef-7315-94f2-cbeec2f167d8',
+                'organizationId' => '/authentication/acme-inc/organizations/01966c5a-10ef-7315-94f2-cbeec2f167d8',
                 'identifier' => 'manager',
                 'label' => 'Manager',
                 'resourceAccesses' => [],
@@ -101,7 +101,7 @@ class RolesTest extends ApiTestCase
         $this->assertJsonContains([
             '@context' => '/contexts/Role',
             '@type' => 'Role',
-            'organizationId' => '/authentication/organizations/01966c5a-10ef-7315-94f2-cbeec2f167d8',
+            'organizationId' => '/authentication/acme-inc/organizations/01966c5a-10ef-7315-94f2-cbeec2f167d8',
             'identifier' => 'manager',
             'label' => 'Manager',
             'resourceAccesses' => [],
@@ -111,7 +111,7 @@ class RolesTest extends ApiTestCase
     /** @test */
     public function itShouldRespondBadRequestOnIncompletePayloadOnCreation(): void
     {
-        static::createClient()->request('POST', '/authentication/roles', [
+        static::createClient()->request('POST', '/authentication/acme-inc/roles', [
             'json' => [
             ],
             'headers' => [
@@ -131,7 +131,7 @@ class RolesTest extends ApiTestCase
     /** @test */
     public function itShouldDeleteARole(): void
     {
-        static::createClient()->request('DELETE', '/authentication/roles/01969388-78d2-7530-bd4d-d7673bce9f34', [
+        static::createClient()->request('DELETE', '/authentication/acme-inc/roles/01969388-78d2-7530-bd4d-d7673bce9f34', [
             'headers' => [
                 'Content-Type' => 'application/merge-patch+json',
             ],

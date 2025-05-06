@@ -6,13 +6,14 @@ namespace App\Authentication\Domain\Organization;
 
 use App\Authentication\Domain\IdInterface;
 use App\Authentication\Domain\InvalidUuidFormatException;
+use App\Authentication\Domain\Realm\RealmId;
 use Symfony\Component\Routing\Requirement\Requirement;
 
 final class OrganizationId implements IdInterface
 {
     const string REQUIREMENT = Requirement::UUID_V7;
-    const string URI_REQUIREMENT = '\/authentication\/organizations\/'.Requirement::UUID_V7;
-    const string PARSE = '/\/authentication\/organizations\/(?<reference>'.Requirement::UUID.')/';
+    const string URI_REQUIREMENT = '\/authentication\/'.RealmId::REQUIREMENT.'\/organizations\/'.Requirement::UUID_V7;
+    const string PARSE = '/\/authentication\/'.RealmId::REQUIREMENT.'\/organizations\/(?<reference>'.Requirement::UUID.')/';
 
     private function __construct(
         private readonly string $reference,

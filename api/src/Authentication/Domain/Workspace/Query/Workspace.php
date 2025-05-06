@@ -11,6 +11,7 @@ use ApiPlatform\Metadata\QueryParameter;
 use ApiPlatform\OpenApi\Model\Operation;
 use ApiPlatform\OpenApi\Model\Parameter;
 use App\Authentication\Domain\Organization\OrganizationId;
+use App\Authentication\Domain\Realm\RealmId;
 use App\Authentication\Domain\Workspace\Query\UseCases\QueryOneWorkspace;
 use App\Authentication\Domain\Workspace\Query\UseCases\QuerySeveralWorkspace;
 use App\Authentication\Domain\Workspace\Query\UseCases\QuerySeveralWorkspaceInOrganization;
@@ -21,8 +22,8 @@ use Symfony\Component\Routing\Requirement\Requirement;
 use Symfony\Component\Serializer\Attribute\Context;
 
 #[Get(
-    uriTemplate: '/authentication/workspaces/{uuid}',
-    uriVariables: ['uuid'],
+    uriTemplate: '/authentication/{realm}/workspaces/{uuid}',
+    uriVariables: ['realm', 'uuid'],
     openapi: new Operation(
         parameters: [
             new Parameter(
@@ -38,7 +39,8 @@ use Symfony\Component\Serializer\Attribute\Context;
     provider: QueryOneWorkspaceProvider::class
 )]
 #[GetCollection(
-    uriTemplate: '/authentication/workspaces',
+    uriTemplate: '/authentication/{realm}/workspaces',
+    uriVariables: ['realm'],
     openapi: new Operation(),
     paginationEnabled: true,
     paginationItemsPerPage: 25,
@@ -53,8 +55,9 @@ use Symfony\Component\Serializer\Attribute\Context;
     ],
 )]
 #[GetCollection(
-    uriTemplate: '/authentication/organizations/{organizationId}/workspaces',
+    uriTemplate: '/authentication/{realm}/organizations/{organizationId}/workspaces',
     uriVariables: [
+        'realm',
 //        'organizationId' => new Link('organizationId', fromClass: self::class, toClass: Organization::class),
         'organizationId',
     ],
@@ -96,6 +99,12 @@ final readonly class Workspace
         )]
         #[Context(['iri_only' => true])]
         public OrganizationId $organizationId,
+        #[ApiProperty(
+            description: 'Realm of the Workspace',
+            identifier: true,
+            schema: ['type' => 'string', 'pattern' => RealmId::REQUIREMENT],
+        )]
+        public RealmId $realmId,
         #[ApiProperty(
             description: 'Name of the Workspace',
             schema: ['type' => 'string'],

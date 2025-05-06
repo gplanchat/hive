@@ -12,6 +12,7 @@ use App\Authentication\Domain\Organization\Command\UseCases\CreatePendingOrganiz
 use App\Authentication\Domain\Organization\OrganizationId;
 use App\Authentication\Domain\Organization\Query\Organization;
 use App\Authentication\Domain\Organization\Query\OrganizationRepositoryInterface;
+use App\Authentication\Domain\Realm\RealmId;
 use Symfony\Component\HttpFoundation\Exception\LogicException;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -34,6 +35,7 @@ final readonly class CreateOrganizationProcessor implements ProcessorInterface
             $command = $data->enabled
                 ? new CreateEnabledOrganization(
                     OrganizationId::generateRandom(),
+                    RealmId::fromString($uriVariables['realm']),
                     $data->name,
                     $data->slug,
                     $data->validUntil,
@@ -41,6 +43,7 @@ final readonly class CreateOrganizationProcessor implements ProcessorInterface
                 )
                 : new CreatePendingOrganization(
                     OrganizationId::generateRandom(),
+                    RealmId::fromString($uriVariables['realm']),
                     $data->name,
                     $data->slug,
                     $data->featureRolloutIds,

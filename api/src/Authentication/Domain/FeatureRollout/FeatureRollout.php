@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Authentication\Domain\FeatureRollout;
 
-use ApiPlatform\JsonLd\ContextBuilder;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
@@ -16,7 +15,7 @@ use App\Authentication\UserInterface\FeatureRollout\QueryOneFeatureRolloutProvid
 use App\Authentication\UserInterface\FeatureRollout\QuerySeveralFeatureRolloutProvider;
 
 #[Get(
-    uriTemplate: '/authentication/feature-rollouts/{code}',
+    uriTemplate: '/feature-rollouts/{code}',
     uriVariables: ['code'],
     openapi: new Operation(
         summary: 'Get feature rollout',
@@ -36,7 +35,7 @@ use App\Authentication\UserInterface\FeatureRollout\QuerySeveralFeatureRolloutPr
     provider: QueryOneFeatureRolloutProvider::class,
 )]
 #[GetCollection(
-    uriTemplate: '/authentication/feature-rollouts',
+    uriTemplate: '/feature-rollouts',
     paginationEnabled: true,
     paginationItemsPerPage: 25,
     paginationMaximumItemsPerPage: 100,

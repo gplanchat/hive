@@ -4,50 +4,18 @@ declare(strict_types=1);
 
 namespace App\Authentication\Domain\Role\Command;
 
-use ApiPlatform\Metadata\Delete;
-use ApiPlatform\Metadata\Post;
 use App\Authentication\Domain\Organization\OrganizationId;
+use App\Authentication\Domain\Realm\RealmId;
 use App\Authentication\Domain\Role\ResourceAccess;
 use App\Authentication\Domain\Role\RoleId;
-use App\Authentication\Domain\Role\Query\Role as QueryRole;
-use App\Authentication\UserInterface\Role\CreateRoleInput;
-use App\Authentication\UserInterface\Role\CreateRoleProcessor;
-use App\Authentication\UserInterface\Role\CreateRoleWithinOrganizationInput;
-use App\Authentication\UserInterface\Role\DeleteRoleProcessor;
-use App\Authentication\UserInterface\Role\QueryOneRoleProvider;
 
-#[Post(
-    uriTemplate: '/authentication/organizations/{organizationId}/roles',
-    uriVariables: ['organizationId'],
-    class: QueryRole::class,
-    input: CreateRoleWithinOrganizationInput::class,
-    output: QueryRole::class,
-    processor: CreateRoleProcessor::class,
-    itemUriTemplate: '/authentication/roles/{uuid}',
-)]
-#[Post(
-    uriTemplate: '/authentication/roles',
-    class: QueryRole::class,
-    input: CreateRoleInput::class,
-    output: QueryRole::class,
-    processor: CreateRoleProcessor::class,
-    itemUriTemplate: '/authentication/roles/{uuid}',
-)]
-#[Delete(
-    uriTemplate: '/authentication/roles/{uuid}',
-    uriVariables: ['uuid'],
-    class: QueryRole::class,
-    input: false,
-    output: false,
-    provider: QueryOneRoleProvider::class,
-    processor: DeleteRoleProcessor::class,
-)]
 final class Role
 {
     /** @param ResourceAccess[] $resourceAccesses */
     public function __construct(
         public readonly RoleId $uuid,
         public readonly OrganizationId $organizationId,
+        public readonly RealmId $realmId,
         private ?string $identifier = null,
         private ?string $label = null,
         private array $resourceAccesses = [],
@@ -82,15 +50,17 @@ final class Role
     public static function declare(
         RoleId $uuid,
         OrganizationId $organizationId,
+        RealmId $realmId,
         string $identifier,
         string $label,
         array $resourceAccesses = [],
     ): self {
-        $instance = new self($uuid, $organizationId);
+        $instance = new self($uuid, $organizationId, $realmId);
         $instance->recordThat(new DeclaredEvent(
             $uuid,
             1,
             $organizationId,
+            $realmId,
             $identifier,
             $label,
             $resourceAccesses,
@@ -111,7 +81,7 @@ final class Role
             throw new InvalidRoleStateException('Cannot delete an already deleted Role.');
         }
 
-        $this->recordThat(new DeletedEvent($this->uuid, $this->version + 1));
+        $this->recordThat(new DeletedEvent($this->uuid, $this->version + 1, $this->organizationId, $this->realmId));
     }
 
     private function applyDeletedEvent(DeletedEvent $event): void

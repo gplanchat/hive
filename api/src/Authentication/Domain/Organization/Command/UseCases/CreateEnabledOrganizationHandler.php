@@ -19,6 +19,7 @@ final readonly class CreateEnabledOrganizationHandler
     {
         $organization = Organization::declareEnabled(
             $command->uuid,
+            $command->realmId,
             $command->name,
             $command->slug,
             $command->validUntil,

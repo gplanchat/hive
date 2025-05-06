@@ -6,13 +6,14 @@ namespace App\Authentication\Domain\Role;
 
 use App\Authentication\Domain\IdInterface;
 use App\Authentication\Domain\InvalidUuidFormatException;
+use App\Authentication\Domain\Realm\RealmId;
 use Symfony\Component\Routing\Requirement\Requirement;
 
 final class RoleId implements IdInterface
 {
     const string REQUIREMENT = Requirement::UUID_V7;
-    const string URI_REQUIREMENT = '\/authentication\/roles\/('.Requirement::UUID_V7.')';
-    const string PARSE = '/\/authentication\/roles\/(?<reference>'.Requirement::UUID.')/';
+    const string URI_REQUIREMENT = '\/authentication\/'.RealmId::REQUIREMENT.'\/roles\/('.Requirement::UUID_V7.')';
+    const string PARSE = '/\/authentication\/'.RealmId::REQUIREMENT.'\/roles\/(?<reference>'.Requirement::UUID.')/';
 
     private function __construct(
         private readonly string $reference,

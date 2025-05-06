@@ -5,29 +5,127 @@ declare(strict_types=1);
 namespace App\Authentication\Infrastructure\Keycloak;
 
 use App\Authentication\Domain\Organization\Query\Organization;
+use App\Authentication\Domain\Realm\Query\Realm;
+use App\Authentication\Domain\Realm\Query\UseCases\RealmPage;
+use App\Authentication\Domain\Realm\RealmId;
 use App\Authentication\Domain\User\Query\User;
+use Http\Discovery\Psr17FactoryDiscovery;
+use Psr\Http\Message\UriInterface;
 
 final readonly class Keycloak implements KeycloakInterface
 {
-    public function __construct(
-        private KeycloakClientInterface $httpClient
-    ) {}
+    /** @var RealmId[] */
+    private array $allowedRealmIds;
 
-    public function createRealmFromOrganization(
-        Organization $organization,
+    public function __construct(
+        private KeycloakClientInterface $httpClient,
+        private UriInterface $baseUri,
+        RealmId ...$allowedRealmIds,
+    ) {
+        $this->allowedRealmIds = $allowedRealmIds;
+    }
+
+    public static function createFromUri(
+        KeycloakClientInterface $httpClient,
+        string $baseUri,
+        array $allowedRealmIds,
+    ): self {
+        return new self(
+            $httpClient,
+            Psr17FactoryDiscovery::findUriFactory()->createUri($baseUri),
+            ...array_map(fn (string $realmId) => RealmId::fromString($realmId), $allowedRealmIds),
+        );
+    }
+
+    public function queryAllRealms(): RealmPage
+    {
+        $response = $this->httpClient->request('GET', "{$this->baseUri}/admin/realms", [
+            'headers' => [
+                'content-type' => 'application/json',
+            ]
+        ]);
+
+        if ($response->getStatusCode() !== 200) {
+            throw new \RuntimeException(strtr(
+                'Could not list Realms on the Keycloak instance %keycloakUri%',
+                [
+                    '%keycloakUri%' => $this->baseUri,
+                ]
+            ));
+        }
+
+        $items = array_map(
+            fn (array $current) => new Realm(
+                code: RealmId::fromString($current['realm']),
+                displayName: $current['displayName'],
+            ),
+            array_filter(
+                $response->toArray(),
+                fn (array $current): bool => array_any($this->allowedRealmIds, fn (RealmId $realmId) => $realmId->equals($current['realm']))
+            ),
+        );
+
+        return new RealmPage(1, 100, count($items), ...$items);
+    }
+
+    public function createOrganizationInsideRealm(RealmId $realmId, Organization $organization): void
+    {
+        if (!array_any($this->allowedRealmIds, fn (RealmId $current) => $current->equals($realmId))) {
+            throw new \RuntimeException();
+        }
+
+        throw new \RuntimeException('Not implemented.');
+    }
+
+    public function queryOneRealm(RealmId $realmId): Realm
+    {
+        if (!array_any($this->allowedRealmIds, fn (RealmId $current) => $current->equals($realmId))) {
+            throw new \RuntimeException();
+        }
+
+        $url = strtr(
+            "{$this->baseUri}/admin/realms/{realm}",
+            [
+                '{realm}' => $realmId->toString(),
+            ]
+        );
+
+        $response = $this->httpClient->request('GET', $url, [
+            'headers' => [
+                'content-type' => 'application/json',
+            ]
+        ]);
+
+        if ($response->getStatusCode() !== 200) {
+            throw new \RuntimeException(strtr(
+                'Could not list Realms on the Keycloak instance %keycloakUri%',
+                [
+                    '%keycloakUri%' => $this->baseUri,
+                ]
+            ));
+        }
+
+        $item = $response->toArray();
+        return new Realm(
+            code: RealmId::fromString($item['realm']),
+            displayName: $item['displayName'],
+        );
+    }
+
+    public function createRealm(
+        Realm $realm,
     ): void {
-        // FIXME: change Keycloak URI
-        $response = $this->httpClient->request('POST', 'http://keycloak:7080/admin/realms', [
+        $response = $this->httpClient->request('POST', "{$this->baseUri}/admin/realms", [
             'headers' => [
                 'content-type' => 'application/json',
             ],
             'body' => \json_encode([
-                'id' => $organization->uuid->toString(),
-                'realm' => $organization->slug,
+                'id' => $realm->code->toString(),
+                'realm' => $realm->slug,
                 'notBefore' => 0,
                 'revokeRefreshToken' => false,
-                'displayName' => $organization->name,
-                'enabled' => $organization->enabled,
+                'displayName' => $realm->name,
+                'enabled' => $realm->enabled,
                 'sslRequired' => 'external',
                 'registrationAllowed' => false,
                 'loginWithEmailAllowed' => true,
@@ -42,8 +140,7 @@ final readonly class Keycloak implements KeycloakInterface
             throw new ConflictException(strtr(
                 'Could not create Realm on the Keycloak instance %keycloakUri%, as another realm already uses this name.',
                 [
-                    // FIXME: change Keycloak URI
-                    '%keycloakUri%' => 'http://keycloak:7080/',
+                    '%keycloakUri%' => $this->baseUri,
                 ]
             ));
         }
@@ -52,25 +149,23 @@ final readonly class Keycloak implements KeycloakInterface
             throw new \RuntimeException(strtr(
                 'Could not create Realm on the Keycloak instance %keycloakUri%',
                 [
-                    // FIXME: change Keycloak URI
-                    '%keycloakUri%' => 'http://keycloak:7080/',
+                    '%keycloakUri%' => $this->baseUri,
                 ]
             ));
         }
     }
 
-    public function createUserInsideRealmFromUser(
-        Organization $organization,
+    public function createUserInsideRealm(
+        Realm $realm,
         User $user,
     ): void {
         $url = strtr(
-            'http://keycloak:7080/admin/realms/{realm}/users',
+            "{$this->baseUri}/admin/realms/{realm}/users",
             [
-                '{realm}' => $organization->slug,
+                '{realm}' => $realm->code->toString(),
             ]
         );
 
-        // FIXME: change Keycloak URI
         $response = $this->httpClient->request('POST', $url, [
             'headers' => [
                 'content-type' => 'application/json',
@@ -89,9 +184,34 @@ final readonly class Keycloak implements KeycloakInterface
             throw new \RuntimeException(strtr(
                 'Could not create User in the %realm% on the Keycloak instance %keycloakUri%',
                 [
-                    // FIXME: change Keycloak URI
-                    '%keycloakUri%' => 'http://keycloak:7080/',
-                    '%realm%' => $organization->slug,
+                    '%keycloakUri%' => $this->baseUri,
+                    '%realm%' => $realm->code->toString(),
+                ]
+            ));
+        }
+    }
+
+    public function fetchOpenidCertificates(Realm $realm): void
+    {
+        $url = strtr(
+            "{$this->baseUri}/realms/{realm}/protocol/openid-connect/certs",
+            [
+                '{realm}' => $realm->code->toString(),
+            ]
+        );
+
+        $response = $this->httpClient->request('GET', $url, [
+            'headers' => [
+                'content-type' => 'application/json',
+            ],
+        ]);
+
+        if ($response->getStatusCode() !== 200) {
+            throw new \RuntimeException(strtr(
+                'Could not create User in the %realm% on the Keycloak instance %keycloakUri%',
+                [
+                    '%keycloakUri%' => $this->baseUri,
+                    '%realm%' => $realm->code->toString(),
                 ]
             ));
         }

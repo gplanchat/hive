@@ -44,30 +44,56 @@ final readonly class IdNormalizer implements NormalizerInterface, DenormalizerIn
             return $data->toString();
         }
 
+        $resource = $context['object'] ?? null;
+
         return match ($data::class) {
             FeatureRolloutId::class => $this->iriConverter->getIriFromResource(FeatureRollout::class, context: [
                 'uri_variables' => [
-                    'code' => $data->toString()
+                    'code' => $data->toString(),
                 ]
             ]),
             OrganizationId::class => $this->iriConverter->getIriFromResource(Organization::class, context: [
                 'uri_variables' => [
-                    'uuid' => $data->toString()
+                    'realm' => is_object($resource) ? match ($resource::class) {
+                        Organization::class => $resource->realmId->toString(),
+                        Role::class => $resource->realmId->toString(),
+                        User::class => $resource->realmId->toString(),
+                        Workspace::class => $resource->realmId->toString(),
+                    } : null,
+                    'uuid' => $data->toString(),
                 ]
             ]),
             UserId::class => $this->iriConverter->getIriFromResource(User::class, context: [
                 'uri_variables' => [
-                    'uuid' => $data->toString()
+                    'realm' => is_object($resource) ? match ($resource::class) {
+                        Organization::class => $resource->realmId->toString(),
+                        Role::class => $resource->realmId->toString(),
+                        User::class => $resource->realmId->toString(),
+                        Workspace::class => $resource->realmId->toString(),
+                    } : null,
+                    'uuid' => $data->toString(),
                 ]
             ]),
             RoleId::class => $this->iriConverter->getIriFromResource(Role::class, context: [
                 'uri_variables' => [
-                    'uuid' => $data->toString()
+                    'realm' => is_object($resource) ? match ($resource::class) {
+                        Organization::class => $resource->realmId->toString(),
+                        Role::class => $resource->realmId->toString(),
+                        User::class => $resource->realmId->toString(),
+                        Workspace::class => $resource->realmId->toString(),
+                    } : null,
+                    'uuid' => $data->toString(),
                 ]
             ]),
             WorkspaceId::class => $this->iriConverter->getIriFromResource(Workspace::class, context: [
                 'uri_variables' => [
-                    'uuid' => $data->toString()
+                    'realm' => is_object($resource) ? match ($resource::class) {
+                        Organization::class => $resource->realmId->toString(),
+                        Role::class => $resource->realmId->toString(),
+                        User::class => $resource->realmId->toString(),
+                        Workspace::class => $resource->realmId->toString(),
+                    } : null,
+                    'uuid' => $data->toString(),
                 ]
             ]),
         };

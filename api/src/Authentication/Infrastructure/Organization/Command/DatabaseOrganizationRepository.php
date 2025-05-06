@@ -14,6 +14,7 @@ use App\Authentication\Domain\Organization\Command\EnabledEvent;
 use App\Authentication\Domain\Organization\Command\Organization;
 use App\Authentication\Domain\Organization\Command\OrganizationRepositoryInterface;
 use App\Authentication\Domain\Organization\OrganizationId;
+use App\Authentication\Domain\Realm\RealmId;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\ParameterType;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
@@ -29,7 +30,7 @@ final class DatabaseOrganizationRepository implements OrganizationRepositoryInte
     public function get(OrganizationId $organizationId): Organization
     {
         $sql =<<<SQL
-            SELECT uuid, name, slug, valid_until, feature_rollout_ids, enabled, version
+            SELECT uuid, realm_id, name, slug, valid_until, feature_rollout_ids, enabled, version
             FROM organizations
             WHERE uuid = :uuid
             LIMIT 1
@@ -47,6 +48,7 @@ final class DatabaseOrganizationRepository implements OrganizationRepositoryInte
 
         return new Organization(
             OrganizationId::fromString($organization['uuid']),
+            realmId: RealmId::fromString($organization['realm_id']),
             name: $organization['name'],
             validUntil: $organization['valid_until'] !== null
                 ? \DateTimeImmutable::createFromFormat('Y-m-d', $organization['valid_until'], new \DateTimeZone('UTC'))

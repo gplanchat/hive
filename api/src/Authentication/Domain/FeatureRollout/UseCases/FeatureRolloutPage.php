@@ -8,13 +8,14 @@ use App\Authentication\Domain\FeatureRollout\FeatureRollout;
 
 final readonly class FeatureRolloutPage implements \IteratorAggregate, \Countable
 {
+    /** @var FeatureRollout[] */
     private array $featureRollouts;
 
     public function __construct(
         public int $page,
         public int $pageSize,
         public int $totalItems,
-        FeatureRollout ...$featureRollouts
+        FeatureRollout ...$featureRollouts,
     ) {
         $this->featureRollouts = $featureRollouts;
     }

@@ -57,12 +57,12 @@ class WorkspacesTest extends ApiTestCase
     {
         $this->workspaceFixtures->load();
 
-        static::createClient()->request('GET', '/authentication/workspaces');
+        static::createClient()->request('GET', '/authentication/acme-inc/workspaces');
 
         $this->assertResponseStatusCodeSame(200);
         $this->assertJsonContains([
             '@context' => '/contexts/Workspace',
-            '@id' => '/authentication/workspaces',
+            '@id' => '/authentication/acme-inc/workspaces',
             '@type' => 'hydra:Collection',
             'hydra:totalItems' => 6,
         ]);
@@ -71,15 +71,15 @@ class WorkspacesTest extends ApiTestCase
     /** @test */
     public function itShouldShowAWorkspace(): void
     {
-        static::createClient()->request('GET', '/authentication/workspaces/01966c5a-10ef-70ce-ab8c-c455e874c3fc');
+        static::createClient()->request('GET', '/authentication/acme-inc/workspaces/01966c5a-10ef-70ce-ab8c-c455e874c3fc');
 
         $this->assertResponseStatusCodeSame(200);
         $this->assertJsonContains([
             '@context' => '/contexts/Workspace',
             '@type' => 'Workspace',
-            '@id' => '/authentication/workspaces/01966c5a-10ef-70ce-ab8c-c455e874c3fc',
+            '@id' => '/authentication/acme-inc/workspaces/01966c5a-10ef-70ce-ab8c-c455e874c3fc',
             'uuid' => '01966c5a-10ef-70ce-ab8c-c455e874c3fc',
-            'organizationId' => '/authentication/organizations/01966c5a-10ef-76f6-9513-e3b858c22f0a',
+            'organizationId' => '/authentication/acme-inc/organizations/01966c5a-10ef-76f6-9513-e3b858c22f0a',
         ]);
     }
 
@@ -88,9 +88,9 @@ class WorkspacesTest extends ApiTestCase
     {
         $validUntil = $this->clock->now()->add(new \DateInterval('P3M2D'))->format('Y-m-d');
 
-        static::createClient()->request('POST', '/authentication/workspaces', [
+        static::createClient()->request('POST', '/authentication/acme-inc/workspaces', [
             'json' => [
-                'organizationId' => '/authentication/organizations/01966c5a-10ef-7315-94f2-cbeec2f167d8',
+                'organizationId' => '/authentication/acme-inc/organizations/01966c5a-10ef-7315-94f2-cbeec2f167d8',
                 'name' => 'Project 101',
                 'slug' => 'project-101',
                 'validUntil' => $validUntil,
@@ -105,7 +105,7 @@ class WorkspacesTest extends ApiTestCase
         $this->assertJsonContains([
             '@context' => '/contexts/Workspace',
             '@type' => 'Workspace',
-            'organizationId' => '/authentication/organizations/01966c5a-10ef-7315-94f2-cbeec2f167d8',
+            'organizationId' => '/authentication/acme-inc/organizations/01966c5a-10ef-7315-94f2-cbeec2f167d8',
             'name' => 'Project 101',
             'slug' => 'project-101',
             'validUntil' => $validUntil,
@@ -116,9 +116,9 @@ class WorkspacesTest extends ApiTestCase
     /** @test */
     public function itShouldCreateAPendingWorkspace(): void
     {
-        static::createClient()->request('POST', '/authentication/workspaces', [
+        static::createClient()->request('POST', '/authentication/acme-inc/workspaces', [
             'json' => [
-                'organizationId' => '/authentication/organizations/01966c5a-10ef-7315-94f2-cbeec2f167d8',
+                'organizationId' => '/authentication/acme-inc/organizations/01966c5a-10ef-7315-94f2-cbeec2f167d8',
                 'name' => 'Project 101',
                 'slug' => 'project-101',
                 'enabled' => false,
@@ -132,7 +132,7 @@ class WorkspacesTest extends ApiTestCase
         $this->assertJsonContains([
             '@context' => '/contexts/Workspace',
             '@type' => 'Workspace',
-            'organizationId' => '/authentication/organizations/01966c5a-10ef-7315-94f2-cbeec2f167d8',
+            'organizationId' => '/authentication/acme-inc/organizations/01966c5a-10ef-7315-94f2-cbeec2f167d8',
             'name' => 'Project 101',
             'slug' => 'project-101',
             'enabled' => false,
@@ -142,7 +142,7 @@ class WorkspacesTest extends ApiTestCase
     /** @test */
     public function itShouldRespondBadRequestOnIncompletePayloadOnCreation(): void
     {
-        static::createClient()->request('POST', '/authentication/workspaces', [
+        static::createClient()->request('POST', '/authentication/acme-inc/workspaces', [
             'json' => [
             ],
             'headers' => [
@@ -164,7 +164,7 @@ class WorkspacesTest extends ApiTestCase
     {
         $validUntil = $this->clock->now()->add(new \DateInterval('P3M2D'))->format('Y-m-d');
 
-        static::createClient()->request('POST', '/authentication/organizations/01966c5a-10ef-7315-94f2-cbeec2f167d8/workspaces', [
+        static::createClient()->request('POST', '/authentication/acme-inc/organizations/01966c5a-10ef-7315-94f2-cbeec2f167d8/workspaces', [
             'json' => [
                 'name' => 'Project 101',
                 'slug' => 'project-101',
@@ -190,7 +190,7 @@ class WorkspacesTest extends ApiTestCase
     /** @test */
     public function itShouldCreateAPendingWorkspaceWithinAnOrganization(): void
     {
-        static::createClient()->request('POST', '/authentication/organizations/01966c5a-10ef-7315-94f2-cbeec2f167d8/workspaces', [
+        static::createClient()->request('POST', '/authentication/acme-inc/organizations/01966c5a-10ef-7315-94f2-cbeec2f167d8/workspaces', [
             'json' => [
                 'name' => 'Project 101',
                 'slug' => 'project-101',
@@ -205,7 +205,7 @@ class WorkspacesTest extends ApiTestCase
         $this->assertJsonContains([
             '@context' => '/contexts/Workspace',
             '@type' => 'Workspace',
-            'organizationId' => '/authentication/organizations/01966c5a-10ef-7315-94f2-cbeec2f167d8',
+            'organizationId' => '/authentication/acme-inc/organizations/01966c5a-10ef-7315-94f2-cbeec2f167d8',
             'name' => 'Project 101',
             'slug' => 'project-101',
             'enabled' => false,
@@ -215,7 +215,7 @@ class WorkspacesTest extends ApiTestCase
     /** @test */
     public function itShouldRespondBadRequestOnIncompletePayloadOnCreationWithinAnOrganization(): void
     {
-        static::createClient()->request('POST', '/authentication/organizations/01966c5a-10ef-7315-94f2-cbeec2f167d8/workspaces', [
+        static::createClient()->request('POST', '/authentication/acme-inc/organizations/01966c5a-10ef-7315-94f2-cbeec2f167d8/workspaces', [
             'json' => [
             ],
             'headers' => [
@@ -237,7 +237,7 @@ class WorkspacesTest extends ApiTestCase
     {
         $validUntil = $this->clock->now()->add(new \DateInterval('P3M2D'))->format('Y-m-d');
 
-        static::createClient()->request('PATCH', '/authentication/workspaces/01966c5a-10ef-7795-9e13-7359dd58b49c/enable', [
+        static::createClient()->request('PATCH', '/authentication/acme-inc/workspaces/01966c5a-10ef-7795-9e13-7359dd58b49c/enable', [
             'json' => [
                 'enabled' => true,
                 'validUntil' => $validUntil,
@@ -251,9 +251,9 @@ class WorkspacesTest extends ApiTestCase
         $this->assertJsonContains([
             '@context' => '/contexts/Workspace',
             '@type' => 'Workspace',
-            '@id' => '/authentication/workspaces/01966c5a-10ef-7795-9e13-7359dd58b49c',
+            '@id' => '/authentication/acme-inc/workspaces/01966c5a-10ef-7795-9e13-7359dd58b49c',
             'uuid' => '01966c5a-10ef-7795-9e13-7359dd58b49c',
-            'organizationId' => '/authentication/organizations/01966c5a-10ef-7315-94f2-cbeec2f167d8',
+            'organizationId' => '/authentication/acme-inc/organizations/01966c5a-10ef-7315-94f2-cbeec2f167d8',
             'name' => 'Consectetur adipiscing elit',
             'slug' => 'consectetur-adipiscing-elit',
             'validUntil' => $validUntil,
@@ -266,7 +266,7 @@ class WorkspacesTest extends ApiTestCase
     {
         $validUntil = $this->clock->now()->add(new \DateInterval('P3M2D'))->format('Y-m-d');
 
-        static::createClient()->request('PATCH', '/authentication/workspaces/01966c5a-10ef-723c-bc33-2b1dc30d8963/disable', [
+        static::createClient()->request('PATCH', '/authentication/acme-inc/workspaces/01966c5a-10ef-723c-bc33-2b1dc30d8963/disable', [
             'json' => [
                 'enabled' => false,
                 'validUntil' => $validUntil,
@@ -280,9 +280,9 @@ class WorkspacesTest extends ApiTestCase
         $this->assertJsonContains([
             '@context' => '/contexts/Workspace',
             '@type' => 'Workspace',
-            '@id' => '/authentication/workspaces/01966c5a-10ef-723c-bc33-2b1dc30d8963',
+            '@id' => '/authentication/acme-inc/workspaces/01966c5a-10ef-723c-bc33-2b1dc30d8963',
             'uuid' => '01966c5a-10ef-723c-bc33-2b1dc30d8963',
-            'organizationId' => '/authentication/organizations/01966c5a-10ef-7315-94f2-cbeec2f167d8',
+            'organizationId' => '/authentication/acme-inc/organizations/01966c5a-10ef-7315-94f2-cbeec2f167d8',
             'name' => 'Lorem ipsum',
             'slug' => 'lorem-ipsum',
             'validUntil' => $validUntil,
@@ -293,7 +293,7 @@ class WorkspacesTest extends ApiTestCase
     /** @test */
     public function itShouldDeleteAWorkspace(): void
     {
-        static::createClient()->request('DELETE', '/authentication/workspaces/01966c5a-10ef-723c-bc33-2b1dc30d8963', [
+        static::createClient()->request('DELETE', '/authentication/acme-inc/workspaces/01966c5a-10ef-723c-bc33-2b1dc30d8963', [
             'headers' => [
                 'Content-Type' => 'application/merge-patch+json',
             ],

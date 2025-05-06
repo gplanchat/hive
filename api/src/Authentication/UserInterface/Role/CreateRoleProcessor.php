@@ -8,6 +8,7 @@ use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
 use App\Authentication\Domain\CommandBusInterface;
 use App\Authentication\Domain\Organization\OrganizationId;
+use App\Authentication\Domain\Realm\RealmId;
 use App\Authentication\Domain\Role\Command\UseCases\CreateEnabledRole;
 use App\Authentication\Domain\Role\Command\UseCases\CreatePendingRole;
 use App\Authentication\Domain\Role\Command\UseCases\CreateRole;
@@ -33,6 +34,8 @@ final readonly class CreateRoleProcessor implements ProcessorInterface
         }
 
         try {
+            $realmId = RealmId::fromString($uriVariables['realm']);
+
             if ($data instanceof CreateRoleWithinOrganizationInput
                 && array_key_exists('organizationId', $uriVariables)
             ) {
@@ -41,6 +44,7 @@ final readonly class CreateRoleProcessor implements ProcessorInterface
                 $command = new CreateRole(
                     RoleId::generateRandom(),
                     $organizationId,
+                    $realmId,
                     $data->identifier,
                     $data->label,
                     $data->resourceAccesses,
@@ -49,6 +53,7 @@ final readonly class CreateRoleProcessor implements ProcessorInterface
                 $command = new CreateRole(
                     RoleId::generateRandom(),
                     $data->organizationId,
+                    $realmId,
                     $data->identifier,
                     $data->label,
                     $data->resourceAccesses,

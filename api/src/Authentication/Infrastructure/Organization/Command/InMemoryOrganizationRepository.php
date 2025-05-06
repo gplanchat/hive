@@ -42,6 +42,7 @@ final readonly class InMemoryOrganizationRepository implements OrganizationRepos
 
         return new Organization(
             uuid: $value->uuid,
+            realmId: $value->realmId,
             name: $value->name,
             slug: $value->slug,
             validUntil: $value->validUntil,
@@ -84,6 +85,7 @@ final readonly class InMemoryOrganizationRepository implements OrganizationRepos
 
             return new QueryOrganization(
                 uuid: $event->uuid,
+                realmId: $event->realmId,
                 name: $event->name,
                 slug: $event->slug,
                 validUntil: $event->validUntil,
@@ -108,6 +110,7 @@ final readonly class InMemoryOrganizationRepository implements OrganizationRepos
 
         $item->set(new QueryOrganization(
             uuid: $current->uuid,
+            realmId: $current->realmId,
             name: $current->name,
             slug: $current->slug,
             validUntil: $event->validUntil,
@@ -133,6 +136,7 @@ final readonly class InMemoryOrganizationRepository implements OrganizationRepos
 
             $item->set(new QueryOrganization(
                 uuid: $current->uuid,
+                realmId: $current->realmId,
                 name: $current->name,
                 slug: $current->slug,
                 validUntil: $event->validUntil,

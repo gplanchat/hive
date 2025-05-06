@@ -10,8 +10,8 @@ use Symfony\Component\Routing\Requirement\Requirement;
 final class FeatureRolloutId implements IdInterface
 {
     const string REQUIREMENT = '[A-Za-z0-9]+(?:[-.][A-Za-z0-9]+)*';
-    const string URI_REQUIREMENT = '\/authentication\/feature-rollouts\/[A-Za-z0-9]+(?:[-.][A-Za-z0-9]+)*';
-    const string PARSE = '/\/authentication\/feature-rollouts\/(?<reference>[A-Za-z0-9]+(?:[-.][A-Za-z0-9]+)*)/';
+    const string URI_REQUIREMENT = '\/feature-rollouts\/[A-Za-z0-9]+(?:[-.][A-Za-z0-9]+)*';
+    const string PARSE = '/\/feature-rollouts\/(?<reference>[A-Za-z0-9]+(?:[-.][A-Za-z0-9]+)*)/';
 
     private function __construct(
         private readonly string $reference,
