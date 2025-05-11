@@ -9,8 +9,10 @@ use App\Authentication\Domain\Realm\Query\Realm;
 use App\Authentication\Domain\Realm\Query\UseCases\RealmPage;
 use App\Authentication\Domain\Realm\RealmId;
 use App\Authentication\Domain\User\Query\User;
+use Firebase\JWT\JWK;
 use Http\Discovery\Psr17FactoryDiscovery;
 use Psr\Http\Message\UriInterface;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 final readonly class Keycloak implements KeycloakInterface
 {
@@ -18,15 +20,15 @@ final readonly class Keycloak implements KeycloakInterface
     private array $allowedRealmIds;
 
     public function __construct(
-        private KeycloakClientInterface $httpClient,
-        private UriInterface $baseUri,
+        private KeycloakAdminClientInterface $httpClient,
+        private UriInterface                 $baseUri,
         RealmId ...$allowedRealmIds,
     ) {
         $this->allowedRealmIds = $allowedRealmIds;
     }
 
     public static function createFromUri(
-        KeycloakClientInterface $httpClient,
+        KeycloakAdminClientInterface $httpClient,
         string $baseUri,
         array $allowedRealmIds,
     ): self {
@@ -191,12 +193,12 @@ final readonly class Keycloak implements KeycloakInterface
         }
     }
 
-    public function fetchOpenidCertificates(Realm $realm): void
+    public function fetchOpenidCertificates(RealmId $realmId): array
     {
         $url = strtr(
             "{$this->baseUri}/realms/{realm}/protocol/openid-connect/certs",
             [
-                '{realm}' => $realm->code->toString(),
+                '{realm}' => $realmId->toString(),
             ]
         );
 
@@ -211,9 +213,11 @@ final readonly class Keycloak implements KeycloakInterface
                 'Could not create User in the %realm% on the Keycloak instance %keycloakUri%',
                 [
                     '%keycloakUri%' => $this->baseUri,
-                    '%realm%' => $realm->code->toString(),
+                    '%realm%' => $realmId->toString(),
                 ]
             ));
         }
+
+        return JWK::parseKeySet($response->toArray(false));
     }
 }

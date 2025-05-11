@@ -29,10 +29,6 @@ final readonly class CreateRoleProcessor implements ProcessorInterface
 
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): Role
     {
-        if (!$data instanceof CreateRoleInput) {
-            throw new BadRequestHttpException();
-        }
-
         try {
             $realmId = RealmId::fromString($uriVariables['realm']);
 
@@ -43,8 +39,8 @@ final readonly class CreateRoleProcessor implements ProcessorInterface
 
                 $command = new CreateRole(
                     RoleId::generateRandom(),
-                    $organizationId,
                     $realmId,
+                    $organizationId,
                     $data->identifier,
                     $data->label,
                     $data->resourceAccesses,
@@ -52,8 +48,8 @@ final readonly class CreateRoleProcessor implements ProcessorInterface
             } else if ($data instanceof CreateRoleInput) {
                 $command = new CreateRole(
                     RoleId::generateRandom(),
-                    $data->organizationId,
                     $realmId,
+                    $data->organizationId,
                     $data->identifier,
                     $data->label,
                     $data->resourceAccesses,
@@ -67,6 +63,6 @@ final readonly class CreateRoleProcessor implements ProcessorInterface
             throw new LogicException($exception->getMessage(), previous: $exception);
         }
 
-        return $this->userRepository->get($command->uuid);
+        return $this->userRepository->get($command->uuid, $command->realmId);
     }
 }

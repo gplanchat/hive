@@ -9,20 +9,23 @@ use App\Authentication\Domain\Realm\RealmId;
 use App\Authentication\Domain\Realm\Query\RealmRepositoryInterface;
 use App\Authentication\Domain\Realm\Query\UseCases\RealmPage;
 use App\Authentication\Domain\NotFoundException;
+use App\Shared\Infrastructure\Collection\Collection;
 
 final class InMemoryRealmRepository implements RealmRepositoryInterface
 {
     private array $storage = [];
 
     public function __construct(
-        Realm ...$featureRollouts,
+        Realm ...$realms,
     ) {
-        $this->storage = $featureRollouts;
+        $this->storage = $realms;
     }
 
-    public function get(RealmId $featureRolloutId): Realm
+    public function get(RealmId $realmId): Realm
     {
-        $result = array_filter($this->storage, fn (Realm $featureRollout) => $featureRollout->code->equals($featureRolloutId));
+        $result = Collection::fromArray($this->storage)
+            ->filter(fn (Realm $realm) => $realm->code->equals($realmId))
+            ->toArray();
 
         return array_shift($result) ?? throw new NotFoundException();
     }
@@ -43,7 +46,8 @@ final class InMemoryRealmRepository implements RealmRepositoryInterface
     {
         return new self(
             new Realm(
-                RealmId::fromString('gyroscops'),
+                RealmId::fromString('acme-inc'),
+                'Acme Inc.',
             ),
         );
     }

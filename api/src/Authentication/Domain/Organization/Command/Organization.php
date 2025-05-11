@@ -7,6 +7,7 @@ namespace App\Authentication\Domain\Organization\Command;
 use App\Authentication\Domain\FeatureRollout\FeatureRolloutId;
 use App\Authentication\Domain\Organization\OrganizationId;
 use App\Authentication\Domain\Realm\RealmId;
+use App\Shared\Infrastructure\Collection\Collection;
 use Webmozart\Assert\Assert;
 
 final class Organization
@@ -31,7 +32,7 @@ final class Organization
 
     private function apply(object $event): void
     {
-        $methodName = 'apply'.substr(__CLASS__, strrpos(__CLASS__, '\\') + 1);
+        $methodName = 'apply'.substr($event::class, strrpos($event::class, '\\') + 1);
         if (method_exists($this, $methodName)) {
             $this->{$methodName}($event);
         }
@@ -123,7 +124,7 @@ final class Organization
             throw new InvalidOrganizationStateException('Cannot enable an already enabled Organization.');
         }
 
-        $this->recordThat(new EnabledEvent($this->uuid, $this->version + 1, $validUntil));
+        $this->recordThat(new EnabledEvent($this->uuid, $this->version + 1, $this->realmId, $validUntil));
     }
 
     private function applyEnabledEvent(EnabledEvent $event): void
@@ -140,12 +141,45 @@ final class Organization
             throw new InvalidOrganizationStateException('Cannot disable an already disabled Organization.');
         }
 
-        $this->recordThat(new DisabledEvent($this->uuid, $this->version + 1, $validUntil));
+        $this->recordThat(new DisabledEvent($this->uuid, $this->version + 1, $this->realmId, $validUntil));
     }
 
     private function applyDisabledEvent(DisabledEvent $event): void
     {
         $this->enabled = false;
+    }
+
+    public function addFeatureRollouts(FeatureRolloutId ...$featureRolloutIds): void
+    {
+        if ($this->deleted) {
+            throw new InvalidOrganizationStateException('Cannot modify an already deleted Organization.');
+        }
+
+        $this->recordThat(new AddedFeatureRolloutsEvent($this->uuid, $this->version + 1, $this->realmId, $featureRolloutIds));
+    }
+
+    private function applyAddedFeatureRolloutsEvent(AddedFeatureRolloutsEvent $event): void
+    {
+        $this->featureRolloutIds = Collection::fromArray([...$this->featureRolloutIds, ...$event->featureRolloutIds])
+            ->unique(fn (FeatureRolloutId $left, FeatureRolloutId $right) => $left->equals($right))
+            ->toArray();
+    }
+
+    public function removeFeatureRollouts(FeatureRolloutId ...$featureRolloutIds): void
+    {
+        if ($this->deleted) {
+            throw new InvalidOrganizationStateException('Cannot modify an already deleted Organization.');
+        }
+
+        $this->recordThat(new RemovedFeatureRolloutsEvent($this->uuid, $this->version + 1, $this->realmId, $featureRolloutIds));
+    }
+
+    private function applyRemovedFeatureRolloutsEvent(RemovedFeatureRolloutsEvent $event): void
+    {
+        $this->featureRolloutIds = Collection::fromArray($this->featureRolloutIds)
+            ->filter(fn (FeatureRolloutId $current) => Collection::fromArray($event->featureRolloutIds)
+                ->none(fn (FeatureRolloutId $toRemove) => $current->equals($toRemove)))
+            ->toArray();
     }
 
     public function delete(): void

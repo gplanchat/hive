@@ -10,8 +10,8 @@ use App\Authentication\Domain\Workspace\WorkspaceId;
 final readonly class QueryOneWorkspace
 {
     public function __construct(
-        public RealmId $realmId,
         public WorkspaceId $uuid,
+        public RealmId $realmId,
     ) {
     }
 }

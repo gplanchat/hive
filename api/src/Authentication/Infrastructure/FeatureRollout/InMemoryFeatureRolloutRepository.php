@@ -148,7 +148,10 @@ final class InMemoryFeatureRolloutRepository implements FeatureRolloutRepository
                 FeatureRolloutId::fromString('demo.fermentum-praesent'),
             ),
             new FeatureRollout(
-                FeatureRolloutId::fromString('demo.id-ipsum-vel-nibh'),
+                FeatureRolloutId::fromString('demo.this-can-be-added'),
+            ),
+            new FeatureRollout(
+                FeatureRolloutId::fromString('demo.this-can-also-be-added'),
             ),
         );
     }

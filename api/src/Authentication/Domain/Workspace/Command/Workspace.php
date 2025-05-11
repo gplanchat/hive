@@ -4,71 +4,15 @@ declare(strict_types=1);
 
 namespace App\Authentication\Domain\Workspace\Command;
 
-use ApiPlatform\Metadata\Delete;
-use ApiPlatform\Metadata\Patch;
-use ApiPlatform\Metadata\Post;
 use App\Authentication\Domain\Organization\OrganizationId;
-use App\Authentication\Domain\Workspace\Query\Workspace as QueryWorkspace;
+use App\Authentication\Domain\Realm\RealmId;
 use App\Authentication\Domain\Workspace\WorkspaceId;
-use App\Authentication\UserInterface\Workspace\CreateWorkspaceInput;
-use App\Authentication\UserInterface\Workspace\CreateWorkspaceProcessor;
-use App\Authentication\UserInterface\Workspace\CreateWorkspaceWithinOrganizationInput;
-use App\Authentication\UserInterface\Workspace\DeleteWorkspaceProcessor;
-use App\Authentication\UserInterface\Workspace\DisableWorkspaceInput;
-use App\Authentication\UserInterface\Workspace\DisableWorkspaceProcessor;
-use App\Authentication\UserInterface\Workspace\EnableWorkspaceInput;
-use App\Authentication\UserInterface\Workspace\EnableWorkspaceProcessor;
-use App\Authentication\UserInterface\Workspace\QueryOneWorkspaceProvider;
 
-#[Post(
-    uriTemplate: '/authentication/{realm}/workspaces',
-    uriVariables: ['realm'],
-    class: QueryWorkspace::class,
-    input: CreateWorkspaceInput::class,
-    output: QueryWorkspace::class,
-    processor: CreateWorkspaceProcessor::class,
-    itemUriTemplate: '/authentication/{realm}/workspaces/{uuid}',
-)]
-#[Post(
-    uriTemplate: '/authentication/{realm}/organizations/{organizationId}/workspaces',
-    uriVariables: ['realm', 'organizationId'],
-    class: QueryWorkspace::class,
-    input: CreateWorkspaceWithinOrganizationInput::class,
-    output: QueryWorkspace::class,
-    processor: CreateWorkspaceProcessor::class,
-    itemUriTemplate: '/authentication/{realm}/workspaces/{uuid}',
-)]
-#[Patch(
-    uriTemplate: '/authentication/{realm}/workspaces/{uuid}/enable',
-    uriVariables: ['realm', 'uuid'],
-    class: QueryWorkspace::class,
-    input: EnableWorkspaceInput::class,
-    output: QueryWorkspace::class,
-    provider: QueryOneWorkspaceProvider::class,
-    processor: EnableWorkspaceProcessor::class,
-)]
-#[Patch(
-    uriTemplate: '/authentication/{realm}/workspaces/{uuid}/disable',
-    uriVariables: ['realm', 'uuid'],
-    class: QueryWorkspace::class,
-    input: DisableWorkspaceInput::class,
-    output: QueryWorkspace::class,
-    provider: QueryOneWorkspaceProvider::class,
-    processor: DisableWorkspaceProcessor::class,
-)]
-#[Delete(
-    uriTemplate: '/authentication/{realm}/workspaces/{uuid}',
-    uriVariables: ['realm', 'uuid'],
-    class: QueryWorkspace::class,
-    input: false,
-    output: false,
-    provider: QueryOneWorkspaceProvider::class,
-    processor: DeleteWorkspaceProcessor::class,
-)]
 final class Workspace
 {
     public function __construct(
         public readonly WorkspaceId $uuid,
+        public readonly RealmId $realmId,
         public readonly OrganizationId $organizationId,
         private ?string $name = null,
         private ?string $slug = null,
@@ -82,7 +26,7 @@ final class Workspace
 
     private function apply(object $event): void
     {
-        $methodName = 'apply'.substr(__CLASS__, strrpos(__CLASS__, '\\') + 1);
+        $methodName = 'apply'.substr($event::class, strrpos($event::class, '\\') + 1);
         if (method_exists($this, $methodName)) {
             $this->{$methodName}($event);
         }
@@ -104,15 +48,17 @@ final class Workspace
 
     public static function declareEnabled(
         WorkspaceId $uuid,
+        RealmId $realmId,
         OrganizationId $organizationId,
         string $name,
         string $slug,
         \DateTimeInterface $validUntil,
     ): self {
-        $instance = new self($uuid, $organizationId);
+        $instance = new self($uuid, $realmId, $organizationId);
         $instance->recordThat(new DeclaredEvent(
             $uuid,
             1,
+            $realmId,
             $organizationId,
             $name,
             $slug,
@@ -125,14 +71,16 @@ final class Workspace
 
     public static function declareDisabled(
         WorkspaceId $uuid,
+        RealmId $realmId,
         OrganizationId $organizationId,
         string $name,
         string $slug,
     ): self {
-        $instance = new self($uuid, $organizationId);
+        $instance = new self($uuid, $realmId, $organizationId);
         $instance->recordThat(new DeclaredEvent(
             $uuid,
             1,
+            $realmId,
             $organizationId,
             $name,
             $slug,
@@ -160,7 +108,7 @@ final class Workspace
             throw new InvalidWorkspaceStateException('Cannot enable an already enabled Workspace.');
         }
 
-        $this->recordThat(new EnabledEvent($this->uuid, $this->organizationId, $this->version + 1, $validUntil));
+        $this->recordThat(new EnabledEvent($this->uuid, $this->realmId, $this->organizationId, $this->version + 1, $validUntil));
     }
 
     private function applyEnabledEvent(EnabledEvent $event): void
@@ -177,7 +125,7 @@ final class Workspace
             throw new InvalidWorkspaceStateException('Cannot disable an already disabled Workspace.');
         }
 
-        $this->recordThat(new DisabledEvent($this->uuid, $this->organizationId, $this->version + 1, $validUntil));
+        $this->recordThat(new DisabledEvent($this->uuid, $this->realmId, $this->organizationId, $this->version + 1, $validUntil));
     }
 
     private function applyDisabledEvent(DisabledEvent $event): void
@@ -191,7 +139,7 @@ final class Workspace
             throw new InvalidWorkspaceStateException('Cannot delete an already deleted Workspace.');
         }
 
-        $this->recordThat(new DeletedEvent($this->uuid, $this->organizationId, $this->version + 1));
+        $this->recordThat(new DeletedEvent($this->uuid, $this->realmId, $this->organizationId, $this->version + 1));
     }
 
     private function applyDeletedEvent(DeletedEvent $event): void

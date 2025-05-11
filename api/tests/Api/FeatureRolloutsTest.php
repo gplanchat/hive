@@ -26,7 +26,7 @@ class FeatureRolloutsTest extends ApiTestCase
             '@context' => '/contexts/FeatureRollout',
             '@id' => '/feature-rollouts',
             '@type' => 'hydra:Collection',
-            'hydra:totalItems' => 36,
+            'hydra:totalItems' => 37,
         ]);
     }
 

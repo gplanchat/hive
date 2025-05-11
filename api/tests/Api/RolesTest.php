@@ -68,6 +68,22 @@ class RolesTest extends ApiTestCase
     }
 
     /** @test */
+    public function itShouldListRolesFromOrganization(): void
+    {
+        $this->roleFixtures->load();
+
+        static::createClient()->request('GET', '/authentication/acme-inc/organizations/01966c5a-10ef-7315-94f2-cbeec2f167d8/roles');
+
+        $this->assertResponseStatusCodeSame(200);
+        $this->assertJsonContains([
+            '@context' => '/contexts/Role',
+            '@id' => '/authentication/acme-inc/organizations/01966c5a-10ef-7315-94f2-cbeec2f167d8/roles',
+            '@type' => 'hydra:Collection',
+            'hydra:totalItems' => 2,
+        ]);
+    }
+
+    /** @test */
     public function itShouldShowARole(): void
     {
         static::createClient()->request('GET', '/authentication/acme-inc/roles/01966d41-78eb-7406-ad99-03ad025e8bcf');
@@ -88,6 +104,31 @@ class RolesTest extends ApiTestCase
         static::createClient()->request('POST', '/authentication/acme-inc/roles', [
             'json' => [
                 'organizationId' => '/authentication/acme-inc/organizations/01966c5a-10ef-7315-94f2-cbeec2f167d8',
+                'identifier' => 'manager',
+                'label' => 'Manager',
+                'resourceAccesses' => [],
+            ],
+            'headers' => [
+                'Content-Type' => 'application/ld+json',
+            ],
+        ]);
+
+        $this->assertResponseStatusCodeSame(201);
+        $this->assertJsonContains([
+            '@context' => '/contexts/Role',
+            '@type' => 'Role',
+            'organizationId' => '/authentication/acme-inc/organizations/01966c5a-10ef-7315-94f2-cbeec2f167d8',
+            'identifier' => 'manager',
+            'label' => 'Manager',
+            'resourceAccesses' => [],
+        ]);
+    }
+
+    /** @test */
+    public function itShouldCreateARoleInOrganization(): void
+    {
+        static::createClient()->request('POST', '/authentication/acme-inc/organizations/01966c5a-10ef-7315-94f2-cbeec2f167d8/roles', [
+            'json' => [
                 'identifier' => 'manager',
                 'label' => 'Manager',
                 'resourceAccesses' => [],

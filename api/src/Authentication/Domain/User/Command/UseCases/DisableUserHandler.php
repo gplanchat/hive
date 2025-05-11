@@ -16,7 +16,7 @@ final readonly class DisableUserHandler
 
     public function __invoke(DisableUser $command): void
     {
-        $user = $this->userRepository->get($command->uuid);
+        $user = $this->userRepository->get($command->uuid, $command->realmId);
         $user->disable();
         $this->userRepository->save($user);
     }

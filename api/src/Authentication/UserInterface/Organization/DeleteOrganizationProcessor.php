@@ -28,7 +28,7 @@ final readonly class DeleteOrganizationProcessor implements ProcessorInterface
         }
 
         try {
-            $command = new DeleteOrganization($data->uuid);
+            $command = new DeleteOrganization($data->uuid, $data->realmId);
             $this->commandBus->apply($command);
         } catch (InvalidOrganizationStateException $exception) {
             throw new BadRequestHttpException($exception->getMessage(), previous: $exception);

@@ -28,7 +28,7 @@ final readonly class DeleteUserProcessor implements ProcessorInterface
         }
 
         try {
-            $command = new DeleteUser($data->uuid);
+            $command = new DeleteUser($data->uuid, $data->realmId);
             $this->commandBus->apply($command);
         } catch (InvalidUserStateException $exception) {
             throw new BadRequestHttpException($exception->getMessage(), previous: $exception);

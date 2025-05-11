@@ -53,6 +53,6 @@ final readonly class CreateOrganizationProcessor implements ProcessorInterface
             throw new LogicException($exception->getMessage(), previous: $exception);
         }
 
-        return $this->organizationRepository->get($command->uuid);
+        return $this->organizationRepository->get($command->uuid, $command->realmId);
     }
 }

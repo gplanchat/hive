@@ -13,8 +13,8 @@ final readonly class DeclaredEvent
     public function __construct(
         public RoleId $uuid,
         public int $version,
-        public OrganizationId $organizationId,
         public RealmId $realmId,
+        public OrganizationId $organizationId,
         public string $identifier,
         public string $label,
         public array $resourceAccesses = [],

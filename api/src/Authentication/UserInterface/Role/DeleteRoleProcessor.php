@@ -28,7 +28,7 @@ final readonly class DeleteRoleProcessor implements ProcessorInterface
         }
 
         try {
-            $command = new DeleteRole($data->uuid);
+            $command = new DeleteRole($data->uuid, $data->realmId);
             $this->commandBus->apply($command);
         } catch (InvalidRoleStateException $exception) {
             throw new BadRequestHttpException($exception->getMessage(), previous: $exception);

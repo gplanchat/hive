@@ -18,7 +18,7 @@ final class DeleteWorkspaceHandler
 
     public function __invoke(DeleteWorkspace $command): void
     {
-        $organization = $this->workspaceRepository->get($command->uuid);
+        $organization = $this->workspaceRepository->get($command->uuid, $command->realmId);
         $organization->delete();
         $this->workspaceRepository->save($organization);
     }

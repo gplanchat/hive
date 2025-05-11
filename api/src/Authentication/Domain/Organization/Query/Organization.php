@@ -14,10 +14,13 @@ use ApiPlatform\Metadata\QueryParameter;
 use ApiPlatform\OpenApi\Model\Operation;
 use ApiPlatform\OpenApi\Model\Parameter;
 use App\Authentication\Domain\FeatureRollout\FeatureRolloutId;
+use App\Authentication\Domain\Organization\Command\UseCases\AddFeatureRolloutsToOrganization;
 use App\Authentication\Domain\Organization\OrganizationId;
 use App\Authentication\Domain\Organization\Query\UseCases\QueryOneOrganization;
 use App\Authentication\Domain\Organization\Query\UseCases\QuerySeveralOrganization;
 use App\Authentication\Domain\Realm\RealmId;
+use App\Authentication\UserInterface\Organization\AddFeatureRolloutsToOrganizationInput;
+use App\Authentication\UserInterface\Organization\AddFeatureRolloutsToOrganizationProcessor;
 use App\Authentication\UserInterface\Organization\CreateOrganizationInput;
 use App\Authentication\UserInterface\Organization\CreateOrganizationProcessor;
 use App\Authentication\UserInterface\Organization\DeleteOrganizationProcessor;
@@ -27,6 +30,8 @@ use App\Authentication\UserInterface\Organization\EnableOrganizationInput;
 use App\Authentication\UserInterface\Organization\EnableOrganizationProcessor;
 use App\Authentication\UserInterface\Organization\QueryOneOrganizationProvider;
 use App\Authentication\UserInterface\Organization\QuerySeveralOrganizationProvider;
+use App\Authentication\UserInterface\Organization\RemoveFeatureRolloutsFromOrganizationInput;
+use App\Authentication\UserInterface\Organization\RemoveFeatureRolloutsFromOrganizationProcessor;
 use Symfony\Component\Serializer\Attribute\Context;
 
 #[Get(
@@ -53,7 +58,6 @@ use Symfony\Component\Serializer\Attribute\Context;
             ),
         ],
     ),
-    input: QueryOneOrganization::class,
     provider: QueryOneOrganizationProvider::class,
 )]
 #[GetCollection(
@@ -77,7 +81,6 @@ use Symfony\Component\Serializer\Attribute\Context;
     paginationMaximumItemsPerPage: 100,
     paginationPartial: true,
     order: ['uuid' => 'ASC'],
-    input: QuerySeveralOrganization::class,
     provider: QuerySeveralOrganizationProvider::class,
     itemUriTemplate: '/authentication/{realm}/organizations/{uuid}'
 )]
@@ -112,6 +115,28 @@ use Symfony\Component\Serializer\Attribute\Context;
     output: self::class,
     provider: QueryOneOrganizationProvider::class,
     processor: DisableOrganizationProcessor::class,
+)]
+#[Patch(
+    uriTemplate: '/authentication/{realm}/organizations/{uuid}/add-features',
+    uriVariables: [
+        'realm' => 'realmId',
+        'uuid',
+    ],
+    input: AddFeatureRolloutsToOrganizationInput::class,
+    output: self::class,
+    provider: QueryOneOrganizationProvider::class,
+    processor: AddFeatureRolloutsToOrganizationProcessor::class,
+)]
+#[Patch(
+    uriTemplate: '/authentication/{realm}/organizations/{uuid}/remove-features',
+    uriVariables: [
+        'realm' => 'realmId',
+        'uuid',
+    ],
+    input: RemoveFeatureRolloutsFromOrganizationInput::class,
+    output: self::class,
+    provider: QueryOneOrganizationProvider::class,
+    processor: RemoveFeatureRolloutsFromOrganizationProcessor::class,
 )]
 #[Delete(
     uriTemplate: '/authentication/{realm}/organizations/{uuid}',

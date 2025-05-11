@@ -10,8 +10,8 @@ use App\Authentication\Domain\User\UserId;
 final readonly class QueryOneUser
 {
     public function __construct(
-        public RealmId $realmId,
         public UserId $uuid,
+        public RealmId $realmId,
     ) {
     }
 }

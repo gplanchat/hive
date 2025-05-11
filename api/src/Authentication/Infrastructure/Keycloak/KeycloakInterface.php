@@ -19,5 +19,5 @@ interface KeycloakInterface
 
     public function createUserInsideRealm(Realm $realm, User $user): void;
 
-    public function fetchOpenidCertificates(Realm $realm): void;
+    public function fetchOpenidCertificates(RealmId $realmId): array;
 }

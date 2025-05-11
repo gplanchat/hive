@@ -12,7 +12,7 @@ use ApiPlatform\State\ProviderInterface;
 use App\Authentication\Domain\QueryBusInterface;
 use App\Authentication\Domain\Realm\RealmId;
 use App\Authentication\Domain\User\Query\UseCases\QuerySeveralUser;
-use App\Authentication\Domain\User\Query\UserPage;
+use App\Authentication\Domain\User\Query\UseCases\UserPage;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;

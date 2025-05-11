@@ -4,11 +4,16 @@ declare(strict_types=1);
 
 namespace App\Authentication\Infrastructure\Keycloak;
 
-use App\Authentication\Infrastructure\Security\User;
+use App\Authentication\Domain\NotFoundException;
+use App\Authentication\Domain\Realm\RealmId;
+use App\Authentication\Domain\Role\Query\RoleRepositoryInterface;
+use App\Authentication\Domain\User\Query\UserRepositoryInterface;
+use App\Authentication\Domain\User\UserId;
 use Firebase\JWT\BeforeValidException;
 use Firebase\JWT\ExpiredException;
 use Firebase\JWT\JWT;
 use Firebase\JWT\SignatureInvalidException;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -23,6 +28,9 @@ final class KeycloakAuthenticator extends AbstractAuthenticator
 {
     public function __construct(
         private readonly Keycloak $keycloak,
+        private readonly UserRepositoryInterface $userRepository,
+        private readonly RoleRepositoryInterface $roleRepository,
+        private readonly LoggerInterface $logger,
     ) {}
 
     public function supports(Request $request): ?bool
@@ -47,12 +55,14 @@ final class KeycloakAuthenticator extends AbstractAuthenticator
         }
 
         $header = json_decode(base64_decode($parts[0]), true);
+        // FIXME: make the Realm dynamic
+        $realmId = RealmId::fromString('acme-inc');
 
         // Validate token
         try {
-            $this->keycloak->fetchOpenidCertificates();
+            $keys = $this->keycloak->fetchOpenidCertificates($realmId);
 
-            $decodedToken = JWT::decode($jwtToken, $this->getJwks(), [$header['alg']]);
+            $decodedToken = JWT::decode($jwtToken, $keys, [$header['alg']]);
         } catch (SignatureInvalidException $exception) {
             throw new AuthenticationException('Provided JWT was invalid because the signature verification failed', previous: $exception);
         } catch (BeforeValidException $exception) {
@@ -68,15 +78,24 @@ final class KeycloakAuthenticator extends AbstractAuthenticator
         }
 
         return new SelfValidatingPassport(
-            new UserBadge($decodedToken->sub, function (string $userId) {
-                $user = $this->userRepository->find($userId);
-                if (null === $user) {
-                    $user = new User($userId);
-                    $this->entityManager->persist($user);
-                    $this->entityManager->flush();
-                }
+            new UserBadge($decodedToken->sub, function (string $userId) use ($realmId) {
+                $userId = UserId::fromUri($userId);
+                try {
+                    $user = $this->userRepository->get($userId, $realmId);
 
-                return $user;
+                    return new KeycloakUser($user->keycloakUserId, $this->roleRepository->getAll($realmId, ...$user->roleIds));
+                } catch (NotFoundException) {
+                    // We are not providing access if the User repository does not return a User instance
+                    // This should be reviewed in the case we are using the database to store users or Keycloak itself
+                    $this->logger->info(strtr(
+                        'User with ID %userId% was not found in the %realmId% Realm.',
+                        [
+                            '%userId%' => $userId->toString(),
+                            '%realmId%' => $realmId->toString(),
+                        ]
+                    ));
+                    return null;
+                }
             })
         );
     }

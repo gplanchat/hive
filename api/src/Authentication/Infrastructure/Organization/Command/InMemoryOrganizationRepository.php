@@ -6,17 +6,22 @@ namespace App\Authentication\Infrastructure\Organization\Command;
 
 use App\Authentication\Domain\ConflictException;
 use App\Authentication\Domain\EventBusInterface;
+use App\Authentication\Domain\FeatureRollout\FeatureRolloutId;
 use App\Authentication\Domain\NotFoundException;
+use App\Authentication\Domain\Organization\Command\AddedFeatureRolloutsEvent;
 use App\Authentication\Domain\Organization\Command\DeclaredEvent;
 use App\Authentication\Domain\Organization\Command\DeletedEvent;
 use App\Authentication\Domain\Organization\Command\DisabledEvent;
 use App\Authentication\Domain\Organization\Command\EnabledEvent;
 use App\Authentication\Domain\Organization\Command\Organization;
 use App\Authentication\Domain\Organization\Command\OrganizationRepositoryInterface;
+use App\Authentication\Domain\Organization\Command\RemovedFeatureRolloutsEvent;
 use App\Authentication\Domain\Organization\OrganizationId;
 use App\Authentication\Domain\Organization\Query\Organization as QueryOrganization;
+use App\Authentication\Domain\Realm\RealmId;
 use App\Authentication\Infrastructure\Organization\DataFixtures\OrganizationFixtures;
 use App\Authentication\Infrastructure\StorageMock;
+use App\Shared\Infrastructure\Collection\Collection;
 use Symfony\Contracts\Cache\ItemInterface;
 
 final readonly class InMemoryOrganizationRepository implements OrganizationRepositoryInterface
@@ -27,9 +32,9 @@ final readonly class InMemoryOrganizationRepository implements OrganizationRepos
     ) {
     }
 
-    public function get(OrganizationId $organizationId): Organization
+    public function get(OrganizationId $organizationId, RealmId $realmId): Organization
     {
-        $item = $this->storage->getItem("tests.data-fixtures.organization.{$organizationId->toString()}");
+        $item = $this->storage->getItem(OrganizationFixtures::buildCacheKey($organizationId, $realmId));
 
         if (!$item->isHit()) {
             throw new NotFoundException();
@@ -76,7 +81,7 @@ final readonly class InMemoryOrganizationRepository implements OrganizationRepos
 
     private function applyDeclaredEvent(DeclaredEvent $event): void
     {
-        $this->storage->get("tests.data-fixtures.organization.{$event->uuid->toString()}", function (ItemInterface $item) use ($event): QueryOrganization {
+        $this->storage->get(OrganizationFixtures::buildCacheKey($event->uuid, $event->realmId), function (ItemInterface $item) use ($event): QueryOrganization {
             if ($item->isHit()) {
                 throw new ConflictException();
             }
@@ -97,7 +102,7 @@ final readonly class InMemoryOrganizationRepository implements OrganizationRepos
 
     private function applyEnabledEvent(EnabledEvent $event): void
     {
-        $item = $this->storage->getItem("tests.data-fixtures.organization.{$event->uuid->toString()}");
+        $item = $this->storage->getItem(OrganizationFixtures::buildCacheKey($event->uuid, $event->realmId));
 
         if (!$item->isHit()) {
             throw new NotFoundException();
@@ -123,7 +128,7 @@ final readonly class InMemoryOrganizationRepository implements OrganizationRepos
 
     private function applyDisabledEvent(DisabledEvent $event): void
     {
-        $item = $this->storage->getItem("tests.data-fixtures.organization.{$event->uuid->toString()}");
+        $item = $this->storage->getItem(OrganizationFixtures::buildCacheKey($event->uuid, $event->realmId));
 
             if (!$item->isHit()) {
                 throw new NotFoundException();
@@ -147,9 +152,66 @@ final readonly class InMemoryOrganizationRepository implements OrganizationRepos
             $this->storage->save($item);
     }
 
+    private function applyAddedFeatureRolloutsEvent(AddedFeatureRolloutsEvent $event): void
+    {
+        $item = $this->storage->getItem(OrganizationFixtures::buildCacheKey($event->uuid, $event->realmId));
+
+        if (!$item->isHit()) {
+            throw new NotFoundException();
+        }
+
+        $current = $item->get();
+        if (!$current instanceof QueryOrganization) {
+            throw new NotFoundException();
+        }
+
+        $item->set(new QueryOrganization(
+            uuid: $current->uuid,
+            realmId: $current->realmId,
+            name: $current->name,
+            slug: $current->slug,
+            validUntil: $current->validUntil,
+            featureRolloutIds: Collection::fromArray([...$current->featureRolloutIds, ...$event->featureRolloutIds])
+                ->unique(fn (FeatureRolloutId $left, FeatureRolloutId $right) => $left->equals($right))
+                ->toArray(),
+            enabled: $current->enabled,
+        ));
+
+        $this->storage->save($item);
+    }
+
+    private function applyRemovedFeatureRolloutsEvent(RemovedFeatureRolloutsEvent $event): void
+    {
+        $item = $this->storage->getItem(OrganizationFixtures::buildCacheKey($event->uuid, $event->realmId));
+
+        if (!$item->isHit()) {
+            throw new NotFoundException();
+        }
+
+        $current = $item->get();
+        if (!$current instanceof QueryOrganization) {
+            throw new NotFoundException();
+        }
+
+        $item->set(new QueryOrganization(
+            uuid: $current->uuid,
+            realmId: $current->realmId,
+            name: $current->name,
+            slug: $current->slug,
+            validUntil: $current->validUntil,
+            featureRolloutIds: Collection::fromArray($current->featureRolloutIds)
+                ->filter(fn (FeatureRolloutId $current) => Collection::fromArray($event->featureRolloutIds)
+                    ->none(fn (FeatureRolloutId $toRemove) => $current->equals($toRemove)))
+                ->toArray(),
+            enabled: $current->enabled,
+        ));
+
+        $this->storage->save($item);
+    }
+
     private function applyDeletedEvent(DeletedEvent $event): void
     {
-        if (!$this->storage->deleteItem("tests.data-fixtures.organization.{$event->uuid->toString()}")) {
+        if (!$this->storage->deleteItem(OrganizationFixtures::buildCacheKey($event->uuid, $event->realmId))) {
             throw new NotFoundException();
         }
     }

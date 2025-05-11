@@ -21,6 +21,7 @@ use App\Authentication\UserInterface\Role\CreateRoleProcessor;
 use App\Authentication\UserInterface\Role\CreateRoleWithinOrganizationInput;
 use App\Authentication\UserInterface\Role\DeleteRoleProcessor;
 use App\Authentication\UserInterface\Role\QueryOneRoleProvider;
+use App\Authentication\UserInterface\Role\QuerySeveralRoleInOrganizationProvider;
 use App\Authentication\UserInterface\Role\QuerySeveralRoleProvider;
 use Symfony\Component\Routing\Requirement\Requirement;
 use Symfony\Component\Serializer\Attribute\Context;
@@ -104,7 +105,7 @@ use Symfony\Component\Serializer\Attribute\Context;
     paginationMaximumItemsPerPage: 100,
     paginationPartial: true,
     order: ['uuid' => 'ASC'],
-    provider: QuerySeveralRoleProvider::class,
+    provider: QuerySeveralRoleInOrganizationProvider::class,
     itemUriTemplate: '/authentication/{realm}/roles/{uuid}'
 )]
 #[Post(
@@ -152,17 +153,17 @@ final readonly class Role
         )]
         public RoleId $uuid,
         #[ApiProperty(
-            description: 'Identifier of the Owning Organization',
-            schema: ['type' => 'string', 'pattern' => OrganizationId::URI_REQUIREMENT],
-        )]
-        #[Context(['iri_only' => true])]
-        public OrganizationId $organizationId,
-        #[ApiProperty(
             description: 'Realm of the Role',
             identifier: true,
             schema: ['type' => 'string', 'pattern' => RealmId::REQUIREMENT],
         )]
         public RealmId $realmId,
+        #[ApiProperty(
+            description: 'Identifier of the Owning Organization',
+            schema: ['type' => 'string', 'pattern' => OrganizationId::URI_REQUIREMENT],
+        )]
+        #[Context(['iri_only' => true])]
+        public OrganizationId $organizationId,
         #[ApiProperty(
             description: 'Identifier of the Role',
             schema: ['type' => 'string', 'minLength' => 3, 'maxLength' => 150, 'pattern' => Requirement::ASCII_SLUG],

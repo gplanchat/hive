@@ -8,6 +8,7 @@ use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
 use App\Authentication\Domain\CommandBusInterface;
 use App\Authentication\Domain\Organization\OrganizationId;
+use App\Authentication\Domain\Realm\RealmId;
 use App\Authentication\Domain\Workspace\Command\UseCases\CreateEnabledWorkspace;
 use App\Authentication\Domain\Workspace\Command\UseCases\CreatePendingWorkspace;
 use App\Authentication\Domain\Workspace\Query\Workspace;
@@ -29,6 +30,8 @@ final readonly class CreateWorkspaceProcessor implements ProcessorInterface
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): Workspace
     {
         try {
+            $realmId = RealmId::fromString($uriVariables['realm']);
+
             if ($data instanceof CreateWorkspaceWithinOrganizationInput
                 && array_key_exists('organizationId', $uriVariables)
             ) {
@@ -37,6 +40,7 @@ final readonly class CreateWorkspaceProcessor implements ProcessorInterface
                 $command = $data->enabled
                     ? new CreateEnabledWorkspace(
                         WorkspaceId::generateRandom(),
+                        $realmId,
                         $organizationId,
                         $data->name,
                         $data->slug,
@@ -44,6 +48,7 @@ final readonly class CreateWorkspaceProcessor implements ProcessorInterface
                     )
                     : new CreatePendingWorkspace(
                         WorkspaceId::generateRandom(),
+                        $realmId,
                         $organizationId,
                         $data->name,
                         $data->slug,
@@ -52,6 +57,7 @@ final readonly class CreateWorkspaceProcessor implements ProcessorInterface
                 $command = $data->enabled
                     ? new CreateEnabledWorkspace(
                         WorkspaceId::generateRandom(),
+                        $realmId,
                         $data->organizationId,
                         $data->name,
                         $data->slug,
@@ -59,6 +65,7 @@ final readonly class CreateWorkspaceProcessor implements ProcessorInterface
                     )
                     : new CreatePendingWorkspace(
                         WorkspaceId::generateRandom(),
+                        $realmId,
                         $data->organizationId,
                         $data->name,
                         $data->slug,
@@ -72,6 +79,6 @@ final readonly class CreateWorkspaceProcessor implements ProcessorInterface
             throw new NotFoundHttpException($exception->getMessage(), previous: $exception);
         }
 
-        return $this->workspaceRepository->get($command->uuid);
+        return $this->workspaceRepository->get($command->uuid, $command->realmId);
     }
 }

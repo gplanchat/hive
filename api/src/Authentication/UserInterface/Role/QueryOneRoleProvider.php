@@ -27,8 +27,8 @@ final readonly class QueryOneRoleProvider implements ProviderInterface
     {
         try {
             $query = new QueryOneRole(
-                RealmId::fromString($uriVariables['realm']),
                 RoleId::fromString($uriVariables['uuid']),
+                RealmId::fromString($uriVariables['realm']),
             );
         } catch (\InvalidArgumentException $exception) {
             throw new BadRequestHttpException($exception->getMessage(), previous: $exception);

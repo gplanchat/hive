@@ -22,13 +22,6 @@ final readonly class CreateRoleWithinOrganizationInput
      */
     public function __construct(
         #[ApiProperty(
-            description: 'Organization in which the user is assigned',
-            schema: ['type' => 'string', 'pattern' => OrganizationId::URI_REQUIREMENT],
-        )]
-        #[Context(['iri_only' => true])]
-        #[Assert\NotBlank()]
-        public OrganizationId $organizationId,
-        #[ApiProperty(
             description: 'Role\'s display name',
             schema: ['type' => 'string'],
         )]

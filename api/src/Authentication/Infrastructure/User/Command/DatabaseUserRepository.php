@@ -7,6 +7,7 @@ namespace App\Authentication\Infrastructure\User\Command;
 use App\Authentication\Domain\EventBusInterface;
 use App\Authentication\Domain\NotFoundException;
 use App\Authentication\Domain\Organization\OrganizationId;
+use App\Authentication\Domain\Realm\RealmId;
 use App\Authentication\Domain\Role\RoleId;
 use App\Authentication\Domain\User\Command\DeclaredEvent;
 use App\Authentication\Domain\User\Command\DeletedEvent;
@@ -28,10 +29,10 @@ final readonly class DatabaseUserRepository implements UserRepositoryInterface
         private EventBusInterface $eventBus,
     ) {}
 
-    public function get(UserId $userId): User
+    public function get(UserId $userId, $realmId): User
     {
         $sql = <<<SQL
-            SELECT uuid, organization_id, workspace_ids, role_ids, username, firstname, lastname, email, enabled, version
+            SELECT uuid, realm_id, organization_id, workspace_ids, role_ids, username, firstname, lastname, email, enabled, version
             FROM users
             WHERE uuid = :uuid
             LIMIT 1
@@ -49,6 +50,7 @@ final readonly class DatabaseUserRepository implements UserRepositoryInterface
 
         return new User(
             UserId::fromString($user['uuid']),
+            RealmId::fromString($user['realm_id']),
             OrganizationId::fromString($user['organization_id']),
             workspaceIds: array_map(
                 fn (string $workspaceIds): WorkspaceId => WorkspaceId::fromString($workspaceIds),
@@ -96,12 +98,13 @@ final readonly class DatabaseUserRepository implements UserRepositoryInterface
     private function applyDeclaredEvent(DeclaredEvent $event): void
     {
         $statement = $this->connection->prepare(<<<SQL
-            INSERT INTO users (uuid, organization_id, workspace_ids, role_ids, username, firstname, lastname, email, enabled, version)
-            VALUES (:uuid, :organization_id, :workspace_ids, :role_ids, :username, :firstname, :lastname, :email, :enabled, 1)
+            INSERT INTO users (uuid, realm_id, organization_id, workspace_ids, role_ids, username, firstname, lastname, email, enabled, version)
+            VALUES (:uuid, :realm_id :organization_id, :workspace_ids, :role_ids, :username, :firstname, :lastname, :email, :enabled, 1)
             SQL
         );
 
         $statement->bindValue(':uuid', $event->uuid->toString(), ParameterType::STRING);
+        $statement->bindValue(':realm_id', $event->realmId->toString(), ParameterType::STRING);
         $statement->bindValue(':organization_id', $event->organizationId->toString(), ParameterType::STRING);
         $statement->bindValue(':workspace_ids', json_encode(
             array_map(fn (WorkspaceId $workspaceId) => $workspaceId->toString(), $event->workspaceIds),
@@ -130,12 +133,15 @@ final readonly class DatabaseUserRepository implements UserRepositoryInterface
             UPDATE users
             SET enabled = true,
                 version = :version
-            WHERE uuid = :uuid AND version=(:version - 1)
+            WHERE uuid = :uuid
+              AND version=(:version - 1)
+              AND realm_id = :realm_id
             SQL
         );
 
         $statement->bindValue(':uuid', $event->uuid->toString(), ParameterType::STRING);
         $statement->bindValue(':version', $event->version, ParameterType::INTEGER);
+        $statement->bindValue(':realm_id', $event->realmId->toString(), ParameterType::STRING);
 
         $result = $statement->executeQuery();
 
@@ -150,12 +156,15 @@ final readonly class DatabaseUserRepository implements UserRepositoryInterface
             UPDATE users
             SET enabled = false,
                 version = :version
-            WHERE uuid = :uuid AND version=(:version - 1)
+            WHERE uuid = :uuid
+              AND version=(:version - 1)
+              AND realm_id = :realm_id
             SQL
         );
 
         $statement->bindValue(':uuid', $event->uuid->toString(), ParameterType::STRING);
         $statement->bindValue(':version', $event->version, ParameterType::INTEGER);
+        $statement->bindValue(':realm_id', $event->realmId->toString(), ParameterType::STRING);
 
         $result = $statement->executeQuery();
 
@@ -168,12 +177,15 @@ final readonly class DatabaseUserRepository implements UserRepositoryInterface
     {
         $statement = $this->connection->prepare(<<<SQL
             DELETE FROM users
-            WHERE uuid = :uuid AND version=(:version - 1)
+            WHERE uuid = :uuid
+              AND version=(:version - 1)
+              AND realm_id = :realm_id
             SQL
         );
 
         $statement->bindValue(':uuid', $event->uuid->toString(), ParameterType::STRING);
         $statement->bindValue(':version', $event->version, ParameterType::INTEGER);
+        $statement->bindValue(':realm_id', $event->realmId->toString(), ParameterType::STRING);
 
         $result = $statement->executeQuery();
 

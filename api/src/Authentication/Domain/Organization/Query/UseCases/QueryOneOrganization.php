@@ -10,8 +10,8 @@ use App\Authentication\Domain\Realm\RealmId;
 final readonly class QueryOneOrganization
 {
     public function __construct(
-        public RealmId $realmId,
         public OrganizationId $uuid,
+        public RealmId $realmId,
     ) {
     }
 }

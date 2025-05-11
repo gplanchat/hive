@@ -17,6 +17,6 @@ final readonly class QueryOneUserHandler
 
     public function __invoke(QueryOneUser $query): User
     {
-        return $this->userRepository->get($query->uuid);
+        return $this->userRepository->get($query->uuid, $query->realmId);
     }
 }

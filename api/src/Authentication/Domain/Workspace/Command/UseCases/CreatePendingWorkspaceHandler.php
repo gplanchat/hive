@@ -19,6 +19,7 @@ final readonly class CreatePendingWorkspaceHandler
     {
         $workspace = Workspace::declareDisabled(
             $command->uuid,
+            $command->realmId,
             $command->organizationId,
             $command->name,
             $command->slug,

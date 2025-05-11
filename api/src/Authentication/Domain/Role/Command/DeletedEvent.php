@@ -13,8 +13,8 @@ final readonly class DeletedEvent
     public function __construct(
         public RoleId $uuid,
         public int $version,
-        public OrganizationId $organizationId,
         public RealmId $realmId,
+        public OrganizationId $organizationId,
     ) {
     }
 }

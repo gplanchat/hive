@@ -68,6 +68,38 @@ class UsersTest extends ApiTestCase
     }
 
     /** @test */
+    public function itShouldListUsersFromOrganization(): void
+    {
+        $this->userFixtures->load();
+
+        static::createClient()->request('GET', '/authentication/acme-inc/organizations/01966c5a-10ef-7315-94f2-cbeec2f167d8/users');
+
+        $this->assertResponseStatusCodeSame(200);
+        $this->assertJsonContains([
+            '@context' => '/contexts/User',
+            '@id' => '/authentication/acme-inc/organizations/01966c5a-10ef-7315-94f2-cbeec2f167d8/users',
+            '@type' => 'hydra:Collection',
+            'hydra:totalItems' => 3,
+        ]);
+    }
+
+    /** @test */
+    public function itShouldListUsersFromWorkspace(): void
+    {
+        $this->userFixtures->load();
+
+        static::createClient()->request('GET', '/authentication/acme-inc/workspaces/01966c5a-10ef-723c-bc33-2b1dc30d8963/users');
+
+        $this->assertResponseStatusCodeSame(200);
+        $this->assertJsonContains([
+            '@context' => '/contexts/User',
+            '@id' => '/authentication/acme-inc/workspaces/01966c5a-10ef-723c-bc33-2b1dc30d8963/users',
+            '@type' => 'hydra:Collection',
+            'hydra:totalItems' => 3,
+        ]);
+    }
+
+    /** @test */
     public function itShouldShowAnUser(): void
     {
         static::createClient()->request('GET', '/authentication/acme-inc/users/01966c5a-10ef-7abd-9c88-52b075bcae99');
@@ -84,8 +116,8 @@ class UsersTest extends ApiTestCase
                 '/authentication/acme-inc/workspaces/01966cc2-0323-7a38-9da3-3aeea904ea49',
             ],
             'roleIds' => [
-                '/authentication/acme-inc/organizations/01966d41-78eb-7406-ad99-03ad025e8bcf',
-                '/authentication/acme-inc/organizations/01966d41-a4a3-7cd4-a095-be712f2e724a',
+                '/authentication/acme-inc/roles/01966d41-78eb-7406-ad99-03ad025e8bcf',
+                '/authentication/acme-inc/roles/01966d41-a4a3-7cd4-a095-be712f2e724a',
             ],
             'username' => 'john.doe',
             'firstName' => 'John',
@@ -106,8 +138,8 @@ class UsersTest extends ApiTestCase
                     '/authentication/acme-inc/workspaces/01966cc2-0323-7a38-9da3-3aeea904ea49',
                 ],
                 'roleIds' => [
-                    '/authentication/acme-inc/organizations/01966d41-78eb-7406-ad99-03ad025e8bcf',
-                    '/authentication/acme-inc/organizations/01966d41-a4a3-7cd4-a095-be712f2e724a',
+                    '/authentication/acme-inc/roles/01966d41-78eb-7406-ad99-03ad025e8bcf',
+                    '/authentication/acme-inc/roles/01966d41-a4a3-7cd4-a095-be712f2e724a',
                 ],
                 'username' => 'wile.coyote',
                 'firstName' => 'Wile',
@@ -130,8 +162,8 @@ class UsersTest extends ApiTestCase
                 '/authentication/acme-inc/workspaces/01966cc2-0323-7a38-9da3-3aeea904ea49',
             ],
             'roleIds' => [
-                '/authentication/acme-inc/organizations/01966d41-78eb-7406-ad99-03ad025e8bcf',
-                '/authentication/acme-inc/organizations/01966d41-a4a3-7cd4-a095-be712f2e724a',
+                '/authentication/acme-inc/roles/01966d41-78eb-7406-ad99-03ad025e8bcf',
+                '/authentication/acme-inc/roles/01966d41-a4a3-7cd4-a095-be712f2e724a',
             ],
             'username' => 'wile.coyote',
             'firstName' => 'Wile',
@@ -152,8 +184,8 @@ class UsersTest extends ApiTestCase
                     '/authentication/acme-inc/workspaces/01966cc2-0323-7a38-9da3-3aeea904ea49',
                 ],
                 'roleIds' => [
-                    '/authentication/acme-inc/organizations/01966d41-78eb-7406-ad99-03ad025e8bcf',
-                    '/authentication/acme-inc/organizations/01966d41-a4a3-7cd4-a095-be712f2e724a',
+                    '/authentication/acme-inc/roles/01966d41-78eb-7406-ad99-03ad025e8bcf',
+                    '/authentication/acme-inc/roles/01966d41-a4a3-7cd4-a095-be712f2e724a',
                 ],
                 'username' => 'wile.coyote',
                 'firstName' => 'Wile',
@@ -176,8 +208,8 @@ class UsersTest extends ApiTestCase
                 '/authentication/acme-inc/workspaces/01966cc2-0323-7a38-9da3-3aeea904ea49',
             ],
             'roleIds' => [
-                '/authentication/acme-inc/organizations/01966d41-78eb-7406-ad99-03ad025e8bcf',
-                '/authentication/acme-inc/organizations/01966d41-a4a3-7cd4-a095-be712f2e724a',
+                '/authentication/acme-inc/roles/01966d41-78eb-7406-ad99-03ad025e8bcf',
+                '/authentication/acme-inc/roles/01966d41-a4a3-7cd4-a095-be712f2e724a',
             ],
             'username' => 'wile.coyote',
             'firstName' => 'Wile',
@@ -217,8 +249,8 @@ class UsersTest extends ApiTestCase
                     '/authentication/acme-inc/workspaces/01966cc2-0323-7a38-9da3-3aeea904ea49',
                 ],
                 'roleIds' => [
-                    '/authentication/acme-inc/organizations/01966d41-78eb-7406-ad99-03ad025e8bcf',
-                    '/authentication/acme-inc/organizations/01966d41-a4a3-7cd4-a095-be712f2e724a',
+                    '/authentication/acme-inc/roles/01966d41-78eb-7406-ad99-03ad025e8bcf',
+                    '/authentication/acme-inc/roles/01966d41-a4a3-7cd4-a095-be712f2e724a',
                 ],
                 'username' => 'wile.coyote',
                 'firstName' => 'Wile',
@@ -241,8 +273,8 @@ class UsersTest extends ApiTestCase
                 '/authentication/acme-inc/workspaces/01966cc2-0323-7a38-9da3-3aeea904ea49',
             ],
             'roleIds' => [
-                '/authentication/acme-inc/organizations/01966d41-78eb-7406-ad99-03ad025e8bcf',
-                '/authentication/acme-inc/organizations/01966d41-a4a3-7cd4-a095-be712f2e724a',
+                '/authentication/acme-inc/roles/01966d41-78eb-7406-ad99-03ad025e8bcf',
+                '/authentication/acme-inc/roles/01966d41-a4a3-7cd4-a095-be712f2e724a',
             ],
             'username' => 'wile.coyote',
             'firstName' => 'Wile',
@@ -262,8 +294,8 @@ class UsersTest extends ApiTestCase
                     '/authentication/acme-inc/workspaces/01966cc2-0323-7a38-9da3-3aeea904ea49',
                 ],
                 'roleIds' => [
-                    '/authentication/acme-inc/organizations/01966d41-78eb-7406-ad99-03ad025e8bcf',
-                    '/authentication/acme-inc/organizations/01966d41-a4a3-7cd4-a095-be712f2e724a',
+                    '/authentication/acme-inc/roles/01966d41-78eb-7406-ad99-03ad025e8bcf',
+                    '/authentication/acme-inc/roles/01966d41-a4a3-7cd4-a095-be712f2e724a',
                 ],
                 'username' => 'wile.coyote',
                 'firstName' => 'Wile',
@@ -286,8 +318,8 @@ class UsersTest extends ApiTestCase
                 '/authentication/acme-inc/workspaces/01966cc2-0323-7a38-9da3-3aeea904ea49',
             ],
             'roleIds' => [
-                '/authentication/acme-inc/organizations/01966d41-78eb-7406-ad99-03ad025e8bcf',
-                '/authentication/acme-inc/organizations/01966d41-a4a3-7cd4-a095-be712f2e724a',
+                '/authentication/acme-inc/roles/01966d41-78eb-7406-ad99-03ad025e8bcf',
+                '/authentication/acme-inc/roles/01966d41-a4a3-7cd4-a095-be712f2e724a',
             ],
             'username' => 'wile.coyote',
             'firstName' => 'Wile',
@@ -342,8 +374,8 @@ class UsersTest extends ApiTestCase
                 '/authentication/acme-inc/workspaces/01966c5a-10ef-7795-9e13-7359dd58b49c',
             ],
             'roleIds' => [
-                '/authentication/acme-inc/organizations/01966d41-78eb-7406-ad99-03ad025e8bcf',
-                '/authentication/acme-inc/organizations/01966d41-a4a3-7cd4-a095-be712f2e724a',
+                '/authentication/acme-inc/roles/01966d41-78eb-7406-ad99-03ad025e8bcf',
+                '/authentication/acme-inc/roles/01966d41-a4a3-7cd4-a095-be712f2e724a',
             ],
             'username' => 'clara.froelich',
             'firstName' => 'Clara',
@@ -377,8 +409,8 @@ class UsersTest extends ApiTestCase
                 '/authentication/acme-inc/workspaces/01966cc2-0323-7a38-9da3-3aeea904ea49',
             ],
             'roleIds' => [
-                '/authentication/acme-inc/organizations/01966d41-78eb-7406-ad99-03ad025e8bcf',
-                '/authentication/acme-inc/organizations/01966d41-a4a3-7cd4-a095-be712f2e724a',
+                '/authentication/acme-inc/roles/01966d41-78eb-7406-ad99-03ad025e8bcf',
+                '/authentication/acme-inc/roles/01966d41-a4a3-7cd4-a095-be712f2e724a',
             ],
             'username' => 'john.doe',
             'firstName' => 'John',

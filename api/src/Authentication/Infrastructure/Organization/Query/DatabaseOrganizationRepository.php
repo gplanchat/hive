@@ -10,6 +10,7 @@ use App\Authentication\Domain\Organization\OrganizationId;
 use App\Authentication\Domain\Organization\Query\Organization;
 use App\Authentication\Domain\Organization\Query\OrganizationRepositoryInterface;
 use App\Authentication\Domain\Organization\Query\UseCases\OrganizationPage;
+use App\Authentication\Domain\Realm\RealmId;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\ParameterType;
 use Doctrine\DBAL\Result;
@@ -22,17 +23,19 @@ final readonly class DatabaseOrganizationRepository implements OrganizationRepos
         private Connection $connection,
     ) {}
 
-    public function get(OrganizationId $organizationId): Organization
+    public function get(OrganizationId $organizationId, RealmId $realmId): Organization
     {
         $sql =<<<SQL
-            SELECT uuid, name, slug, valid_until, feature_rollout_ids, enabled
+            SELECT uuid, realm_id, name, slug, valid_until, feature_rollout_ids, enabled
             FROM organizations
             WHERE uuid = :uuid
+              AND realm_id = :realm_id
             LIMIT 1
             SQL;
 
         $statement = $this->connection->prepare($sql);
         $statement->bindValue(':uuid', $organizationId->toString(), ParameterType::STRING);
+        $statement->bindValue(':realm_id', $realmId->toString(), ParameterType::STRING);
 
         $result = $statement->executeQuery();
         if ($result->rowCount() <= 0) {
@@ -42,11 +45,12 @@ final readonly class DatabaseOrganizationRepository implements OrganizationRepos
         return $this->hydrateOne($result->fetchAssociative());
     }
 
-    public function list(int $currentPage = 1, int $pageSize = 25): OrganizationPage
+    public function list(RealmId $realmId, int $currentPage = 1, int $pageSize = 25): OrganizationPage
     {
         $sql =<<<SQL
-            SELECT uuid, name, slug, valid_until, feature_rollout_ids, enabled
+            SELECT uuid, realm_id, name, slug, valid_until, feature_rollout_ids, enabled
             FROM organizations
+            WHERE realm_id = :realm_id
             LIMIT :limit
             OFFSET :offset
             SQL;
@@ -54,6 +58,7 @@ final readonly class DatabaseOrganizationRepository implements OrganizationRepos
         $statement = $this->connection->prepare($sql);
         $statement->bindValue(':limit', $pageSize, ParameterType::INTEGER);
         $statement->bindValue(':offset', $pageSize * ($currentPage - 1), ParameterType::INTEGER);
+        $statement->bindValue(':realm_id', $realmId->toString(), ParameterType::STRING);
 
         $result = $statement->executeQuery();
         if ($result->rowCount() <= 0) {
@@ -67,6 +72,7 @@ final readonly class DatabaseOrganizationRepository implements OrganizationRepos
     {
         return new Organization(
             OrganizationId::fromString($organization['uuid']),
+            realmId: RealmId::fromString($organization['realm_id']),
             name: $organization['name'],
             slug: $organization['slug'],
             validUntil: $organization['valid_until'] !== null

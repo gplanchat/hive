@@ -66,7 +66,7 @@ services:
             - '%api_platform.resource_class_directories%'
             - '@.inner'
     
-    App\Authentication\Infrastructure\Keycloak\KeycloakClientInterface: '@App\Authentication\Infrastructure\Keycloak\KeycloakClient'
+    App\Authentication\Infrastructure\Keycloak\KeycloakAdminClientInterface: '@App\Authentication\Infrastructure\Keycloak\KeycloakAdminClient'
 
     App\Authentication\Infrastructure\Keycloak\KeycloakInterface: '@App\Authentication\Infrastructure\Keycloak\Keycloak'
         
@@ -91,9 +91,9 @@ services:
     
     App\Authentication\Infrastructure\User\Query\DatabaseUserRepository:
 
-    App\Authentication\Domain\Realm\Query\RealmRepositoryInterface: '@App\Authentication\Infrastructure\Realm\Query\InMemoryRealmRepository'
+    App\Authentication\Domain\Realm\Query\RealmRepositoryInterface: '@App\Authentication\Infrastructure\Realm\KeycloakRealmRepository'
     
-    App\Authentication\Infrastructure\Realm\Query\InMemoryRealmRepository:
+    App\Authentication\Infrastructure\Realm\KeycloakRealmRepository:
 
     App\Authentication\Domain\Role\Command\RoleRepositoryInterface: '@App\Authentication\Infrastructure\Role\Command\InMemoryRoleRepository'
 
@@ -110,6 +110,8 @@ services:
     App\Authentication\Domain\QueryBusInterface: '@App\Authentication\Infrastructure\Messenger\QueryBus' 
     App\Authentication\Domain\CommandBusInterface: '@App\Authentication\Infrastructure\Messenger\CommandBus'
     App\Authentication\Domain\EventBusInterface: '@App\Authentication\Infrastructure\Messenger\EventBus'
+    
+    App\Authentication\Domain\SecurityContextInterface: '@App\Authentication\Infrastructure\Keycloak\KeycloakSecurityContext'
 
 when@test:
     services:
@@ -132,6 +134,11 @@ when@test:
         App\Authentication\Infrastructure\User\DataFixtures\UserFixtures:
             autowire: true
             public: true
+
+        App\Authentication\Domain\Realm\Query\RealmRepositoryInterface: '@App\Authentication\Infrastructure\Realm\InMemoryRealmRepository'
+            
+        App\Authentication\Infrastructure\Realm\InMemoryRealmRepository:
+            factory: [ 'App\Authentication\Infrastructure\Realm\InMemoryRealmRepository', 'buildTestRepository' ]
         
         App\Authentication\Infrastructure\Workspace\DataFixtures\WorkspaceFixtures:
             autowire: true

@@ -49,7 +49,7 @@ final class KeycloakMock implements KeycloakInterface
     {
     }
 
-    public function fetchOpenidCertificates(Realm $realm): void
+    public function fetchOpenidCertificates(RealmId $realmId): array
     {
     }
 }

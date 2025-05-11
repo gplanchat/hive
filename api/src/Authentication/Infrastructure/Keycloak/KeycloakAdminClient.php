@@ -10,7 +10,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 use Symfony\Contracts\HttpClient\ResponseStreamInterface;
 
-final class KeycloakClient implements KeycloakClientInterface
+final class KeycloakAdminClient implements KeycloakAdminClientInterface
 {
     use ClientTrait;
 

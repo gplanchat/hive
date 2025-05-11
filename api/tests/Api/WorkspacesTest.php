@@ -69,6 +69,22 @@ class WorkspacesTest extends ApiTestCase
     }
 
     /** @test */
+    public function itShouldListWorkspacesInOrganization(): void
+    {
+        $this->workspaceFixtures->load();
+
+        static::createClient()->request('GET', '/authentication/acme-inc/organizations/01966c5a-10ef-76f6-9513-e3b858c22f0a/workspaces');
+
+        $this->assertResponseStatusCodeSame(200);
+        $this->assertJsonContains([
+            '@context' => '/contexts/Workspace',
+            '@id' => '/authentication/acme-inc/organizations/01966c5a-10ef-76f6-9513-e3b858c22f0a/workspaces',
+            '@type' => 'hydra:Collection',
+            'hydra:totalItems' => 3,
+        ]);
+    }
+
+    /** @test */
     public function itShouldShowAWorkspace(): void
     {
         static::createClient()->request('GET', '/authentication/acme-inc/workspaces/01966c5a-10ef-70ce-ab8c-c455e874c3fc');

@@ -9,6 +9,8 @@ use App\Authentication\Domain\Organization\OrganizationId;
 use App\Authentication\Domain\Organization\Query\Organization;
 use App\Authentication\Domain\Organization\Query\OrganizationRepositoryInterface;
 use App\Authentication\Domain\Organization\Query\UseCases\OrganizationPage;
+use App\Authentication\Domain\Realm\RealmId;
+use App\Authentication\Infrastructure\Organization\DataFixtures\OrganizationFixtures;
 use App\Authentication\Infrastructure\StorageMock;
 
 final class InMemoryOrganizationRepository implements OrganizationRepositoryInterface
@@ -18,9 +20,9 @@ final class InMemoryOrganizationRepository implements OrganizationRepositoryInte
     ) {
     }
 
-    public function get(OrganizationId $organizationId): Organization
+    public function get(OrganizationId $organizationId, RealmId $realmId): Organization
     {
-        $item = $this->storage->getItem("tests.data-fixtures.organization.{$organizationId->toString()}");
+        $item = $this->storage->getItem(OrganizationFixtures::buildCacheKey($organizationId, $realmId));
 
         if (!$item->isHit()) {
             throw new NotFoundException();
@@ -34,14 +36,12 @@ final class InMemoryOrganizationRepository implements OrganizationRepositoryInte
         return $value;
     }
 
-    public function list(int $currentPage = 1, int $pageSize = 25): OrganizationPage
+    public function list(RealmId $realmId, int $currentPage = 1, int $pageSize = 25): OrganizationPage
     {
-        $result = array_filter(
-            $this->storage->getValues(),
-            function (mixed $value): bool {
-                return $value instanceof Organization;
-            }
-        );
+        $result = $this->storage->getValues()
+            ->filter(fn (mixed $value): bool => $value instanceof Organization)
+            ->filter(fn (Organization $organization) => $organization->realmId->equals($realmId))
+            ->toArray();
 
         return new OrganizationPage(
             $currentPage,

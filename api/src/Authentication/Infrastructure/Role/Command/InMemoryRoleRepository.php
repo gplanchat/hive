@@ -7,6 +7,7 @@ namespace App\Authentication\Infrastructure\Role\Command;
 use App\Authentication\Domain\EventBusInterface;
 use App\Authentication\Domain\ConflictException;
 use App\Authentication\Domain\NotFoundException;
+use App\Authentication\Domain\Realm\RealmId;
 use App\Authentication\Domain\Role\Command\DeclaredEvent;
 use App\Authentication\Domain\Role\Command\DeletedEvent;
 use App\Authentication\Domain\Role\Command\Role;
@@ -25,9 +26,9 @@ final readonly class InMemoryRoleRepository implements RoleRepositoryInterface
     ) {
     }
 
-    public function get(RoleId $roleId): Role
+    public function get(RoleId $roleId, RealmId $realmId): Role
     {
-        $item = $this->storage->getItem("tests.data-fixtures.role.{$roleId->toString()}");
+        $item = $this->storage->getItem(RoleFixtures::buildCacheKey($roleId, $realmId));
 
         if (!$item->isHit()) {
             throw new NotFoundException();
@@ -40,8 +41,8 @@ final readonly class InMemoryRoleRepository implements RoleRepositoryInterface
 
         return new Role(
             uuid: $value->uuid,
-            organizationId: $value->organizationId,
             realmId: $value->realmId,
+            organizationId: $value->organizationId,
             identifier: $value->identifier,
             label: $value->label,
             resourceAccesses: $value->resourceAccesses,
@@ -73,7 +74,7 @@ final readonly class InMemoryRoleRepository implements RoleRepositoryInterface
 
     private function applyDeclaredEvent(DeclaredEvent $event): void
     {
-        $this->storage->get("tests.data-fixtures.role.{$event->uuid->toString()}", function (ItemInterface $item) use ($event): QueryRole {
+        $this->storage->get(RoleFixtures::buildCacheKey($event->uuid, $event->realmId), function (ItemInterface $item) use ($event): QueryRole {
             if ($item->isHit()) {
                 throw new ConflictException();
             }
@@ -82,8 +83,8 @@ final readonly class InMemoryRoleRepository implements RoleRepositoryInterface
 
             return new QueryRole(
                 uuid: $event->uuid,
-                organizationId: $event->organizationId,
                 realmId: $event->realmId,
+                organizationId: $event->organizationId,
                 identifier: $event->identifier,
                 label: $event->label,
                 resourceAccesses: $event->resourceAccesses,
@@ -93,7 +94,7 @@ final readonly class InMemoryRoleRepository implements RoleRepositoryInterface
 
     private function applyDeletedEvent(DeletedEvent $event): void
     {
-        if (!$this->storage->deleteItem("tests.data-fixtures.role.{$event->uuid->toString()}")) {
+        if (!$this->storage->deleteItem(RoleFixtures::buildCacheKey($event->uuid, $event->realmId))) {
             throw new NotFoundException();
         }
     }

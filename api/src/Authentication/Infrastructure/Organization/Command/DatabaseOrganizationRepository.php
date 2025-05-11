@@ -7,12 +7,14 @@ namespace App\Authentication\Infrastructure\Organization\Command;
 use App\Authentication\Domain\EventBusInterface;
 use App\Authentication\Domain\FeatureRollout\FeatureRolloutId;
 use App\Authentication\Domain\NotFoundException;
+use App\Authentication\Domain\Organization\Command\AddedFeatureRolloutsEvent;
 use App\Authentication\Domain\Organization\Command\DeclaredEvent;
 use App\Authentication\Domain\Organization\Command\DeletedEvent;
 use App\Authentication\Domain\Organization\Command\DisabledEvent;
 use App\Authentication\Domain\Organization\Command\EnabledEvent;
 use App\Authentication\Domain\Organization\Command\Organization;
 use App\Authentication\Domain\Organization\Command\OrganizationRepositoryInterface;
+use App\Authentication\Domain\Organization\Command\RemovedFeatureRolloutsEvent;
 use App\Authentication\Domain\Organization\OrganizationId;
 use App\Authentication\Domain\Realm\RealmId;
 use Doctrine\DBAL\Connection;
@@ -27,17 +29,19 @@ final class DatabaseOrganizationRepository implements OrganizationRepositoryInte
         private EventBusInterface $eventBus,
     ) {}
 
-    public function get(OrganizationId $organizationId): Organization
+    public function get(OrganizationId $organizationId, RealmId $realmId): Organization
     {
         $sql =<<<SQL
             SELECT uuid, realm_id, name, slug, valid_until, feature_rollout_ids, enabled, version
             FROM organizations
             WHERE uuid = :uuid
+              AND realm_id = :realm_id
             LIMIT 1
             SQL;
 
         $statement = $this->connection->prepare($sql);
         $statement->bindValue(':uuid', $organizationId->toString(), ParameterType::STRING);
+        $statement->bindValue(':realm_id', $realmId->toString(), ParameterType::STRING);
 
         $result = $statement->executeQuery();
         if ($result->rowCount() <= 0) {
@@ -91,12 +95,13 @@ final class DatabaseOrganizationRepository implements OrganizationRepositoryInte
     private function applyDeclaredEvent(DeclaredEvent $event): void
     {
         $statement = $this->connection->prepare(<<<SQL
-            INSERT INTO organizations (uuid, name, valid_until, feature_rollout_ids, enabled, version)
-            VALUES (:uuid, :name, :valid_until, :feature_rollout_ids, :enabled, 1)
+            INSERT INTO organizations (uuid, realm_id, name, valid_until, feature_rollout_ids, enabled, version)
+            VALUES (:uuid, :realm_id, :name, :valid_until, :feature_rollout_ids, :enabled, 1)
             SQL
         );
 
         $statement->bindValue(':uuid', $event->uuid->toString(), ParameterType::STRING);
+        $statement->bindValue(':realm_id', $event->realmId->toString(), ParameterType::STRING);
         $statement->bindValue(':name', $event->name, ParameterType::STRING);
         $statement->bindValue(':valid_until', $event->validUntil?->format('Y-m-d'), ParameterType::STRING);
         $statement->bindValue(':feature_rollout_ids', json_encode(
@@ -118,12 +123,15 @@ final class DatabaseOrganizationRepository implements OrganizationRepositoryInte
             UPDATE organizations
             SET enabled = true,
                 version = :version
-            WHERE uuid = :uuid AND version=(:version - 1)
+            WHERE uuid = :uuid
+              AND version=(:version - 1)
+              AND realm_id = :realm_id
             SQL
         );
 
         $statement->bindValue(':uuid', $event->uuid->toString(), ParameterType::STRING);
         $statement->bindValue(':version', $event->version, ParameterType::INTEGER);
+        $statement->bindValue(':realm_id', $event->realmId->toString(), ParameterType::STRING);
 
         $result = $statement->executeQuery();
 
@@ -138,12 +146,15 @@ final class DatabaseOrganizationRepository implements OrganizationRepositoryInte
             UPDATE organizations
             SET enabled = false,
                 version = :version
-            WHERE uuid = :uuid AND version=(:version - 1)
+            WHERE uuid = :uuid
+              AND version=(:version - 1)
+              AND realm_id = :realm_id
             SQL
         );
 
         $statement->bindValue(':uuid', $event->uuid->toString(), ParameterType::STRING);
         $statement->bindValue(':version', $event->version, ParameterType::INTEGER);
+        $statement->bindValue(':realm_id', $event->realmId->toString(), ParameterType::STRING);
 
         $result = $statement->executeQuery();
 
@@ -152,16 +163,61 @@ final class DatabaseOrganizationRepository implements OrganizationRepositoryInte
         }
     }
 
-    private function applyDeletedEvent(DeletedEvent $event): void
+    private function applyAddedFeatureRolloutEvent(AddedFeatureRolloutsEvent $event): void
     {
         $statement = $this->connection->prepare(<<<SQL
-            DELETE FROM organizations
-            WHERE uuid = :uuid AND version=(:version - 1)
+            UPDATE organizations
+            SET feature_rollout_ids = :feature_rollout_ids,
+                version = :version
+            WHERE uuid = :uuid
+              AND version=(:version - 1)
+              AND realm_id = :realm_id
             SQL
         );
 
         $statement->bindValue(':uuid', $event->uuid->toString(), ParameterType::STRING);
         $statement->bindValue(':version', $event->version, ParameterType::INTEGER);
+        $statement->bindValue(':realm_id', $event->realmId->toString(), ParameterType::STRING);
+        $statement->bindValue(':feature_rollout_ids', json_encode(
+            array_map(fn (FeatureRolloutId $featureRolloutId) => $featureRolloutId->toString(), $event->featureRolloutIds),
+            JSON_THROW_ON_ERROR,
+        ), ParameterType::STRING);
+    }
+
+    private function applyRemovedFeatureRolloutEvent(RemovedFeatureRolloutsEvent $event): void
+    {
+        $statement = $this->connection->prepare(<<<SQL
+            UPDATE organizations
+            SET feature_rollout_ids = :feature_rollout_ids,
+                version = :version
+            WHERE uuid = :uuid
+              AND version=(:version - 1)
+              AND realm_id = :realm_id
+            SQL
+        );
+
+        $statement->bindValue(':uuid', $event->uuid->toString(), ParameterType::STRING);
+        $statement->bindValue(':version', $event->version, ParameterType::INTEGER);
+        $statement->bindValue(':realm_id', $event->realmId->toString(), ParameterType::STRING);
+        $statement->bindValue(':feature_rollout_ids', json_encode(
+            array_map(fn (FeatureRolloutId $featureRolloutId) => $featureRolloutId->toString(), $event->featureRolloutIds),
+            JSON_THROW_ON_ERROR,
+        ), ParameterType::STRING);
+    }
+
+    private function applyDeletedEvent(DeletedEvent $event): void
+    {
+        $statement = $this->connection->prepare(<<<SQL
+            DELETE FROM organizations
+            WHERE uuid = :uuid
+              AND version=(:version - 1)
+              AND realm_id = :realm_id
+            SQL
+        );
+
+        $statement->bindValue(':uuid', $event->uuid->toString(), ParameterType::STRING);
+        $statement->bindValue(':version', $event->version, ParameterType::INTEGER);
+        $statement->bindValue(':realm_id', $event->realmId->toString(), ParameterType::STRING);
 
         $result = $statement->executeQuery();
 

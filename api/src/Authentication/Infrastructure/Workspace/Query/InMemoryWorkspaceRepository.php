@@ -6,11 +6,13 @@ namespace App\Authentication\Infrastructure\Workspace\Query;
 
 use App\Authentication\Domain\NotFoundException;
 use App\Authentication\Domain\Organization\OrganizationId;
+use App\Authentication\Domain\Realm\RealmId;
 use App\Authentication\Domain\Workspace\Query\UseCases\WorkspacePage;
 use App\Authentication\Domain\Workspace\Query\Workspace;
 use App\Authentication\Domain\Workspace\Query\WorkspaceRepositoryInterface;
 use App\Authentication\Domain\Workspace\WorkspaceId;
 use App\Authentication\Infrastructure\StorageMock;
+use App\Authentication\Infrastructure\Workspace\DataFixtures\WorkspaceFixtures;
 
 final class InMemoryWorkspaceRepository implements WorkspaceRepositoryInterface
 {
@@ -19,9 +21,9 @@ final class InMemoryWorkspaceRepository implements WorkspaceRepositoryInterface
     ) {
     }
 
-    public function get(WorkspaceId $workspaceId): Workspace
+    public function get(WorkspaceId $workspaceId, RealmId $realmId): Workspace
     {
-        $item = $this->storage->getItem("tests.data-fixtures.workspace.{$workspaceId->toString()}");
+        $item = $this->storage->getItem(WorkspaceFixtures::buildCacheKey($workspaceId, $realmId));
 
         if (!$item->isHit()) {
             throw new NotFoundException();
@@ -35,14 +37,12 @@ final class InMemoryWorkspaceRepository implements WorkspaceRepositoryInterface
         return $value;
     }
 
-    public function list(int $currentPage = 1, int $pageSize = 25): WorkspacePage
+    public function list(RealmId $realmId, int $currentPage = 1, int $pageSize = 25): WorkspacePage
     {
-        $result = array_filter(
-            $this->storage->getValues(),
-            function (mixed $value): bool {
-                return $value instanceof Workspace;
-            }
-        );
+        $result = $this->storage->getValues()
+            ->filter(fn (mixed $value): bool => $value instanceof Workspace)
+            ->filter(fn (Workspace $workspace) => $workspace->realmId->equals($realmId))
+            ->toArray();
 
         return new WorkspacePage(
             $currentPage,
@@ -52,17 +52,13 @@ final class InMemoryWorkspaceRepository implements WorkspaceRepositoryInterface
         );
     }
 
-    public function listFromOrganization(OrganizationId $organizationId, int $currentPage = 1, int $pageSize = 25): WorkspacePage
+    public function listFromOrganization(RealmId $realmId, OrganizationId $organizationId, int $currentPage = 1, int $pageSize = 25): WorkspacePage
     {
-        $result = array_filter(
-            array_filter(
-                $this->storage->getValues(),
-                function (mixed $value): bool {
-                    return $value instanceof Workspace;
-                }
-            ),
-            fn (Workspace $workspace) => $workspace->organizationId->equals($organizationId),
-        );
+        $result = $this->storage->getValues()
+            ->filter(fn (mixed $value): bool => $value instanceof Workspace)
+            ->filter(fn (Workspace $workspace) => $workspace->realmId->equals($realmId))
+            ->filter(fn (Workspace $workspace) => $workspace->organizationId->equals($organizationId))
+            ->toArray();
 
         return new WorkspacePage(
             $currentPage,

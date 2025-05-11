@@ -28,7 +28,7 @@ final readonly class DeleteWorkspaceProcessor implements ProcessorInterface
         }
 
         try {
-            $command = new DeleteWorkspace($data->uuid);
+            $command = new DeleteWorkspace($data->uuid, $data->realmId);
             $this->commandBus->apply($command);
         } catch (InvalidWorkspaceStateException $exception) {
             throw new BadRequestHttpException($exception->getMessage(), previous: $exception);

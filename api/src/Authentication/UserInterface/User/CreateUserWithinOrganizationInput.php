@@ -36,7 +36,7 @@ final readonly class CreateUserWithinOrganizationInput
             new Assert\NotBlank(),
             new Assert\Type(RoleId::class),
         ])]
-        public array   $roleIds = [],
+        public array $roleIds = [],
         #[ApiProperty(
             description: 'User\'s display name',
             schema: ['type' => 'string'],

@@ -27,8 +27,8 @@ final readonly class QueryOneOrganizationProvider implements ProviderInterface
     {
         try {
             $query = new QueryOneOrganization(
-                RealmId::fromString($uriVariables['realm']),
                 OrganizationId::fromString($uriVariables['uuid']),
+                RealmId::fromString($uriVariables['realm']),
             );
         } catch (\InvalidArgumentException $exception) {
             throw new BadRequestHttpException($exception->getMessage(), previous: $exception);

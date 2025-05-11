@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Authentication\Infrastructure;
 
+use App\Shared\Infrastructure\Collection\Collection;
 use Psr\Cache\CacheItemInterface;
 use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
@@ -85,8 +86,8 @@ final class StorageMock implements AdapterInterface, TagAwareCacheInterface
         return $this->decorated->delete($key);
     }
 
-    public function getValues(): array
+    public function getValues(): Collection
     {
-        return $this->adapter->getValues();
+        return Collection::fromArray($this->adapter->getValues());
     }
 }

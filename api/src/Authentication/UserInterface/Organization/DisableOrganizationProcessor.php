@@ -13,6 +13,7 @@ use App\Authentication\Domain\Organization\Command\UseCases\DisableOrganization;
 use App\Authentication\Domain\Organization\OrganizationId;
 use App\Authentication\Domain\Organization\Query\Organization;
 use App\Authentication\Domain\Organization\Query\OrganizationRepositoryInterface;
+use App\Authentication\Domain\Realm\RealmId;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
@@ -33,6 +34,7 @@ final readonly class DisableOrganizationProcessor implements ProcessorInterface
         try {
             $command = new DisableOrganization(
                 OrganizationId::fromString($uriVariables['uuid']),
+                RealmId::fromString($uriVariables['realm']),
                 $data->validUntil,
             );
             $this->commandBus->apply($command);
@@ -42,6 +44,6 @@ final readonly class DisableOrganizationProcessor implements ProcessorInterface
             throw new NotFoundHttpException($exception->getMessage(), previous: $exception);
         }
 
-        return $this->organizationRepository->get($command->uuid);
+        return $this->organizationRepository->get($command->uuid, $command->realmId);
     }
 }

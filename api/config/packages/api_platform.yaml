@@ -14,7 +14,7 @@ api_platform:
 
     serializer:
         hydra_prefix: true
-        
+
 # Good defaults for REST APIs
     defaults:
         stateless: true
@@ -43,3 +43,8 @@ api_platform:
     swagger:
         swagger_ui_extra_configuration:
             filter: true
+
+        api_keys:
+            JWT:
+                name: Authorization
+                type: header

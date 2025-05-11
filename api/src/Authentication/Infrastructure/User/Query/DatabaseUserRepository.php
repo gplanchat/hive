@@ -6,9 +6,11 @@ namespace App\Authentication\Infrastructure\User\Query;
 
 use App\Authentication\Domain\NotFoundException;
 use App\Authentication\Domain\Organization\OrganizationId;
+use App\Authentication\Domain\Realm\RealmId;
 use App\Authentication\Domain\Role\RoleId;
+use App\Authentication\Domain\User\KeycloakUserId;
+use App\Authentication\Domain\User\Query\UseCases\UserPage;
 use App\Authentication\Domain\User\Query\User;
-use App\Authentication\Domain\User\Query\UserPage;
 use App\Authentication\Domain\User\Query\UserRepositoryInterface;
 use App\Authentication\Domain\User\UserId;
 use App\Authentication\Domain\Workspace\WorkspaceId;
@@ -24,17 +26,19 @@ final readonly class DatabaseUserRepository implements UserRepositoryInterface
         private Connection $connection,
     ) {}
 
-    public function get(UserId $userId): User
+    public function get(UserId $userId, RealmId $realmId): User
     {
         $sql =<<<SQL
-            SELECT uuid, organization_id, workspace_ids, role_ids, username, firstname, lastname, email, enabled
+            SELECT uuid, realm_id, keycloak_user_id, organization_id, workspace_ids, role_ids, username, firstname, lastname, email, enabled
             FROM users
             WHERE uuid = :uuid
+              AND realm_id = :realm_id
             LIMIT 1
             SQL;
 
         $statement = $this->connection->prepare($sql);
         $statement->bindValue(':uuid', $userId->toString(), ParameterType::STRING);
+        $statement->bindValue(':realm_id', $realmId->toString(), ParameterType::STRING);
 
         $result = $statement->executeQuery();
         if ($result->rowCount() <= 0) {
@@ -44,11 +48,12 @@ final readonly class DatabaseUserRepository implements UserRepositoryInterface
         return $this->hydrateOne($result->fetchAssociative());
     }
 
-    public function list(int $currentPage = 1, int $pageSize = 25): UserPage
+    public function list(RealmId $realmId, int $currentPage = 1, int $pageSize = 25): UserPage
     {
         $sql =<<<SQL
-            SELECT uuid, organization_id, workspace_ids, role_ids, username, firstname, lastname, email, enabled
+            SELECT uuid, realm_id, keycloak_user_id, organization_id, workspace_ids, role_ids, username, firstname, lastname, email, enabled
             FROM users
+            WHERE realm_id = :realm_id
             LIMIT :limit
             OFFSET :offset
             SQL;
@@ -56,6 +61,7 @@ final readonly class DatabaseUserRepository implements UserRepositoryInterface
         $statement = $this->connection->prepare($sql);
         $statement->bindValue(':limit', $pageSize, ParameterType::INTEGER);
         $statement->bindValue(':offset', $pageSize * ($currentPage - 1), ParameterType::INTEGER);
+        $statement->bindValue(':realm_id', $realmId->toString(), ParameterType::STRING);
 
         $result = $statement->executeQuery();
         if ($result->rowCount() <= 0) {
@@ -65,12 +71,13 @@ final readonly class DatabaseUserRepository implements UserRepositoryInterface
         return new UserPage(1, $pageSize, 0, ...$this->hydrateAll($result));
     }
 
-    public function listFromOrganization(OrganizationId $organizationId, int $currentPage = 1, int $pageSize = 25): UserPage
+    public function listFromOrganization(RealmId $realmId, OrganizationId $organizationId, int $currentPage = 1, int $pageSize = 25): UserPage
     {
         $sql =<<<SQL
-            SELECT uuid, organization_id, workspace_ids, role_ids, username, firstname, lastname, email, enabled
+            SELECT uuid, realm_id, keycloak_user_id, organization_id, workspace_ids, role_ids, username, firstname, lastname, email, enabled
             FROM users
             WHERE organization_id = :organization_id
+              AND realm_id = :realm_id
             LIMIT :limit
             OFFSET :offset
             SQL;
@@ -78,6 +85,7 @@ final readonly class DatabaseUserRepository implements UserRepositoryInterface
         $statement = $this->connection->prepare($sql);
         $statement->bindValue(':limit', $pageSize, ParameterType::INTEGER);
         $statement->bindValue(':offset', $pageSize * ($currentPage - 1), ParameterType::INTEGER);
+        $statement->bindValue(':realm_id', $realmId->toString(), ParameterType::STRING);
         $statement->bindValue(':organization_id', $organizationId->toString(), ParameterType::STRING);
 
         $result = $statement->executeQuery();
@@ -88,12 +96,13 @@ final readonly class DatabaseUserRepository implements UserRepositoryInterface
         return new UserPage(1, $pageSize, 0, ...$this->hydrateAll($result));
     }
 
-    public function listFromWorkspace(WorkspaceId $workspaceId, int $currentPage = 1, int $pageSize = 25): UserPage
+    public function listFromWorkspace(RealmId $realmId, WorkspaceId $workspaceId, int $currentPage = 1, int $pageSize = 25): UserPage
     {
         $sql =<<<SQL
-            SELECT uuid, organization_id, workspace_ids, role_ids, username, firstname, lastname, email, enabled
+            SELECT uuid, realm_id, keycloak_user_id, organization_id, workspace_ids, role_ids, username, firstname, lastname, email, enabled
             FROM users
-            WHERE workspace_ids::jsonb ? :organization_id
+            WHERE workspace_ids::jsonb ? :workspace_id
+              AND realm_id = :realm_id
             LIMIT :limit
             OFFSET :offset
             SQL;
@@ -101,7 +110,8 @@ final readonly class DatabaseUserRepository implements UserRepositoryInterface
         $statement = $this->connection->prepare($sql);
         $statement->bindValue(':limit', $pageSize, ParameterType::INTEGER);
         $statement->bindValue(':offset', $pageSize * ($currentPage - 1), ParameterType::INTEGER);
-        $statement->bindValue(':organization_id', $workspaceId->toString(), ParameterType::STRING);
+        $statement->bindValue(':realm_id', $realmId->toString(), ParameterType::STRING);
+        $statement->bindValue(':workspace_id', $workspaceId->toString(), ParameterType::STRING);
 
         $result = $statement->executeQuery();
         if ($result->rowCount() <= 0) {
@@ -115,6 +125,8 @@ final readonly class DatabaseUserRepository implements UserRepositoryInterface
     {
         return new User(
             UserId::fromString($user['uuid']),
+            RealmId::fromString($user['realm_id']),
+            KeycloakUserId::fromString($user['keycloak_user_id']),
             OrganizationId::fromString($user['organization_id']),
             workspaceIds: array_map(
                 fn (string $workspaceId): WorkspaceId => WorkspaceId::fromString($workspaceId),

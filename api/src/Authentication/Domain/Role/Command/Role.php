@@ -14,8 +14,8 @@ final class Role
     /** @param ResourceAccess[] $resourceAccesses */
     public function __construct(
         public readonly RoleId $uuid,
-        public readonly OrganizationId $organizationId,
         public readonly RealmId $realmId,
+        public readonly OrganizationId $organizationId,
         private ?string $identifier = null,
         private ?string $label = null,
         private array $resourceAccesses = [],
@@ -27,7 +27,7 @@ final class Role
 
     private function apply(object $event): void
     {
-        $methodName = 'apply'.substr(__CLASS__, strrpos(__CLASS__, '\\') + 1);
+        $methodName = 'apply'.substr($event::class, strrpos($event::class, '\\') + 1);
         if (method_exists($this, $methodName)) {
             $this->{$methodName}($event);
         }
@@ -49,18 +49,18 @@ final class Role
 
     public static function declare(
         RoleId $uuid,
-        OrganizationId $organizationId,
         RealmId $realmId,
+        OrganizationId $organizationId,
         string $identifier,
         string $label,
         array $resourceAccesses = [],
     ): self {
-        $instance = new self($uuid, $organizationId, $realmId);
+        $instance = new self($uuid, $realmId, $organizationId);
         $instance->recordThat(new DeclaredEvent(
             $uuid,
             1,
-            $organizationId,
             $realmId,
+            $organizationId,
             $identifier,
             $label,
             $resourceAccesses,
@@ -81,7 +81,7 @@ final class Role
             throw new InvalidRoleStateException('Cannot delete an already deleted Role.');
         }
 
-        $this->recordThat(new DeletedEvent($this->uuid, $this->version + 1, $this->organizationId, $this->realmId));
+        $this->recordThat(new DeletedEvent($this->uuid, $this->version + 1, $this->realmId, $this->organizationId));
     }
 
     private function applyDeletedEvent(DeletedEvent $event): void

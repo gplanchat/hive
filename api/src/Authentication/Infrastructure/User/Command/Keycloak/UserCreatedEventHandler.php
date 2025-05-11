@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Authentication\Infrastructure\User\Command\Keycloak;
 
-use App\Authentication\Domain\Organization\Query\OrganizationRepositoryInterface;
 use App\Authentication\Domain\Realm\Query\RealmRepositoryInterface;
 use App\Authentication\Domain\User\Command\DeclaredEvent;
 use App\Authentication\Domain\User\Query\UserRepositoryInterface;
@@ -23,8 +22,8 @@ final readonly class UserCreatedEventHandler
 
     public function __invoke(DeclaredEvent $event): void
     {
-        $organization = $this->realmRepository->get($event->realm);
-        $user = $this->userRepository->get($event->uuid);
+        $organization = $this->realmRepository->get($event->realmId);
+        $user = $this->userRepository->get($event->uuid, $event->realmId);
 
         $this->keycloak->createUserInsideRealm($organization, $user);
     }

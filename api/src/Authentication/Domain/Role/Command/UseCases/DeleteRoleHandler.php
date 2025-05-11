@@ -16,7 +16,7 @@ final readonly class DeleteRoleHandler
 
     public function __invoke(DeleteRole $command): void
     {
-        $role = $this->roleRepository->get($command->roleId);
+        $role = $this->roleRepository->get($command->roleId, $command->realmId);
 
         $role->delete();
 

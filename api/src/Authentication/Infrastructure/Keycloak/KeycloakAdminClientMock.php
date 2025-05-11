@@ -6,6 +6,6 @@ namespace App\Authentication\Infrastructure\Keycloak;
 
 use Symfony\Component\HttpClient\MockHttpClient;
 
-final class KeycloakClientMock extends MockHttpClient implements KeycloakClientInterface
+final class KeycloakAdminClientMock extends MockHttpClient implements KeycloakAdminClientInterface
 {
 }

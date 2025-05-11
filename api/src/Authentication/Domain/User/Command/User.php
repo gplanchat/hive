@@ -8,6 +8,7 @@ use App\Authentication\Domain\FeatureRollout\FeatureRolloutId;
 use App\Authentication\Domain\Organization\OrganizationId;
 use App\Authentication\Domain\Realm\RealmId;
 use App\Authentication\Domain\Role\RoleId;
+use App\Authentication\Domain\User\KeycloakUserId;
 use App\Authentication\Domain\User\UserId;
 use App\Authentication\Domain\Workspace\WorkspaceId;
 
@@ -37,7 +38,7 @@ final class User
 
     private function apply(object $event): void
     {
-        $methodName = 'apply'.substr(__CLASS__, strrpos(__CLASS__, '\\') + 1);
+        $methodName = 'apply'.substr($event::class, strrpos($event::class, '\\') + 1);
         if (method_exists($this, $methodName)) {
             $this->{$methodName}($event);
         }
@@ -64,6 +65,7 @@ final class User
     public static function declareEnabled(
         UserId $uuid,
         RealmId $realmId,
+        KeycloakUserId $keycloakUserId,
         OrganizationId $organizationId,
         array $workspaceIds,
         array $roleIds,
@@ -72,11 +74,12 @@ final class User
         string $lastName,
         string $email,
     ): self {
-        $instance = new self($uuid, $organizationId);
+        $instance = new self($uuid, $realmId, $organizationId);
         $instance->recordThat(new DeclaredEvent(
             $uuid,
             1,
             $realmId,
+            $keycloakUserId,
             $organizationId,
             $workspaceIds,
             $roleIds,
@@ -96,6 +99,7 @@ final class User
     public static function declareDisabled(
         UserId $uuid,
         RealmId $realmId,
+        KeycloakUserId $keycloakUserId,
         OrganizationId $organizationId,
         array $workspaceIds,
         array $roleIds,
@@ -104,11 +108,12 @@ final class User
         string $lastName,
         string $email,
     ): self {
-        $instance = new self($uuid, $organizationId);
+        $instance = new self($uuid, $realmId, $organizationId);
         $instance->recordThat(new DeclaredEvent(
             $uuid,
             1,
             $realmId,
+            $keycloakUserId,
             $organizationId,
             $workspaceIds,
             $roleIds,
@@ -141,7 +146,7 @@ final class User
             throw new InvalidUserStateException('Cannot enable an already enabled User.');
         }
 
-        $this->recordThat(new EnabledEvent($this->uuid, $this->version + 1));
+        $this->recordThat(new EnabledEvent($this->uuid, $this->version + 1, $this->realmId));
     }
 
     private function applyEnabledEvent(EnabledEvent $event): void
@@ -158,7 +163,7 @@ final class User
             throw new InvalidUserStateException('Cannot disable an already disabled User.');
         }
 
-        $this->recordThat(new DisabledEvent($this->uuid, $this->version + 1));
+        $this->recordThat(new DisabledEvent($this->uuid, $this->version + 1, $this->realmId));
     }
 
     private function applyDisabledEvent(DisabledEvent $event): void
@@ -172,7 +177,7 @@ final class User
             throw new InvalidUserStateException('Cannot delete an already deleted User.');
         }
 
-        $this->recordThat(new DeletedEvent($this->uuid, $this->version + 1));
+        $this->recordThat(new DeletedEvent($this->uuid, $this->version + 1, $this->realmId));
     }
 
     private function applyDeletedEvent(DeletedEvent $event): void

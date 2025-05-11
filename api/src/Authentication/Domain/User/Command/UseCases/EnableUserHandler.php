@@ -16,7 +16,7 @@ final readonly class EnableUserHandler
 
     public function __invoke(EnableUser $command): void
     {
-        $user = $this->userRepository->get($command->uuid);
+        $user = $this->userRepository->get($command->uuid, $command->realmId);
         $user->enable();
         $this->userRepository->save($user);
     }

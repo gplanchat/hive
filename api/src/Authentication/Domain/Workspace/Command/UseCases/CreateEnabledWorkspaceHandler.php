@@ -19,6 +19,7 @@ final readonly class CreateEnabledWorkspaceHandler
     {
         $workspace = Workspace::declareEnabled(
             $command->uuid,
+            $command->realmId,
             $command->organizationId,
             $command->name,
             $command->slug,

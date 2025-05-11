@@ -210,8 +210,6 @@ class OrganizationsTest extends ApiTestCase
     /** @test */
     public function itShouldDisableAnEnabledOrganization(): void
     {
-        $validUntil = $this->clock->now()->add(new \DateInterval('P4M12D'));
-
         static::createClient()->request('PATCH', '/authentication/acme-inc/organizations/01966c5a-10ef-77a1-b158-d4356966e1ab/disable', [
             'json' => [
                 'enabled' => false,
@@ -234,6 +232,67 @@ class OrganizationsTest extends ApiTestCase
                 '/feature-rollouts/subscription.enterprise',
                 '/feature-rollouts/demo.lorem-ipsum',
                 '/feature-rollouts/demo.dolor-sit-amet',
+            ],
+        ]);
+    }
+
+    /** @test */
+    public function itShouldAddSomeFeatureRollouts(): void
+    {
+        static::createClient()->request('PATCH', '/authentication/acme-inc/organizations/01966c5a-10ef-77a1-b158-d4356966e1ab/add-features', [
+            'json' => [
+                'featureRolloutIds' => [
+                    '/feature-rollouts/demo.this-can-be-added',
+                    '/feature-rollouts/demo.this-can-also-be-added',
+                ],
+            ],
+            'headers' => [
+                'Content-Type' => 'application/merge-patch+json',
+            ],
+        ]);
+
+        $this->assertResponseStatusCodeSame(200);
+        $this->assertJsonContains([
+            '@context' => '/contexts/Organization',
+            '@type' => 'Organization',
+            'name' => 'ACME Inc.',
+            'slug' => 'acme-inc',
+            'enabled' => true,
+            'featureRolloutIds' => [
+                '/feature-rollouts/subscription.enterprise',
+                '/feature-rollouts/demo.lorem-ipsum',
+                '/feature-rollouts/demo.dolor-sit-amet',
+                '/feature-rollouts/demo.consecutir-sid',
+                '/feature-rollouts/demo.this-can-be-added',
+                '/feature-rollouts/demo.this-can-also-be-added',
+            ],
+        ]);
+    }
+
+    /** @test */
+    public function itShouldRemoveSomeFeatureRollouts(): void
+    {
+        static::createClient()->request('PATCH', '/authentication/acme-inc/organizations/01966c5a-10ef-77a1-b158-d4356966e1ab/remove-features', [
+            'json' => [
+                'featureRolloutIds' => [
+                    '/feature-rollouts/demo.lorem-ipsum',
+                    '/feature-rollouts/demo.dolor-sit-amet',
+                ],
+            ],
+            'headers' => [
+                'Content-Type' => 'application/merge-patch+json',
+            ],
+        ]);
+
+        $this->assertResponseStatusCodeSame(200);
+        $this->assertJsonContains([
+            '@context' => '/contexts/Organization',
+            '@type' => 'Organization',
+            'name' => 'ACME Inc.',
+            'slug' => 'acme-inc',
+            'enabled' => true,
+            'featureRolloutIds' => [
+                '/feature-rollouts/subscription.enterprise',
             ],
         ]);
     }

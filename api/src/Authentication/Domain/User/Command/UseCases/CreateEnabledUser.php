@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace App\Authentication\Domain\User\Command\UseCases;
 
 use App\Authentication\Domain\Organization\OrganizationId;
+use App\Authentication\Domain\Realm\RealmId;
 use App\Authentication\Domain\Role\RoleId;
+use App\Authentication\Domain\User\KeycloakUserId;
 use App\Authentication\Domain\User\UserId;
 use App\Authentication\Domain\Workspace\WorkspaceId;
 
@@ -17,6 +19,8 @@ final readonly class CreateEnabledUser
      */
     public function __construct(
         public UserId $uuid,
+        public RealmId $realmId,
+        public KeycloakUserId $keycloakUserId,
         public OrganizationId $organizationId,
         public array $workspaceIds = [],
         public array $roleIds = [],

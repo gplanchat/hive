@@ -10,8 +10,8 @@ use App\Authentication\Domain\Role\RoleId;
 final readonly class QueryOneRole
 {
     public function __construct(
-        public RealmId $realmId,
         public RoleId $uuid,
+        public RealmId $realmId,
     ) {
     }
 }
