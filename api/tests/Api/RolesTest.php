@@ -3,9 +3,12 @@
 namespace App\Tests\Api;
 
 use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
+use App\Authentication\Infrastructure\Keycloak\KeycloakInterface;
+use App\Authentication\Infrastructure\Keycloak\KeycloakMock;
 use App\Authentication\Infrastructure\Organization\DataFixtures\OrganizationFixtures;
 use App\Authentication\Infrastructure\Role\DataFixtures\RoleFixtures;
 use App\Authentication\Infrastructure\StorageMock;
+use App\Authentication\Infrastructure\User\DataFixtures\UserFixtures;
 use Psr\Clock\ClockInterface;
 
 class RolesTest extends ApiTestCase
@@ -14,6 +17,7 @@ class RolesTest extends ApiTestCase
 
     private ?ClockInterface $clock = null;
     private ?OrganizationFixtures $organizationFixtures = null;
+    private ?UserFixtures $userFixtures = null;
     private ?RoleFixtures $roleFixtures = null;
 
     public function setUp(): void
@@ -30,6 +34,12 @@ class RolesTest extends ApiTestCase
         assert($this->roleFixtures instanceof RoleFixtures);
         $this->roleFixtures->load();
 
+        $this->userFixtures = new UserFixtures(
+            self::getContainer()->get(StorageMock::class)
+        );
+        assert($this->userFixtures instanceof UserFixtures);
+        $this->userFixtures->load();
+
         $this->organizationFixtures = new OrganizationFixtures(
             $this->clock,
             self::getContainer()->get(StorageMock::class)
@@ -43,6 +53,9 @@ class RolesTest extends ApiTestCase
         $this->organizationFixtures->unload();
         $this->organizationFixtures = null;
 
+        $this->userFixtures->unload();
+        $this->userFixtures = null;
+
         $this->roleFixtures->unload();
         $this->roleFixtures = null;
 
@@ -51,12 +64,24 @@ class RolesTest extends ApiTestCase
         parent::tearDown();
     }
 
+    private static function getTokenFor(string $username): string
+    {
+        $keycloak = self::getContainer()->get(KeycloakInterface::class);
+        assert($keycloak instanceof KeycloakMock);
+
+        return $keycloak->generateJWT($username);
+    }
+
     /** @test */
     public function itShouldListRoles(): void
     {
         $this->roleFixtures->load();
 
-        static::createClient()->request('GET', '/authentication/acme-inc/roles');
+        static::createClient()->request('GET', '/authentication/acme-inc/roles', [
+            'headers' => [
+                'authorization' => 'Bearer '.self::getTokenFor('/authentication/acme-inc/users/01966c5a-10ef-7abd-9c88-52b075bcae99'),
+            ],
+        ]);
 
         $this->assertResponseStatusCodeSame(200);
         $this->assertJsonContains([
@@ -72,7 +97,11 @@ class RolesTest extends ApiTestCase
     {
         $this->roleFixtures->load();
 
-        static::createClient()->request('GET', '/authentication/acme-inc/organizations/01966c5a-10ef-7315-94f2-cbeec2f167d8/roles');
+        static::createClient()->request('GET', '/authentication/acme-inc/organizations/01966c5a-10ef-7315-94f2-cbeec2f167d8/roles', [
+            'headers' => [
+                'authorization' => 'Bearer '.self::getTokenFor('/authentication/acme-inc/users/01966c5a-10ef-7abd-9c88-52b075bcae99'),
+            ],
+        ]);
 
         $this->assertResponseStatusCodeSame(200);
         $this->assertJsonContains([
@@ -86,7 +115,11 @@ class RolesTest extends ApiTestCase
     /** @test */
     public function itShouldShowARole(): void
     {
-        static::createClient()->request('GET', '/authentication/acme-inc/roles/01966d41-78eb-7406-ad99-03ad025e8bcf');
+        static::createClient()->request('GET', '/authentication/acme-inc/roles/01966d41-78eb-7406-ad99-03ad025e8bcf', [
+            'headers' => [
+                'authorization' => 'Bearer '.self::getTokenFor('/authentication/acme-inc/users/01966c5a-10ef-7abd-9c88-52b075bcae99'),
+            ],
+        ]);
 
         $this->assertResponseStatusCodeSame(200);
         $this->assertJsonContains([
@@ -110,6 +143,7 @@ class RolesTest extends ApiTestCase
             ],
             'headers' => [
                 'Content-Type' => 'application/ld+json',
+                'authorization' => 'Bearer '.self::getTokenFor('/authentication/acme-inc/users/01966c5a-10ef-7abd-9c88-52b075bcae99'),
             ],
         ]);
 
@@ -135,6 +169,7 @@ class RolesTest extends ApiTestCase
             ],
             'headers' => [
                 'Content-Type' => 'application/ld+json',
+                'authorization' => 'Bearer '.self::getTokenFor('/authentication/acme-inc/users/01966c5a-10ef-7abd-9c88-52b075bcae99'),
             ],
         ]);
 
@@ -157,6 +192,7 @@ class RolesTest extends ApiTestCase
             ],
             'headers' => [
                 'Content-Type' => 'application/ld+json',
+                'authorization' => 'Bearer '.self::getTokenFor('/authentication/acme-inc/users/01966c5a-10ef-7abd-9c88-52b075bcae99'),
             ],
         ]);
 
@@ -174,7 +210,7 @@ class RolesTest extends ApiTestCase
     {
         static::createClient()->request('DELETE', '/authentication/acme-inc/roles/01969388-78d2-7530-bd4d-d7673bce9f34', [
             'headers' => [
-                'Content-Type' => 'application/merge-patch+json',
+                'authorization' => 'Bearer '.self::getTokenFor('/authentication/acme-inc/users/01966c5a-10ef-7abd-9c88-52b075bcae99'),
             ],
         ]);
 

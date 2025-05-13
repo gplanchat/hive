@@ -42,7 +42,7 @@ final readonly class CreateUserProcessor implements ProcessorInterface
                     ? new CreateEnabledUser(
                         UserId::generateRandom(),
                         $realmId,
-                        $this->securityContext->keycloakUserId(),
+                        $this->securityContext->authorization(),
                         $organizationId,
                         $data->workspaceIds,
                         $data->roleIds,
@@ -54,7 +54,7 @@ final readonly class CreateUserProcessor implements ProcessorInterface
                     : new CreatePendingUser(
                         UserId::generateRandom(),
                         $realmId,
-                        $this->securityContext->keycloakUserId(),
+                        $this->securityContext->authorization(),
                         $organizationId,
                         $data->workspaceIds,
                         $data->roleIds,
@@ -68,7 +68,7 @@ final readonly class CreateUserProcessor implements ProcessorInterface
                     ? new CreateEnabledUser(
                         UserId::generateRandom(),
                         $realmId,
-                        $this->securityContext->keycloakUserId(),
+                        $this->securityContext->authorization(),
                         $data->organizationId,
                         $data->workspaceIds,
                         $data->roleIds,
@@ -80,7 +80,7 @@ final readonly class CreateUserProcessor implements ProcessorInterface
                     : new CreatePendingUser(
                         UserId::generateRandom(),
                         $realmId,
-                        $this->securityContext->keycloakUserId(),
+                        $this->securityContext->authorization(),
                         $data->organizationId,
                         $data->workspaceIds,
                         $data->roleIds,

@@ -7,10 +7,11 @@ namespace App\Authentication\Infrastructure\User\DataFixtures;
 use App\Authentication\Domain\Organization\OrganizationId;
 use App\Authentication\Domain\Realm\RealmId;
 use App\Authentication\Domain\Role\RoleId;
-use App\Authentication\Domain\User\KeycloakUserId;
-use App\Authentication\Domain\User\UserId;
 use App\Authentication\Domain\User\Query\User;
+use App\Authentication\Domain\User\UserId;
 use App\Authentication\Domain\Workspace\WorkspaceId;
+use App\Authentication\Infrastructure\Keycloak\KeycloakAuthorization;
+use App\Authentication\Infrastructure\Keycloak\KeycloakUserId;
 use App\Authentication\Infrastructure\StorageMock;
 use Symfony\Contracts\Cache\ItemInterface;
 
@@ -42,7 +43,9 @@ final readonly class UserFixtures
         $this->with(new User(
             UserId::fromString('01966c5a-10ef-7abd-9c88-52b075bcae99'),
             RealmId::fromString('acme-inc'),
-            KeycloakUserId::fromString('01966c5a-10ef-7abd-9c88-52b075bcae99'),
+            new KeycloakAuthorization(
+                KeycloakUserId::fromString('01966c5a-10ef-7abd-9c88-52b075bcae99'),
+            ),
             OrganizationId::fromString('01966c5a-10ef-7315-94f2-cbeec2f167d8'),
             workspaceIds: [
                 WorkspaceId::fromString('01966c5a-10ef-723c-bc33-2b1dc30d8963'),
@@ -62,7 +65,9 @@ final readonly class UserFixtures
         $this->with(new User(
             UserId::fromString('01966c5a-10ef-7c83-9881-4ce08f0116f4'),
             RealmId::fromString('acme-inc'),
-            KeycloakUserId::fromString('01966c5a-10ef-7c83-9881-4ce08f0116f4'),
+            new KeycloakAuthorization(
+                KeycloakUserId::fromString('01966c5a-10ef-7c83-9881-4ce08f0116f4'),
+            ),
             OrganizationId::fromString('01966c5a-10ef-7315-94f2-cbeec2f167d8'),
             workspaceIds: [
                 WorkspaceId::fromString('01966c5a-10ef-723c-bc33-2b1dc30d8963'),
@@ -81,7 +86,9 @@ final readonly class UserFixtures
         $this->with(new User(
             UserId::fromString('01966c5a-10ef-750c-9228-d41d6f3e33a1'),
             RealmId::fromString('acme-inc'),
-            KeycloakUserId::fromString('01966c5a-10ef-750c-9228-d41d6f3e33a1'),
+            new KeycloakAuthorization(
+                KeycloakUserId::fromString('01966c5a-10ef-750c-9228-d41d6f3e33a1'),
+            ),
             OrganizationId::fromString('01966c5a-10ef-7315-94f2-cbeec2f167d8'),
             workspaceIds: [
                 WorkspaceId::fromString('01966c5a-10ef-723c-bc33-2b1dc30d8963'),
@@ -100,7 +107,9 @@ final readonly class UserFixtures
         $this->with(new User(
             UserId::fromString('01966c5a-10ef-7670-971d-e6e600135a73'),
             RealmId::fromString('acme-inc'),
-            KeycloakUserId::fromString('01966c5a-10ef-7670-971d-e6e600135a73'),
+            new KeycloakAuthorization(
+                KeycloakUserId::fromString('01966c5a-10ef-7670-971d-e6e600135a73'),
+            ),
             OrganizationId::fromString('01966c5a-10ef-77a1-b158-d4356966e1ab'),
             workspaceIds: [
                 WorkspaceId::fromString('01966c5a-10ef-7328-8638-39bf546a5bf4'),
@@ -119,7 +128,9 @@ final readonly class UserFixtures
         $this->with(new User(
             UserId::fromString('01966c5a-10ef-7d6f-a6cd-a74560cea954'),
             RealmId::fromString('acme-inc'),
-            KeycloakUserId::fromString('01966c5a-10ef-7d6f-a6cd-a74560cea954'),
+            new KeycloakAuthorization(
+                KeycloakUserId::fromString('01966c5a-10ef-7d6f-a6cd-a74560cea954'),
+            ),
             OrganizationId::fromString('01966c5a-10ef-77a1-b158-d4356966e1ab'),
             workspaceIds: [
                 WorkspaceId::fromString('01966c5a-10ef-7328-8638-39bf546a5bf4'),
@@ -137,7 +148,9 @@ final readonly class UserFixtures
         $this->with(new User(
             UserId::fromString('01966c5a-10ef-7040-9576-09078df3ea8a'),
             RealmId::fromString('acme-inc'),
-            KeycloakUserId::fromString('01966c5a-10ef-7040-9576-09078df3ea8a'),
+            new KeycloakAuthorization(
+                KeycloakUserId::fromString('01966c5a-10ef-7040-9576-09078df3ea8a'),
+            ),
             OrganizationId::fromString('01966c5a-10ef-76f6-9513-e3b858c22f0a'),
             workspaceIds: [
                 WorkspaceId::fromString('01966c5a-10ef-7f9c-8c9f-80657a996b9d'),

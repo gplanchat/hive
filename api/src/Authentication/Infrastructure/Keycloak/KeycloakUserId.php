@@ -2,9 +2,8 @@
 
 declare(strict_types=1);
 
-namespace App\Authentication\Domain\User;
+namespace App\Authentication\Infrastructure\Keycloak;
 
-use App\Authentication\Domain\IdInterface;
 use App\Authentication\Domain\InvalidUuidFormatException;
 
 final class KeycloakUserId

@@ -4,32 +4,55 @@ declare(strict_types=1);
 
 namespace App\Shared\Infrastructure\Collection;
 
+/**
+ * @template Type
+ */
 final class Collection
 {
+    /**
+     * @param \Iterator<array-key, Type> $items
+     */
     private function __construct(
         private readonly \Iterator $items,
     ) {}
 
+    /**
+     * @param \Iterator<array-key, Type> $data
+     */
     public static function fromIterator(\Iterator $data): self
     {
         return new self($data);
     }
 
+    /**
+     * @param \Traversable<array-key, Type> $data
+     */
     public static function fromTraversable(\Traversable $data): self
     {
         return new self(new \IteratorIterator($data));
     }
 
+    /**
+     * @param array<array-key, Type> $data
+     */
     public static function fromArray(array $data): self
     {
         return new self(new \ArrayIterator($data));
     }
 
+    /**
+     * @return array<array-key, Type>
+     */
     public function toArray(): array
     {
         return iterator_to_array($this->items, false);
     }
 
+    /**
+     * @param callable(Type): bool $filter
+     *
+     * @return Collection<array-key, Type>
+     */
     public function filter(callable $filter): self
     {
         return new self(
@@ -37,6 +60,13 @@ final class Collection
         );
     }
 
+    /**
+     * @template ReturnType
+     *
+     * @param callable(Type): ReturnType $map
+     *
+     * @return Collection<array-key, ReturnType>
+     */
     public function map(callable $map): self
     {
         return new self(
@@ -44,6 +74,11 @@ final class Collection
         );
     }
 
+    /**
+     * @param callable(Type $left, Type $right): bool $callable
+     *
+     * @return Collection<array-key, Type>
+     */
     public function unique(callable $callable): self
     {
         $values = $this->toArray();
@@ -64,6 +99,9 @@ final class Collection
         });
     }
 
+    /**
+     * @return Collection<array-key, Type>
+     */
     public function offset(int $offset): self
     {
         return new self(
@@ -71,6 +109,9 @@ final class Collection
         );
     }
 
+    /**
+     * @return Collection<array-key, Type>
+     */
     public function limit(int $limit): self
     {
         return new self(
@@ -78,16 +119,25 @@ final class Collection
         );
     }
 
+    /**
+     * @param callable(Type): bool $callable
+     */
     public function any(callable $callable): bool
     {
         return array_any($this->toArray(), $callable);
     }
 
+    /**
+     * @param callable(Type): bool $callable
+     */
     public function none(callable $callable): bool
     {
         return array_all($this->toArray(), fn ($item) => !$callable($item));
     }
 
+    /**
+     * @param callable(Type): bool $callable
+     */
     public function all(callable $callable): bool
     {
         return array_all($this->toArray(), $callable);

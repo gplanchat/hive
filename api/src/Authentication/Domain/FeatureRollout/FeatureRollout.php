@@ -29,6 +29,7 @@ use App\Authentication\UserInterface\FeatureRollout\QuerySeveralFeatureRolloutPr
             ),
         ],
     ),
+    security: 'is_granted("IS_AUTHENTICATED")',
     input: QueryOneFeatureRollout::class,
     output: FeatureRollout::class,
     validate: true,
@@ -41,6 +42,7 @@ use App\Authentication\UserInterface\FeatureRollout\QuerySeveralFeatureRolloutPr
     paginationMaximumItemsPerPage: 100,
     paginationPartial: true,
     order: ['code' => 'ASC'],
+    security: 'is_granted("IS_AUTHENTICATED")',
     validate: true,
     provider: QuerySeveralFeatureRolloutProvider::class,
     parameters: [
@@ -50,6 +52,7 @@ use App\Authentication\UserInterface\FeatureRollout\QuerySeveralFeatureRolloutPr
 )]
 final readonly class FeatureRollout
 {
+    /** @param Targets[] $targets */
     public function __construct(
         #[ApiProperty(
             description: 'Code of the Feature Rollout',
@@ -64,6 +67,17 @@ final readonly class FeatureRollout
             ],
         )]
         public FeatureRolloutId $code,
+        #[ApiProperty(
+            description: 'Applicable target types of the Feature Rollout',
+            writable: true,
+            required: true,
+            identifier: true,
+            schema: [
+                'type' => 'string',
+                'enum' => [Targets::Global->value, Targets::Organization->value],
+            ],
+        )]
+        public array $targets,
     ) {
     }
 }

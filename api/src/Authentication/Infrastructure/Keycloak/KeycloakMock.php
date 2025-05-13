@@ -9,9 +9,23 @@ use App\Authentication\Domain\Realm\Query\Realm;
 use App\Authentication\Domain\Realm\Query\UseCases\RealmPage;
 use App\Authentication\Domain\Realm\RealmId;
 use App\Authentication\Domain\User\Query\User;
+use Firebase\JWT\JWT;
+use Firebase\JWT\Key;
+use Psr\Clock\ClockInterface;
 
-final class KeycloakMock implements KeycloakInterface
+final readonly class KeycloakMock implements KeycloakInterface
 {
+    public function __construct(
+        private KeysRegistry $keysRegistry,
+        private ClockInterface $clock,
+    ) {
+    }
+
+    public static function create(ClockInterface $clock): self
+    {
+        return new self(KeysRegistry::create(), $clock);
+    }
+
     public function createRealm(Realm $realm): void
     {
     }
@@ -51,5 +65,26 @@ final class KeycloakMock implements KeycloakInterface
 
     public function fetchOpenidCertificates(RealmId $realmId): array
     {
+        return $this->keysRegistry->publicKeys()->toArray();
+    }
+
+    public function generateJWT(string $subject, int $keyId = 0, array $payload = [], array $headers = [], \DateInterval $expiration = new \DateInterval('PT1H')): string
+    {
+        $certificates = $this->keysRegistry->privateKeys()->toArray();
+
+        return JWT::encode(
+            [
+                ...[
+                    'exp'  => $this->clock->now()->add($expiration)->getTimestamp(),
+                    'nbf'  => $this->clock->now()->getTimestamp(),
+                    'sub' => $subject,
+                ],
+                ...$payload
+            ],
+            $certificates[$keyId]->getKeyMaterial(),
+            $certificates[$keyId]->getAlgorithm(),
+            strval($keyId),
+            $headers,
+        );
     }
 }

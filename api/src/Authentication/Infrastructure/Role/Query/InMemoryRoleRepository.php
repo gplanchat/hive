@@ -16,6 +16,7 @@ use App\Authentication\Domain\Role\Resources;
 use App\Authentication\Domain\Role\RoleId;
 use App\Authentication\Infrastructure\Role\DataFixtures\RoleFixtures;
 use App\Authentication\Infrastructure\StorageMock;
+use App\Shared\Infrastructure\Collection\Collection;
 
 
 final class InMemoryRoleRepository implements RoleRepositoryInterface
@@ -41,14 +42,10 @@ final class InMemoryRoleRepository implements RoleRepositoryInterface
         return $value;
     }
 
-    public function getAll(RealmId $realmId, RoleId ...$roleIds): iterable
+    public function getAll(RealmId $realmId, RoleId ...$roleIds): Collection
     {
-        $roles = [];
-        foreach ($roleIds as $roleId) {
-            $roles[] = $this->get($roleId, $realmId);
-        }
-
-        return $roles;
+        return Collection::fromArray($roleIds)
+            ->map(fn (RoleId $roleId) => $this->get($roleId, $realmId));
     }
 
     public function list(RealmId $realmId, int $currentPage = 1, int $pageSize = 25): RolePage

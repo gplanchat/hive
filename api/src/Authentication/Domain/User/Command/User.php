@@ -8,7 +8,7 @@ use App\Authentication\Domain\FeatureRollout\FeatureRolloutId;
 use App\Authentication\Domain\Organization\OrganizationId;
 use App\Authentication\Domain\Realm\RealmId;
 use App\Authentication\Domain\Role\RoleId;
-use App\Authentication\Domain\User\KeycloakUserId;
+use App\Authentication\Domain\User\AuthorizationInterface;
 use App\Authentication\Domain\User\UserId;
 use App\Authentication\Domain\Workspace\WorkspaceId;
 
@@ -65,7 +65,7 @@ final class User
     public static function declareEnabled(
         UserId $uuid,
         RealmId $realmId,
-        KeycloakUserId $keycloakUserId,
+        AuthorizationInterface $authorization,
         OrganizationId $organizationId,
         array $workspaceIds,
         array $roleIds,
@@ -79,7 +79,7 @@ final class User
             $uuid,
             1,
             $realmId,
-            $keycloakUserId,
+            $authorization,
             $organizationId,
             $workspaceIds,
             $roleIds,
@@ -99,7 +99,7 @@ final class User
     public static function declareDisabled(
         UserId $uuid,
         RealmId $realmId,
-        KeycloakUserId $keycloakUserId,
+        AuthorizationInterface $authorization,
         OrganizationId $organizationId,
         array $workspaceIds,
         array $roleIds,
@@ -113,7 +113,7 @@ final class User
             $uuid,
             1,
             $realmId,
-            $keycloakUserId,
+            $authorization,
             $organizationId,
             $workspaceIds,
             $roleIds,

@@ -50,7 +50,8 @@ use Symfony\Component\Serializer\Attribute\Context;
             ),
         ],
     ),
-    provider: QueryOneRoleProvider::class
+    security: 'is_granted("IS_AUTHENTICATED")',
+    provider: QueryOneRoleProvider::class,
 )]
 #[GetCollection(
     uriTemplate: '/authentication/{realm}/roles',
@@ -73,6 +74,7 @@ use Symfony\Component\Serializer\Attribute\Context;
     paginationMaximumItemsPerPage: 100,
     paginationPartial: true,
     order: ['uuid' => 'ASC'],
+    security: 'is_granted("IS_AUTHENTICATED")',
     provider: QuerySeveralRoleProvider::class,
     itemUriTemplate: '/authentication/{realm}/roles/{uuid}',
 )]
@@ -105,8 +107,9 @@ use Symfony\Component\Serializer\Attribute\Context;
     paginationMaximumItemsPerPage: 100,
     paginationPartial: true,
     order: ['uuid' => 'ASC'],
+    security: 'is_granted("IS_AUTHENTICATED")',
     provider: QuerySeveralRoleInOrganizationProvider::class,
-    itemUriTemplate: '/authentication/{realm}/roles/{uuid}'
+    itemUriTemplate: '/authentication/{realm}/roles/{uuid}',
 )]
 #[Post(
     uriTemplate: '/authentication/{realm}/organizations/{organizationId}/roles',
@@ -114,6 +117,7 @@ use Symfony\Component\Serializer\Attribute\Context;
         'realm' => 'realmId',
         'organizationId',
     ],
+    security: 'is_granted("IS_AUTHENTICATED")',
     input: CreateRoleWithinOrganizationInput::class,
     output: self::class,
     processor: CreateRoleProcessor::class,
@@ -124,6 +128,7 @@ use Symfony\Component\Serializer\Attribute\Context;
     uriVariables: [
         'realm' => 'realmId',
     ],
+    security: 'is_granted("IS_AUTHENTICATED")',
     input: CreateRoleInput::class,
     output: self::class,
     processor: CreateRoleProcessor::class,
@@ -135,6 +140,7 @@ use Symfony\Component\Serializer\Attribute\Context;
         'realm' => 'realmId',
         'uuid',
     ],
+    security: 'is_granted("IS_AUTHENTICATED")',
     input: false,
     output: false,
     provider: QueryOneRoleProvider::class,

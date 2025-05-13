@@ -9,6 +9,7 @@ use App\Authentication\Domain\Realm\Query\Realm;
 use App\Authentication\Domain\Realm\Query\UseCases\RealmPage;
 use App\Authentication\Domain\Realm\RealmId;
 use App\Authentication\Domain\User\Query\User;
+use Firebase\JWT\Key;
 
 interface KeycloakInterface
 {
@@ -18,6 +19,6 @@ interface KeycloakInterface
     public function createOrganizationInsideRealm(RealmId $realmId, Organization $organization): void;
 
     public function createUserInsideRealm(Realm $realm, User $user): void;
-
+    /** @return Key[] */
     public function fetchOpenidCertificates(RealmId $realmId): array;
 }

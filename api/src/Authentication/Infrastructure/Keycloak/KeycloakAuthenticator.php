@@ -27,21 +27,22 @@ use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPasspor
 final class KeycloakAuthenticator extends AbstractAuthenticator
 {
     public function __construct(
-        private readonly Keycloak $keycloak,
+        private readonly KeycloakInterface $keycloak,
         private readonly UserRepositoryInterface $userRepository,
         private readonly RoleRepositoryInterface $roleRepository,
         private readonly LoggerInterface $logger,
-    ) {}
+    ) {
+    }
 
     public function supports(Request $request): ?bool
     {
-        return $request->headers->has('Authorization');
+        return $request->headers->has('authorization');
     }
 
     public function authenticate(Request $request): Passport
     {
         // Get token from header
-        $jwtToken = $request->headers->get('Authorization');
+        $jwtToken = $request->headers->get('authorization');
         if (false === str_starts_with($jwtToken, 'Bearer ')) {
             throw new AuthenticationException('Invalid token');
         }
@@ -54,7 +55,7 @@ final class KeycloakAuthenticator extends AbstractAuthenticator
             throw new AuthenticationException('Invalid token');
         }
 
-        $header = json_decode(base64_decode($parts[0]), true);
+        $headers = json_decode(base64_decode($parts[0]), false);
         // FIXME: make the Realm dynamic
         $realmId = RealmId::fromString('acme-inc');
 
@@ -62,7 +63,7 @@ final class KeycloakAuthenticator extends AbstractAuthenticator
         try {
             $keys = $this->keycloak->fetchOpenidCertificates($realmId);
 
-            $decodedToken = JWT::decode($jwtToken, $keys, [$header['alg']]);
+            $decodedToken = JWT::decode($jwtToken, $keys, $headers);
         } catch (SignatureInvalidException $exception) {
             throw new AuthenticationException('Provided JWT was invalid because the signature verification failed', previous: $exception);
         } catch (BeforeValidException $exception) {
@@ -83,8 +84,12 @@ final class KeycloakAuthenticator extends AbstractAuthenticator
                 try {
                     $user = $this->userRepository->get($userId, $realmId);
 
-                    return new KeycloakUser($user->keycloakUserId, $this->roleRepository->getAll($realmId, ...$user->roleIds));
-                } catch (NotFoundException) {
+                    if (!$user->authorization instanceof KeycloakAuthorization) {
+                        return null;
+                    }
+
+                    return new KeycloakUser($user->authorization->keycloakUserId, $this->roleRepository->getAll($realmId, ...$user->roleIds)->toArray());
+                } catch (NotFoundException $exception) {
                     // We are not providing access if the User repository does not return a User instance
                     // This should be reviewed in the case we are using the database to store users or Keycloak itself
                     $this->logger->info(strtr(

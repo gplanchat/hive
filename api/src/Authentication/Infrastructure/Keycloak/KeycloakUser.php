@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Authentication\Infrastructure\Keycloak;
 
 use App\Authentication\Domain\Role\Query\Role;
-use App\Authentication\Domain\User\KeycloakUserId;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 final readonly class KeycloakUser implements UserInterface

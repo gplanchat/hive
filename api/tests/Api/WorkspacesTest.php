@@ -3,9 +3,13 @@
 namespace App\Tests\Api;
 
 use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
+use App\Authentication\Infrastructure\Keycloak\KeycloakInterface;
+use App\Authentication\Infrastructure\Keycloak\KeycloakMock;
 use App\Authentication\Infrastructure\Organization\DataFixtures\OrganizationFixtures;
+use App\Authentication\Infrastructure\Role\DataFixtures\RoleFixtures;
 use App\Authentication\Infrastructure\Workspace\DataFixtures\WorkspaceFixtures;
 use App\Authentication\Infrastructure\StorageMock;
+use App\Authentication\Infrastructure\User\DataFixtures\UserFixtures;
 use Psr\Clock\ClockInterface;
 
 class WorkspacesTest extends ApiTestCase
@@ -15,6 +19,8 @@ class WorkspacesTest extends ApiTestCase
     private ?ClockInterface $clock = null;
     private ?OrganizationFixtures $organizationFixtures = null;
     private ?WorkspaceFixtures $workspaceFixtures = null;
+    private ?UserFixtures $userFixtures = null;
+    private ?RoleFixtures $roleFixtures = null;
 
     public function setUp(): void
     {
@@ -23,6 +29,18 @@ class WorkspacesTest extends ApiTestCase
 
         $this->clock = self::getContainer()->get(ClockInterface::class);
         assert($this->clock instanceof ClockInterface);
+
+        $this->roleFixtures = new RoleFixtures(
+            self::getContainer()->get(StorageMock::class)
+        );
+        assert($this->roleFixtures instanceof RoleFixtures);
+        $this->roleFixtures->load();
+
+        $this->userFixtures = new UserFixtures(
+            self::getContainer()->get(StorageMock::class)
+        );
+        assert($this->userFixtures instanceof UserFixtures);
+        $this->userFixtures->load();
 
         $this->workspaceFixtures = new WorkspaceFixtures(
             $this->clock,
@@ -47,9 +65,23 @@ class WorkspacesTest extends ApiTestCase
         $this->workspaceFixtures->unload();
         $this->workspaceFixtures = null;
 
+        $this->userFixtures->unload();
+        $this->userFixtures = null;
+
+        $this->roleFixtures->unload();
+        $this->roleFixtures = null;
+
         $this->clock = null;
 
         parent::tearDown();
+    }
+
+    private static function getTokenFor(string $username): string
+    {
+        $keycloak = self::getContainer()->get(KeycloakInterface::class);
+        assert($keycloak instanceof KeycloakMock);
+
+        return $keycloak->generateJWT($username);
     }
 
     /** @test */
@@ -57,7 +89,11 @@ class WorkspacesTest extends ApiTestCase
     {
         $this->workspaceFixtures->load();
 
-        static::createClient()->request('GET', '/authentication/acme-inc/workspaces');
+        static::createClient()->request('GET', '/authentication/acme-inc/workspaces', [
+            'headers' => [
+                'authorization' => 'Bearer '.self::getTokenFor('/authentication/acme-inc/users/01966c5a-10ef-7abd-9c88-52b075bcae99'),
+            ],
+        ]);
 
         $this->assertResponseStatusCodeSame(200);
         $this->assertJsonContains([
@@ -73,7 +109,11 @@ class WorkspacesTest extends ApiTestCase
     {
         $this->workspaceFixtures->load();
 
-        static::createClient()->request('GET', '/authentication/acme-inc/organizations/01966c5a-10ef-76f6-9513-e3b858c22f0a/workspaces');
+        static::createClient()->request('GET', '/authentication/acme-inc/organizations/01966c5a-10ef-76f6-9513-e3b858c22f0a/workspaces', [
+            'headers' => [
+                'authorization' => 'Bearer '.self::getTokenFor('/authentication/acme-inc/users/01966c5a-10ef-7abd-9c88-52b075bcae99'),
+            ],
+        ]);
 
         $this->assertResponseStatusCodeSame(200);
         $this->assertJsonContains([
@@ -87,7 +127,11 @@ class WorkspacesTest extends ApiTestCase
     /** @test */
     public function itShouldShowAWorkspace(): void
     {
-        static::createClient()->request('GET', '/authentication/acme-inc/workspaces/01966c5a-10ef-70ce-ab8c-c455e874c3fc');
+        static::createClient()->request('GET', '/authentication/acme-inc/workspaces/01966c5a-10ef-70ce-ab8c-c455e874c3fc', [
+            'headers' => [
+                'authorization' => 'Bearer '.self::getTokenFor('/authentication/acme-inc/users/01966c5a-10ef-7abd-9c88-52b075bcae99'),
+            ],
+        ]);
 
         $this->assertResponseStatusCodeSame(200);
         $this->assertJsonContains([
@@ -114,6 +158,7 @@ class WorkspacesTest extends ApiTestCase
             ],
             'headers' => [
                 'Content-Type' => 'application/ld+json',
+                'authorization' => 'Bearer '.self::getTokenFor('/authentication/acme-inc/users/01966c5a-10ef-7abd-9c88-52b075bcae99'),
             ],
         ]);
 
@@ -141,6 +186,7 @@ class WorkspacesTest extends ApiTestCase
             ],
             'headers' => [
                 'Content-Type' => 'application/ld+json',
+                'authorization' => 'Bearer '.self::getTokenFor('/authentication/acme-inc/users/01966c5a-10ef-7abd-9c88-52b075bcae99'),
             ],
         ]);
 
@@ -163,6 +209,7 @@ class WorkspacesTest extends ApiTestCase
             ],
             'headers' => [
                 'Content-Type' => 'application/ld+json',
+                'authorization' => 'Bearer '.self::getTokenFor('/authentication/acme-inc/users/01966c5a-10ef-7abd-9c88-52b075bcae99'),
             ],
         ]);
 
@@ -189,6 +236,7 @@ class WorkspacesTest extends ApiTestCase
             ],
             'headers' => [
                 'Content-Type' => 'application/ld+json',
+                'authorization' => 'Bearer '.self::getTokenFor('/authentication/acme-inc/users/01966c5a-10ef-7abd-9c88-52b075bcae99'),
             ],
         ]);
 
@@ -214,6 +262,7 @@ class WorkspacesTest extends ApiTestCase
             ],
             'headers' => [
                 'Content-Type' => 'application/ld+json',
+                'authorization' => 'Bearer '.self::getTokenFor('/authentication/acme-inc/users/01966c5a-10ef-7abd-9c88-52b075bcae99'),
             ],
         ]);
 
@@ -236,6 +285,7 @@ class WorkspacesTest extends ApiTestCase
             ],
             'headers' => [
                 'Content-Type' => 'application/ld+json',
+                'authorization' => 'Bearer '.self::getTokenFor('/authentication/acme-inc/users/01966c5a-10ef-7abd-9c88-52b075bcae99'),
             ],
         ]);
 
@@ -260,6 +310,7 @@ class WorkspacesTest extends ApiTestCase
             ],
             'headers' => [
                 'Content-Type' => 'application/merge-patch+json',
+                'authorization' => 'Bearer '.self::getTokenFor('/authentication/acme-inc/users/01966c5a-10ef-7abd-9c88-52b075bcae99'),
             ],
         ]);
 
@@ -289,6 +340,7 @@ class WorkspacesTest extends ApiTestCase
             ],
             'headers' => [
                 'Content-Type' => 'application/merge-patch+json',
+                'authorization' => 'Bearer '.self::getTokenFor('/authentication/acme-inc/users/01966c5a-10ef-7abd-9c88-52b075bcae99'),
             ],
         ]);
 
@@ -311,7 +363,7 @@ class WorkspacesTest extends ApiTestCase
     {
         static::createClient()->request('DELETE', '/authentication/acme-inc/workspaces/01966c5a-10ef-723c-bc33-2b1dc30d8963', [
             'headers' => [
-                'Content-Type' => 'application/merge-patch+json',
+                'authorization' => 'Bearer '.self::getTokenFor('/authentication/acme-inc/users/01966c5a-10ef-7abd-9c88-52b075bcae99'),
             ],
         ]);
 

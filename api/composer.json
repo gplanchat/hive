@@ -5,6 +5,7 @@
         "php": ">=8.4",
         "ext-ctype": "*",
         "ext-iconv": "*",
+        "ext-openssl": "*",
         "api-platform/graphql": "^4.1",
         "api-platform/symfony": "*",
         "cloudevents/sdk-php": "^1.2",

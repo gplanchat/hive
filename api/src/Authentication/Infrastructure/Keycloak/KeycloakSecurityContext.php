@@ -5,12 +5,13 @@ declare(strict_types=1);
 namespace App\Authentication\Infrastructure\Keycloak;
 
 use App\Authentication\Domain\SecurityContextInterface;
-use App\Authentication\Domain\User\KeycloakUserId;
 
 final class KeycloakSecurityContext implements SecurityContextInterface
 {
-    public function keycloakUserId(): KeycloakUserId
+    public function authorization(): KeycloakAuthorization
     {
-        return KeycloakUserId::generateRandom();
+        return new KeycloakAuthorization(
+            KeycloakUserId::generateRandom(),
+        );
     }
 }

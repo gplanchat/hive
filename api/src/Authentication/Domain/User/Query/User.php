@@ -15,7 +15,7 @@ use ApiPlatform\OpenApi\Model\Parameter;
 use App\Authentication\Domain\Organization\OrganizationId;
 use App\Authentication\Domain\Realm\RealmId;
 use App\Authentication\Domain\Role\RoleId;
-use App\Authentication\Domain\User\KeycloakUserId;
+use App\Authentication\Domain\User\AuthorizationInterface;
 use App\Authentication\Domain\User\UserId;
 use App\Authentication\Domain\Workspace\WorkspaceId;
 use App\Authentication\UserInterface\User\CreateUserInput;
@@ -58,6 +58,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
         ],
     ),
     normalizationContext: ['groups' => ['user:show']],
+    security: 'is_granted("IS_AUTHENTICATED")',
     provider: QueryOneUserProvider::class
 )]
 #[GetCollection(
@@ -82,6 +83,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
     paginationPartial: true,
     order: ['uuid' => 'ASC'],
     normalizationContext: ['groups' => ['user:show']],
+    security: 'is_granted("IS_AUTHENTICATED")',
     provider: QuerySeveralUserProvider::class,
     itemUriTemplate: '/authentication/{realm}/users/{uuid}',
 )]
@@ -115,6 +117,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
     paginationPartial: true,
     order: ['uuid' => 'ASC'],
     normalizationContext: ['groups' => ['user:show']],
+    security: 'is_granted("IS_AUTHENTICATED")',
     provider: QuerySeveralUserInOrganizationProvider::class,
     itemUriTemplate: '/authentication/{realm}/users/{uuid}',
 )]
@@ -148,6 +151,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
     paginationPartial: true,
     order: ['uuid' => 'ASC'],
     normalizationContext: ['groups' => ['user:show']],
+    security: 'is_granted("IS_AUTHENTICATED")',
     provider: QuerySeveralUserInWorkspaceProvider::class,
     itemUriTemplate: '/authentication/{realm}/users/{uuid}',
 )]
@@ -155,6 +159,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
     uriTemplate: '/authentication/{realm}/organizations/{organizationId}/users',
     uriVariables: ['realm', 'organizationId'],
     normalizationContext: ['groups' => ['user:show']],
+    security: 'is_granted("IS_AUTHENTICATED")',
     input: CreateUserWithinOrganizationInput::class,
     output: self::class,
     processor: CreateUserProcessor::class,
@@ -166,6 +171,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
         'realm' => 'realmId',
     ],
     normalizationContext: ['groups' => ['user:show']],
+    security: 'is_granted("IS_AUTHENTICATED")',
     input: CreateUserInput::class,
     output: self::class,
     processor: CreateUserProcessor::class,
@@ -178,6 +184,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
         'uuid',
     ],
     normalizationContext: ['groups' => ['user:show']],
+    security: 'is_granted("IS_AUTHENTICATED")',
     input: EnableUserInput::class,
     output: self::class,
     provider: QueryOneUserProvider::class,
@@ -190,6 +197,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
         'uuid',
     ],
     normalizationContext: ['groups' => ['user:show']],
+    security: 'is_granted("IS_AUTHENTICATED")',
     input: DisableUserInput::class,
     output: self::class,
     provider: QueryOneUserProvider::class,
@@ -198,6 +206,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
 #[Delete(
     uriTemplate: '/authentication/{realm}/users/{uuid}',
     uriVariables: ['realm', 'uuid'],
+    security: 'is_granted("IS_AUTHENTICATED")',
     input: false,
     output: false,
     provider: QueryOneUserProvider::class,
@@ -224,7 +233,7 @@ final readonly class User
         )]
         #[Groups(['user:show'])]
         public RealmId $realmId,
-        public KeycloakUserId $keycloakUserId,
+        public AuthorizationInterface $authorization,
         #[ApiProperty(
             description: 'Identifier of the Owning Organization',
             schema: ['type' => 'string', 'pattern' => OrganizationId::URI_REQUIREMENT],

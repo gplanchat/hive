@@ -30,6 +30,7 @@ use App\Authentication\UserInterface\Realm\QuerySeveralRealmProvider;
             ),
         ],
     ),
+    security: 'is_granted("IS_AUTHENTICATED")',
     input: QueryOneRealm::class,
     output: Realm::class,
     validate: true,
@@ -42,6 +43,7 @@ use App\Authentication\UserInterface\Realm\QuerySeveralRealmProvider;
     paginationMaximumItemsPerPage: 100,
     paginationPartial: true,
     order: ['code' => 'ASC'],
+    security: 'is_granted("IS_AUTHENTICATED")',
     validate: true,
     provider: QuerySeveralRealmProvider::class,
     parameters: [

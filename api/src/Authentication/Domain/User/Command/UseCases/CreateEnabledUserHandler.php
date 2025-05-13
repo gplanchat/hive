@@ -24,7 +24,7 @@ final readonly class CreateEnabledUserHandler
         $user = User::declareEnabled(
             $command->uuid,
             $command->realmId,
-            $command->keycloakUserId,
+            $command->authorization,
             $command->organizationId,
             $command->workspaceIds,
             $command->roleIds,

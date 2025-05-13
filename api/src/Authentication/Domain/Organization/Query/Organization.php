@@ -10,14 +10,10 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
-use ApiPlatform\Metadata\QueryParameter;
 use ApiPlatform\OpenApi\Model\Operation;
 use ApiPlatform\OpenApi\Model\Parameter;
 use App\Authentication\Domain\FeatureRollout\FeatureRolloutId;
-use App\Authentication\Domain\Organization\Command\UseCases\AddFeatureRolloutsToOrganization;
 use App\Authentication\Domain\Organization\OrganizationId;
-use App\Authentication\Domain\Organization\Query\UseCases\QueryOneOrganization;
-use App\Authentication\Domain\Organization\Query\UseCases\QuerySeveralOrganization;
 use App\Authentication\Domain\Realm\RealmId;
 use App\Authentication\UserInterface\Organization\AddFeatureRolloutsToOrganizationInput;
 use App\Authentication\UserInterface\Organization\AddFeatureRolloutsToOrganizationProcessor;
@@ -58,6 +54,7 @@ use Symfony\Component\Serializer\Attribute\Context;
             ),
         ],
     ),
+    security: 'is_granted("IS_AUTHENTICATED")',
     provider: QueryOneOrganizationProvider::class,
 )]
 #[GetCollection(
@@ -81,14 +78,16 @@ use Symfony\Component\Serializer\Attribute\Context;
     paginationMaximumItemsPerPage: 100,
     paginationPartial: true,
     order: ['uuid' => 'ASC'],
+    security: 'is_granted("IS_AUTHENTICATED")',
     provider: QuerySeveralOrganizationProvider::class,
-    itemUriTemplate: '/authentication/{realm}/organizations/{uuid}'
+    itemUriTemplate: '/authentication/{realm}/organizations/{uuid}',
 )]
 #[Post(
     uriTemplate: '/authentication/{realm}/organizations',
     uriVariables: [
         'realm' => 'realmId',
     ],
+    security: 'is_granted("IS_AUTHENTICATED")',
     input: CreateOrganizationInput::class,
     output: self::class,
     processor: CreateOrganizationProcessor::class,
@@ -100,6 +99,7 @@ use Symfony\Component\Serializer\Attribute\Context;
         'realm' => 'realmId',
         'uuid',
     ],
+    security: 'is_granted("IS_AUTHENTICATED")',
     input: EnableOrganizationInput::class,
     output: self::class,
     provider: QueryOneOrganizationProvider::class,
@@ -111,6 +111,7 @@ use Symfony\Component\Serializer\Attribute\Context;
         'realm' => 'realmId',
         'uuid',
     ],
+    security: 'is_granted("IS_AUTHENTICATED")',
     input: DisableOrganizationInput::class,
     output: self::class,
     provider: QueryOneOrganizationProvider::class,
@@ -122,6 +123,7 @@ use Symfony\Component\Serializer\Attribute\Context;
         'realm' => 'realmId',
         'uuid',
     ],
+    security: 'is_granted("IS_AUTHENTICATED")',
     input: AddFeatureRolloutsToOrganizationInput::class,
     output: self::class,
     provider: QueryOneOrganizationProvider::class,
@@ -133,6 +135,7 @@ use Symfony\Component\Serializer\Attribute\Context;
         'realm' => 'realmId',
         'uuid',
     ],
+    security: 'is_granted("IS_AUTHENTICATED")',
     input: RemoveFeatureRolloutsFromOrganizationInput::class,
     output: self::class,
     provider: QueryOneOrganizationProvider::class,
@@ -144,6 +147,7 @@ use Symfony\Component\Serializer\Attribute\Context;
         'realm' => 'realmId',
         'uuid',
     ],
+    security: 'is_granted("IS_AUTHENTICATED")',
     input: false,
     output: false,
     provider: QueryOneOrganizationProvider::class,

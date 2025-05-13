@@ -90,7 +90,7 @@ final readonly class InMemoryUserRepository implements UserRepositoryInterface
             return new QueryUser(
                 uuid: $event->uuid,
                 realmId: $event->realmId,
-                keycloakUserId: $event->keycloakUserId,
+                authorization: $event->authorization,
                 organizationId: $event->organizationId,
                 workspaceIds: $event->workspaceIds,
                 roleIds: $event->roleIds,
@@ -119,7 +119,7 @@ final readonly class InMemoryUserRepository implements UserRepositoryInterface
         $item->set(new QueryUser(
             uuid: $event->uuid,
             realmId: $current->realmId,
-            keycloakUserId: $current->keycloakUserId,
+            authorization: $current->authorization,
             organizationId: $current->organizationId,
             workspaceIds: $current->workspaceIds,
             roleIds: $current->roleIds,
@@ -149,7 +149,7 @@ final readonly class InMemoryUserRepository implements UserRepositoryInterface
             $item->set(new QueryUser(
                 uuid: $event->uuid,
                 realmId: $current->realmId,
-                keycloakUserId: $current->keycloakUserId,
+                authorization: $current->authorization,
                 organizationId: $current->organizationId,
                 workspaceIds: $current->workspaceIds,
                 roleIds: $current->roleIds,

@@ -8,12 +8,12 @@ use App\Authentication\Domain\NotFoundException;
 use App\Authentication\Domain\Organization\OrganizationId;
 use App\Authentication\Domain\Realm\RealmId;
 use App\Authentication\Domain\Role\RoleId;
-use App\Authentication\Domain\User\KeycloakUserId;
 use App\Authentication\Domain\User\Query\UseCases\UserPage;
 use App\Authentication\Domain\User\Query\User;
 use App\Authentication\Domain\User\Query\UserRepositoryInterface;
 use App\Authentication\Domain\User\UserId;
 use App\Authentication\Domain\Workspace\WorkspaceId;
+use App\Authentication\Infrastructure\Keycloak\KeycloakAuthorization;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\ParameterType;
 use Doctrine\DBAL\Result;
@@ -29,7 +29,7 @@ final readonly class DatabaseUserRepository implements UserRepositoryInterface
     public function get(UserId $userId, RealmId $realmId): User
     {
         $sql =<<<SQL
-            SELECT uuid, realm_id, keycloak_user_id, organization_id, workspace_ids, role_ids, username, firstname, lastname, email, enabled
+            SELECT uuid, realm_id, authorization_context, organization_id, workspace_ids, role_ids, username, firstname, lastname, email, enabled
             FROM users
             WHERE uuid = :uuid
               AND realm_id = :realm_id
@@ -51,7 +51,7 @@ final readonly class DatabaseUserRepository implements UserRepositoryInterface
     public function list(RealmId $realmId, int $currentPage = 1, int $pageSize = 25): UserPage
     {
         $sql =<<<SQL
-            SELECT uuid, realm_id, keycloak_user_id, organization_id, workspace_ids, role_ids, username, firstname, lastname, email, enabled
+            SELECT uuid, realm_id, authorization_context, organization_id, workspace_ids, role_ids, username, firstname, lastname, email, enabled
             FROM users
             WHERE realm_id = :realm_id
             LIMIT :limit
@@ -74,7 +74,7 @@ final readonly class DatabaseUserRepository implements UserRepositoryInterface
     public function listFromOrganization(RealmId $realmId, OrganizationId $organizationId, int $currentPage = 1, int $pageSize = 25): UserPage
     {
         $sql =<<<SQL
-            SELECT uuid, realm_id, keycloak_user_id, organization_id, workspace_ids, role_ids, username, firstname, lastname, email, enabled
+            SELECT uuid, realm_id, authorization_context, organization_id, workspace_ids, role_ids, username, firstname, lastname, email, enabled
             FROM users
             WHERE organization_id = :organization_id
               AND realm_id = :realm_id
@@ -99,7 +99,7 @@ final readonly class DatabaseUserRepository implements UserRepositoryInterface
     public function listFromWorkspace(RealmId $realmId, WorkspaceId $workspaceId, int $currentPage = 1, int $pageSize = 25): UserPage
     {
         $sql =<<<SQL
-            SELECT uuid, realm_id, keycloak_user_id, organization_id, workspace_ids, role_ids, username, firstname, lastname, email, enabled
+            SELECT uuid, realm_id, authorization_context, organization_id, workspace_ids, role_ids, username, firstname, lastname, email, enabled
             FROM users
             WHERE workspace_ids::jsonb ? :workspace_id
               AND realm_id = :realm_id
@@ -126,7 +126,7 @@ final readonly class DatabaseUserRepository implements UserRepositoryInterface
         return new User(
             UserId::fromString($user['uuid']),
             RealmId::fromString($user['realm_id']),
-            KeycloakUserId::fromString($user['keycloak_user_id']),
+            KeycloakAuthorization::fromNormalized($user['authorization_context']),
             OrganizationId::fromString($user['organization_id']),
             workspaceIds: array_map(
                 fn (string $workspaceId): WorkspaceId => WorkspaceId::fromString($workspaceId),

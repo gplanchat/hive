@@ -116,6 +116,11 @@ services:
 when@test:
     services:
         App\Authentication\Infrastructure\Keycloak\KeycloakClientInterface: '@App\Authentication\Infrastructure\Keycloak\KeycloakClientMock'
+        
+        App\Authentication\Infrastructure\Keycloak\KeycloakMock:
+            factory: [ App\Authentication\Infrastructure\Keycloak\KeycloakMock, create ]
+            arguments:
+                $clock: '@Psr\Clock\ClockInterface'
             
         App\Authentication\Infrastructure\Keycloak\KeycloakInterface: '@App\Authentication\Infrastructure\Keycloak\KeycloakMock'
         

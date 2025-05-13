@@ -53,7 +53,8 @@ use Symfony\Component\Serializer\Attribute\Context;
             ),
         ],
     ),
-    provider: QueryOneWorkspaceProvider::class
+    security: 'is_granted("IS_AUTHENTICATED")',
+    provider: QueryOneWorkspaceProvider::class,
 )]
 #[GetCollection(
     uriTemplate: '/authentication/{realm}/workspaces',
@@ -76,6 +77,7 @@ use Symfony\Component\Serializer\Attribute\Context;
     paginationMaximumItemsPerPage: 100,
     paginationPartial: true,
     order: ['uuid' => 'ASC'],
+    security: 'is_granted("IS_AUTHENTICATED")',
     provider: QuerySeveralWorkspaceProvider::class,
     itemUriTemplate: '/authentication/{realm}/workspace/{uuid}',
 )]
@@ -108,6 +110,7 @@ use Symfony\Component\Serializer\Attribute\Context;
     paginationMaximumItemsPerPage: 100,
     paginationPartial: true,
     order: ['uuid' => 'ASC'],
+    security: 'is_granted("IS_AUTHENTICATED")',
     provider: QuerySeveralWorkspaceInOrganizationProvider::class,
     itemUriTemplate: '/authentication/{realm}/workspace/{uuid}',
 )]
@@ -117,6 +120,7 @@ use Symfony\Component\Serializer\Attribute\Context;
         'realm' => 'realmId',
     ],
     class: QueryWorkspace::class,
+    security: 'is_granted("IS_AUTHENTICATED")',
     input: CreateWorkspaceInput::class,
     output: QueryWorkspace::class,
     processor: CreateWorkspaceProcessor::class,
@@ -128,6 +132,7 @@ use Symfony\Component\Serializer\Attribute\Context;
         'realm' => 'realmId',
         'organizationId',
     ],
+    security: 'is_granted("IS_AUTHENTICATED")',
     input: CreateWorkspaceWithinOrganizationInput::class,
     output: QueryWorkspace::class,
     processor: CreateWorkspaceProcessor::class,
@@ -139,6 +144,7 @@ use Symfony\Component\Serializer\Attribute\Context;
         'realm' => 'realmId',
         'uuid',
     ],
+    security: 'is_granted("IS_AUTHENTICATED")',
     input: EnableWorkspaceInput::class,
     output: QueryWorkspace::class,
     provider: QueryOneWorkspaceProvider::class,
@@ -150,6 +156,7 @@ use Symfony\Component\Serializer\Attribute\Context;
         'realm' => 'realmId',
         'uuid',
     ],
+    security: 'is_granted("IS_AUTHENTICATED")',
     input: DisableWorkspaceInput::class,
     output: QueryWorkspace::class,
     provider: QueryOneWorkspaceProvider::class,
@@ -158,6 +165,7 @@ use Symfony\Component\Serializer\Attribute\Context;
 #[Delete(
     uriTemplate: '/authentication/{realm}/workspaces/{uuid}',
     uriVariables: ['realm', 'uuid'],
+    security: 'is_granted("IS_AUTHENTICATED")',
     input: false,
     output: false,
     provider: QueryOneWorkspaceProvider::class,
