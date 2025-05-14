@@ -12,7 +12,8 @@ final readonly class QuerySeveralUserInWorkspaceHandler
 {
     public function __construct(
         private UserRepositoryInterface $userRepository,
-    ) {}
+    ) {
+    }
 
     public function __invoke(QuerySeveralUserInWorkspace $query): UserPage
     {

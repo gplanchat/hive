@@ -6,7 +6,6 @@ namespace App\Authentication\Infrastructure\Workspace\DataFixtures;
 
 use App\Authentication\Domain\Organization\OrganizationId;
 use App\Authentication\Domain\Realm\RealmId;
-use App\Authentication\Domain\User\Query\User;
 use App\Authentication\Domain\Workspace\Query\Workspace;
 use App\Authentication\Domain\Workspace\WorkspaceId;
 use App\Authentication\Infrastructure\StorageMock;
@@ -15,7 +14,7 @@ use Symfony\Contracts\Cache\ItemInterface;
 
 final readonly class WorkspaceFixtures
 {
-    const TAG = 'tests.data-fixtures.workspace';
+    public const TAG = 'tests.data-fixtures.workspace';
 
     public function __construct(
         private ClockInterface $clock,

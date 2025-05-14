@@ -15,12 +15,13 @@ final readonly class QueryBus implements QueryBusInterface
     public function __construct(
         #[Autowire('@query.bus')]
         private MessageBusInterface $messageBus,
-    ) {}
+    ) {
+    }
 
     public function query(object $query): object
     {
         $envelope = $this->messageBus->dispatch(
-            (new Envelope($query))
+            new Envelope($query)
         );
 
         return $envelope->last(HandledStamp::class)->getResult();

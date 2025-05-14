@@ -13,7 +13,7 @@ use App\Authentication\Infrastructure\Keycloak\KeycloakInterface;
 final readonly class KeycloakRealmRepository implements RealmRepositoryInterface
 {
     public function __construct(
-        private KeycloakInterface $keycloak
+        private KeycloakInterface $keycloak,
     ) {
     }
 

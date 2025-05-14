@@ -12,7 +12,6 @@ use ApiPlatform\State\ProviderInterface;
 use App\Authentication\Domain\Organization\OrganizationId;
 use App\Authentication\Domain\QueryBusInterface;
 use App\Authentication\Domain\Realm\RealmId;
-use App\Authentication\Domain\Workspace\Query\UseCases\QuerySeveralWorkspace;
 use App\Authentication\Domain\Workspace\Query\UseCases\QuerySeveralWorkspaceInOrganization;
 use App\Authentication\Domain\Workspace\Query\UseCases\WorkspacePage;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;

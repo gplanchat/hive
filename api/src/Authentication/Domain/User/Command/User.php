@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Authentication\Domain\User\Command;
 
-use App\Authentication\Domain\FeatureRollout\FeatureRolloutId;
 use App\Authentication\Domain\Organization\OrganizationId;
 use App\Authentication\Domain\Realm\RealmId;
 use App\Authentication\Domain\Role\RoleId;
@@ -16,8 +15,8 @@ final class User
 {
     /**
      * @param WorkspaceId[] $workspaceIds
-     * @param RoleId[] $roleIds
-     * @param object[] $events
+     * @param RoleId[]      $roleIds
+     * @param object[]      $events
      */
     public function __construct(
         public readonly UserId $uuid,
@@ -47,7 +46,7 @@ final class User
     private function recordThat(object $event): void
     {
         $this->events[] = $event;
-        $this->version++;
+        ++$this->version;
         $this->apply($event);
     }
 
@@ -55,12 +54,13 @@ final class User
     {
         $releasedEvents = $this->events;
         $this->events = [];
+
         return $releasedEvents;
     }
 
     /**
      * @param WorkspaceId[] $workspaceIds
-     * @param RoleId[] $roleIds
+     * @param RoleId[]      $roleIds
      */
     public static function declareEnabled(
         UserId $uuid,
@@ -93,9 +93,6 @@ final class User
         return $instance;
     }
 
-    /**
-     * @param FeatureRolloutId[] $featureRolloutIds
-     */
     public static function declareDisabled(
         UserId $uuid,
         RealmId $realmId,

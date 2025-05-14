@@ -33,6 +33,15 @@ use App\Authentication\UserInterface\User\QuerySeveralUserProvider;
 use Symfony\Component\Serializer\Attribute\Context;
 use Symfony\Component\Serializer\Attribute\Groups;
 
+#[Delete(
+    uriTemplate: '/authentication/{realm}/users/{uuid}',
+    uriVariables: ['realm', 'uuid'],
+    security: 'is_granted("IS_AUTHENTICATED")',
+    input: false,
+    output: false,
+    provider: QueryOneUserProvider::class,
+    processor: DeleteUserProcessor::class,
+)]
 #[Get(
     uriTemplate: '/authentication/{realm}/users/{uuid}',
     uriVariables: [
@@ -155,28 +164,6 @@ use Symfony\Component\Serializer\Attribute\Groups;
     provider: QuerySeveralUserInWorkspaceProvider::class,
     itemUriTemplate: '/authentication/{realm}/users/{uuid}',
 )]
-#[Post(
-    uriTemplate: '/authentication/{realm}/organizations/{organizationId}/users',
-    uriVariables: ['realm', 'organizationId'],
-    normalizationContext: ['groups' => ['user:show']],
-    security: 'is_granted("IS_AUTHENTICATED")',
-    input: CreateUserWithinOrganizationInput::class,
-    output: self::class,
-    processor: CreateUserProcessor::class,
-    itemUriTemplate: '/authentication/{realm}/users/{uuid}',
-)]
-#[Post(
-    uriTemplate: '/authentication/{realm}/users',
-    uriVariables: [
-        'realm' => 'realmId',
-    ],
-    normalizationContext: ['groups' => ['user:show']],
-    security: 'is_granted("IS_AUTHENTICATED")',
-    input: CreateUserInput::class,
-    output: self::class,
-    processor: CreateUserProcessor::class,
-    itemUriTemplate: '/authentication/{realm}/users/{uuid}',
-)]
 #[Patch(
     uriTemplate: '/authentication/{realm}/users/{uuid}/enable',
     uriVariables: [
@@ -203,20 +190,33 @@ use Symfony\Component\Serializer\Attribute\Groups;
     provider: QueryOneUserProvider::class,
     processor: DisableUserProcessor::class
 )]
-#[Delete(
-    uriTemplate: '/authentication/{realm}/users/{uuid}',
-    uriVariables: ['realm', 'uuid'],
+#[Post(
+    uriTemplate: '/authentication/{realm}/organizations/{organizationId}/users',
+    uriVariables: ['realm', 'organizationId'],
+    normalizationContext: ['groups' => ['user:show']],
     security: 'is_granted("IS_AUTHENTICATED")',
-    input: false,
-    output: false,
-    provider: QueryOneUserProvider::class,
-    processor: DeleteUserProcessor::class,
+    input: CreateUserWithinOrganizationInput::class,
+    output: self::class,
+    processor: CreateUserProcessor::class,
+    itemUriTemplate: '/authentication/{realm}/users/{uuid}',
+)]
+#[Post(
+    uriTemplate: '/authentication/{realm}/users',
+    uriVariables: [
+        'realm' => 'realmId',
+    ],
+    normalizationContext: ['groups' => ['user:show']],
+    security: 'is_granted("IS_AUTHENTICATED")',
+    input: CreateUserInput::class,
+    output: self::class,
+    processor: CreateUserProcessor::class,
+    itemUriTemplate: '/authentication/{realm}/users/{uuid}',
 )]
 final readonly class User
 {
     /**
      * @param WorkspaceId[] $workspaceIds
-     * @param RoleId[] $roleIds
+     * @param RoleId[]      $roleIds
      */
     public function __construct(
         #[ApiProperty(

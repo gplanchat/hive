@@ -15,6 +15,7 @@ final readonly class CreatePendingOrganizationHandler
         private OrganizationRepositoryInterface $organizationRepository,
     ) {
     }
+
     public function __invoke(CreatePendingOrganization $command): void
     {
         $organization = Organization::declareDisabled(

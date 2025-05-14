@@ -27,6 +27,6 @@ final readonly class RealmPage implements \IteratorAggregate, \Countable
 
     public function count(): int
     {
-        return count($this->realms);
+        return \count($this->realms);
     }
 }

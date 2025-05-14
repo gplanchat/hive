@@ -69,7 +69,7 @@ final class InMemoryWorkspaceRepository implements WorkspaceRepositoryInterface
 
     private function saveEvent(object $event): void
     {
-        $methodName = 'apply'.substr(get_class($event), strrpos(get_class($event), '\\') + 1);
+        $methodName = 'apply'.substr($event::class, strrpos($event::class, '\\') + 1);
         if (method_exists($this, $methodName)) {
             $this->{$methodName}($event);
         }
@@ -126,26 +126,26 @@ final class InMemoryWorkspaceRepository implements WorkspaceRepositoryInterface
     {
         $item = $this->storage->getItem(WorkspaceFixtures::buildCacheKey($event->uuid, $event->realmId));
 
-            if (!$item->isHit()) {
-                throw new NotFoundException();
-            }
+        if (!$item->isHit()) {
+            throw new NotFoundException();
+        }
 
-            $current = $item->get();
-            if (!$current instanceof QueryWorkspace) {
-                throw new NotFoundException();
-            }
+        $current = $item->get();
+        if (!$current instanceof QueryWorkspace) {
+            throw new NotFoundException();
+        }
 
-            $item->set(new QueryWorkspace(
-                uuid: $current->uuid,
-                realmId: $current->realmId,
-                organizationId: $current->organizationId,
-                name: $current->name,
-                slug: $current->slug,
-                validUntil: $current->validUntil,
-                enabled: false,
-            ));
+        $item->set(new QueryWorkspace(
+            uuid: $current->uuid,
+            realmId: $current->realmId,
+            organizationId: $current->organizationId,
+            name: $current->name,
+            slug: $current->slug,
+            validUntil: $current->validUntil,
+            enabled: false,
+        ));
 
-            $this->storage->save($item);
+        $this->storage->save($item);
     }
 
     private function applyDeletedEvent(DeletedEvent $event): void

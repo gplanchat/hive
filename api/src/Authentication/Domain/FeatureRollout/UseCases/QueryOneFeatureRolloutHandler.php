@@ -13,7 +13,8 @@ final class QueryOneFeatureRolloutHandler
 {
     public function __construct(
         private FeatureRolloutRepositoryInterface $featureRolloutRepository,
-    ) {}
+    ) {
+    }
 
     public function __invoke(QueryOneFeatureRollout $query): FeatureRollout
     {

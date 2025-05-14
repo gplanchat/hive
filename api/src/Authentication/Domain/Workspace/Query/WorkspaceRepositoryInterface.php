@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Authentication\Domain\Workspace\Query;
 
 use App\Authentication\Domain\NotFoundException;
@@ -12,7 +14,9 @@ interface WorkspaceRepositoryInterface
 {
     /** @throws NotFoundException */
     public function get(WorkspaceId $workspaceId, RealmId $realmId): Workspace;
+
     public function list(RealmId $realmId, int $currentPage = 1, int $pageSize = 25): WorkspacePage;
+
     /** @throws NotFoundException */
     public function listFromOrganization(RealmId $realmId, OrganizationId $organizationId, int $currentPage = 1, int $pageSize = 25): WorkspacePage;
 }

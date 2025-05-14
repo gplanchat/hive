@@ -16,6 +16,7 @@ final class LoginController
     {
         /** @var KeycloakClient $client */
         $client = $clientRegistry->getClient('keycloak');
+
         return $client->redirect();
     }
 }

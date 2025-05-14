@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Authentication\Infrastructure\User\Command;
 
-use App\Authentication\Domain\EventBusInterface;
 use App\Authentication\Domain\ConflictException;
+use App\Authentication\Domain\EventBusInterface;
 use App\Authentication\Domain\NotFoundException;
 use App\Authentication\Domain\Realm\RealmId;
 use App\Authentication\Domain\User\Command\DeclaredEvent;
@@ -14,10 +14,10 @@ use App\Authentication\Domain\User\Command\DisabledEvent;
 use App\Authentication\Domain\User\Command\EnabledEvent;
 use App\Authentication\Domain\User\Command\User;
 use App\Authentication\Domain\User\Command\UserRepositoryInterface;
-use App\Authentication\Domain\User\UserId;
 use App\Authentication\Domain\User\Query\User as QueryUser;
-use App\Authentication\Infrastructure\User\DataFixtures\UserFixtures;
+use App\Authentication\Domain\User\UserId;
 use App\Authentication\Infrastructure\StorageMock;
+use App\Authentication\Infrastructure\User\DataFixtures\UserFixtures;
 use Symfony\Contracts\Cache\ItemInterface;
 
 final readonly class InMemoryUserRepository implements UserRepositoryInterface
@@ -72,7 +72,7 @@ final readonly class InMemoryUserRepository implements UserRepositoryInterface
 
     private function saveEvent(object $event): void
     {
-        $methodName = 'apply'.substr(get_class($event), strrpos(get_class($event), '\\') + 1);
+        $methodName = 'apply'.substr($event::class, strrpos($event::class, '\\') + 1);
         if (method_exists($this, $methodName)) {
             $this->{$methodName}($event);
         }
@@ -137,30 +137,30 @@ final readonly class InMemoryUserRepository implements UserRepositoryInterface
     {
         $item = $this->storage->getItem(UserFixtures::buildCacheKey($event->uuid, $event->realmId));
 
-            if (!$item->isHit()) {
-                throw new NotFoundException();
-            }
+        if (!$item->isHit()) {
+            throw new NotFoundException();
+        }
 
-            $current = $item->get();
-            if (!$current instanceof QueryUser) {
-                throw new NotFoundException();
-            }
+        $current = $item->get();
+        if (!$current instanceof QueryUser) {
+            throw new NotFoundException();
+        }
 
-            $item->set(new QueryUser(
-                uuid: $event->uuid,
-                realmId: $current->realmId,
-                authorization: $current->authorization,
-                organizationId: $current->organizationId,
-                workspaceIds: $current->workspaceIds,
-                roleIds: $current->roleIds,
-                username: $current->username,
-                firstName: $current->firstName,
-                lastName: $current->lastName,
-                email: $current->email,
-                enabled: false,
-            ));
+        $item->set(new QueryUser(
+            uuid: $event->uuid,
+            realmId: $current->realmId,
+            authorization: $current->authorization,
+            organizationId: $current->organizationId,
+            workspaceIds: $current->workspaceIds,
+            roleIds: $current->roleIds,
+            username: $current->username,
+            firstName: $current->firstName,
+            lastName: $current->lastName,
+            email: $current->email,
+            enabled: false,
+        ));
 
-            $this->storage->save($item);
+        $this->storage->save($item);
     }
 
     private function applyDeletedEvent(DeletedEvent $event): void

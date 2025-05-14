@@ -12,7 +12,8 @@ final readonly class QuerySeveralRoleHandler
 {
     public function __construct(
         private RoleRepositoryInterface $roleRepository,
-    ) {}
+    ) {
+    }
 
     public function __invoke(QuerySeveralRole $query): RolePage
     {

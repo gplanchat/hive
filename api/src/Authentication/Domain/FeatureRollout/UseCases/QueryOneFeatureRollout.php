@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Authentication\Domain\FeatureRollout\UseCases;
 
-use ApiPlatform\Metadata\Get;
 use ApiPlatform\OpenApi\Model\Operation;
 use ApiPlatform\OpenApi\Model\Parameter;
 use App\Authentication\Domain\FeatureRollout\FeatureRollout;

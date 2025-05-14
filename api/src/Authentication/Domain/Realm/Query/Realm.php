@@ -10,8 +10,8 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\QueryParameter;
 use ApiPlatform\OpenApi\Model\Operation;
 use ApiPlatform\OpenApi\Model\Parameter;
-use App\Authentication\Domain\Realm\RealmId;
 use App\Authentication\Domain\Realm\Query\UseCases\QueryOneRealm;
+use App\Authentication\Domain\Realm\RealmId;
 use App\Authentication\UserInterface\Realm\QueryOneRealmProvider;
 use App\Authentication\UserInterface\Realm\QuerySeveralRealmProvider;
 

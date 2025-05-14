@@ -25,7 +25,7 @@ final readonly class EnableOrganizationProcessor implements ProcessorInterface
     ) {
     }
 
-    public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []):Organization
+    public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): Organization
     {
         if (!$data instanceof EnableOrganizationInput) {
             throw new BadRequestHttpException();

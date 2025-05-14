@@ -15,6 +15,7 @@ final readonly class CreateEnabledWorkspaceHandler
         private WorkspaceRepositoryInterface $workspaceRepository,
     ) {
     }
+
     public function __invoke(CreateEnabledWorkspace $command): void
     {
         $workspace = Workspace::declareEnabled(

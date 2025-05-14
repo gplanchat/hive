@@ -11,9 +11,9 @@ use App\Authentication\Domain\NotFoundException;
 use App\Authentication\Domain\Realm\RealmId;
 use App\Authentication\Domain\User\Command\InvalidUserStateException;
 use App\Authentication\Domain\User\Command\UseCases\EnableUser;
-use App\Authentication\Domain\User\UserId;
 use App\Authentication\Domain\User\Query\User;
 use App\Authentication\Domain\User\Query\UserRepositoryInterface;
+use App\Authentication\Domain\User\UserId;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
@@ -25,7 +25,7 @@ final readonly class EnableUserProcessor implements ProcessorInterface
     ) {
     }
 
-    public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []):User
+    public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): User
     {
         if (!$data instanceof EnableUserInput) {
             throw new BadRequestHttpException();

@@ -19,11 +19,12 @@ final class FeatureRolloutIdType extends Type
 
     public function convertToDatabaseValue(mixed $value, AbstractPlatform $platform): mixed
     {
-        if (is_string($value)) {
+        if (\is_string($value)) {
             return $value;
         }
 
-        assert($value instanceof FeatureRolloutId);
+        \assert($value instanceof FeatureRolloutId);
+
         return $value->toString();
     }
 

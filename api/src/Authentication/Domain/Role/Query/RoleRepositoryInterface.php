@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Authentication\Domain\Role\Query;
 
 use App\Authentication\Domain\NotFoundException;
@@ -13,9 +15,12 @@ interface RoleRepositoryInterface
 {
     /** @throws NotFoundException */
     public function get(RoleId $roleId, RealmId $realmId): Role;
+
     /** @return Role[] */
     public function getAll(RealmId $realmId, RoleId ...$roleIds): Collection;
+
     public function list(RealmId $realmId, int $currentPage = 1, int $pageSize = 25): RolePage;
+
     /** @throws NotFoundException */
     public function listFromOrganization(RealmId $realmId, OrganizationId $organizationId, int $currentPage = 1, int $pageSize = 25): RolePage;
 }

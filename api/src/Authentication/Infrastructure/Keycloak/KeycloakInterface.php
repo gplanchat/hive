@@ -14,11 +14,15 @@ use Firebase\JWT\Key;
 interface KeycloakInterface
 {
     public function createRealm(Realm $realm): void;
+
     public function queryAllRealms(): RealmPage;
+
     public function queryOneRealm(RealmId $realmId): Realm;
+
     public function createOrganizationInsideRealm(RealmId $realmId, Organization $organization): void;
 
     public function createUserInsideRealm(Realm $realm, User $user): void;
+
     /** @return Key[] */
     public function fetchOpenidCertificates(RealmId $realmId): array;
 }

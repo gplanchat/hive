@@ -39,7 +39,7 @@ final readonly class AddFeatureRolloutsToOrganizationHandler
                 continue;
             }
 
-            if (!in_array(Targets::Organization, $featureRollout->targets)) {
+            if (!\in_array(Targets::Organization, $featureRollout->targets)) {
                 $this->logger->warning(strtr(
                     'The %featureRolloutId% is not applicable to an organization.',
                     [

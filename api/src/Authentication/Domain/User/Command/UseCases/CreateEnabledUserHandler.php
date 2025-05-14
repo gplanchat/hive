@@ -15,7 +15,8 @@ final readonly class CreateEnabledUserHandler
     public function __construct(
         private UserRepositoryInterface $userRepository,
         private OrganizationRepositoryInterface $organizationRepository,
-    ) {}
+    ) {
+    }
 
     public function __invoke(CreateEnabledUser $command): void
     {

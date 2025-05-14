@@ -51,7 +51,7 @@ final class KeycloakAuthenticator extends AbstractAuthenticator
 
         // Decode the token
         $parts = explode('.', $jwtToken);
-        if (count($parts) !== 3) {
+        if (3 !== \count($parts)) {
             throw new AuthenticationException('Invalid token');
         }
 
@@ -99,33 +99,22 @@ final class KeycloakAuthenticator extends AbstractAuthenticator
                             '%realmId%' => $realmId->toString(),
                         ]
                     ));
+
                     return null;
                 }
             })
         );
     }
-    /**
-     * @param Request $request
-     * @param TokenInterface $token
-     * @param string $firewallName
-     *
-     * @return Response|null
-     */
+
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $firewallName): ?Response
     {
         return null;
     }
 
-    /**
-     * @param Request $request
-     * @param AuthenticationException $exception
-     *
-     * @return Response|null
-     */
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception): ?Response
     {
         $data = [
-            'error' => strtr($exception->getMessageKey(), $exception->getMessageData())
+            'error' => strtr($exception->getMessageKey(), $exception->getMessageData()),
         ];
 
         return new JsonResponse($data, Response::HTTP_UNAUTHORIZED);

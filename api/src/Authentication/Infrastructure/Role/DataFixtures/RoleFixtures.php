@@ -16,7 +16,7 @@ use Symfony\Contracts\Cache\ItemInterface;
 
 final class RoleFixtures
 {
-    const TAG = 'tests.data-fixtures.role';
+    public const TAG = 'tests.data-fixtures.role';
 
     public function __construct(
         private StorageMock $storage,
@@ -93,7 +93,6 @@ final class RoleFixtures
                 Actions::Show,
             ),
         ];
-
 
         $this->with(new Role(
             RoleId::fromString('01966d41-78eb-7406-ad99-03ad025e8bcf'),

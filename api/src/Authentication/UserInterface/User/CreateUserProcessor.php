@@ -15,7 +15,6 @@ use App\Authentication\Domain\User\Command\UseCases\CreatePendingUser;
 use App\Authentication\Domain\User\Query\User;
 use App\Authentication\Domain\User\Query\UserRepositoryInterface;
 use App\Authentication\Domain\User\UserId;
-use Symfony\Component\HttpFoundation\Exception\LogicException;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
@@ -34,7 +33,7 @@ final readonly class CreateUserProcessor implements ProcessorInterface
             $realmId = RealmId::fromString($uriVariables['realm']);
 
             if ($data instanceof CreateUserWithinOrganizationInput
-                && array_key_exists('organizationId', $uriVariables)
+                && \array_key_exists('organizationId', $uriVariables)
             ) {
                 $organizationId = OrganizationId::fromString($uriVariables['organizationId']);
 
@@ -63,7 +62,7 @@ final readonly class CreateUserProcessor implements ProcessorInterface
                         $data->lastName,
                         $data->email,
                     );
-            } else if ($data instanceof CreateUserInput) {
+            } elseif ($data instanceof CreateUserInput) {
                 $command = $data->enabled
                     ? new CreateEnabledUser(
                         UserId::generateRandom(),

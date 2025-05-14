@@ -1,57 +1,61 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Tests\Api;
 
 use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
-use App\Authentication\Domain\Realm\RealmId;
-use App\Authentication\Infrastructure\Keycloak\Keycloak;
 use App\Authentication\Infrastructure\Keycloak\KeycloakInterface;
 use App\Authentication\Infrastructure\Keycloak\KeycloakMock;
 use App\Authentication\Infrastructure\Organization\DataFixtures\OrganizationFixtures;
 use App\Authentication\Infrastructure\Role\DataFixtures\RoleFixtures;
-use App\Authentication\Infrastructure\User\DataFixtures\UserFixtures;
 use App\Authentication\Infrastructure\StorageMock;
-use Firebase\JWT\JWT;
+use App\Authentication\Infrastructure\User\DataFixtures\UserFixtures;
 use Psr\Clock\ClockInterface;
 
+/**
+ * @internal
+ *
+ * @coversNothing
+ */
 class UsersTest extends ApiTestCase
 {
-    static ?bool $alwaysBootKernel = false;
+    public static ?bool $alwaysBootKernel = false;
 
     private ?ClockInterface $clock = null;
     private ?OrganizationFixtures $organizationFixtures = null;
     private ?RoleFixtures $roleFixtures = null;
     private ?UserFixtures $userFixtures = null;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
         self::bootKernel();
 
         $this->clock = self::getContainer()->get(ClockInterface::class);
-        assert($this->clock instanceof ClockInterface);
+        \assert($this->clock instanceof ClockInterface);
 
         $this->userFixtures = new UserFixtures(
             self::getContainer()->get(StorageMock::class)
         );
-        assert($this->userFixtures instanceof UserFixtures);
+        \assert($this->userFixtures instanceof UserFixtures);
         $this->userFixtures->load();
 
         $this->roleFixtures = new RoleFixtures(
             self::getContainer()->get(StorageMock::class)
         );
-        assert($this->roleFixtures instanceof RoleFixtures);
+        \assert($this->roleFixtures instanceof RoleFixtures);
         $this->roleFixtures->load();
 
         $this->organizationFixtures = new OrganizationFixtures(
             $this->clock,
             self::getContainer()->get(StorageMock::class)
         );
-        assert($this->organizationFixtures instanceof OrganizationFixtures);
+        \assert($this->organizationFixtures instanceof OrganizationFixtures);
         $this->organizationFixtures->load();
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         $this->organizationFixtures->unload();
         $this->organizationFixtures = null;
@@ -70,7 +74,7 @@ class UsersTest extends ApiTestCase
     private static function getTokenFor(string $username): string
     {
         $keycloak = self::getContainer()->get(KeycloakInterface::class);
-        assert($keycloak instanceof KeycloakMock);
+        \assert($keycloak instanceof KeycloakMock);
 
         return $keycloak->generateJWT($username);
     }

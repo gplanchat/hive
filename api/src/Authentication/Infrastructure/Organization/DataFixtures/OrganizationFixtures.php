@@ -14,7 +14,7 @@ use Symfony\Contracts\Cache\ItemInterface;
 
 final readonly class OrganizationFixtures
 {
-    const TAG = 'tests.data-fixtures.organization';
+    public const TAG = 'tests.data-fixtures.organization';
 
     public function __construct(
         private ClockInterface $clock,

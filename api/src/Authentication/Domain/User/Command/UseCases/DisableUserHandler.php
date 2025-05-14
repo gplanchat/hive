@@ -12,7 +12,8 @@ final readonly class DisableUserHandler
 {
     public function __construct(
         private UserRepositoryInterface $userRepository,
-    ) {}
+    ) {
+    }
 
     public function __invoke(DisableUser $command): void
     {

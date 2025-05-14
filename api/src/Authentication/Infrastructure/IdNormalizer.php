@@ -29,7 +29,7 @@ final readonly class IdNormalizer implements NormalizerInterface, DenormalizerIn
 
     public function getSupportedTypes(?string $format): array
     {
-        return in_array($format, ['json', 'jsonld'], true) ? [
+        return \in_array($format, ['json', 'jsonld'], true) ? [
             'object' => false,
         ] : [];
     }
@@ -40,7 +40,7 @@ final readonly class IdNormalizer implements NormalizerInterface, DenormalizerIn
             throw new InvalidArgumentException('The provided data type is not supported for normalization.');
         }
 
-        if (!array_key_exists('iri_only', $context) || $context['iri_only'] === false) {
+        if (!\array_key_exists('iri_only', $context) || false === $context['iri_only']) {
             return $data->toString();
         }
 
@@ -50,51 +50,51 @@ final readonly class IdNormalizer implements NormalizerInterface, DenormalizerIn
             FeatureRolloutId::class => $this->iriConverter->getIriFromResource(FeatureRollout::class, context: [
                 'uri_variables' => [
                     'code' => $data->toString(),
-                ]
+                ],
             ]),
             OrganizationId::class => $this->iriConverter->getIriFromResource(Organization::class, context: [
                 'uri_variables' => [
-                    'realm' => is_object($resource) ? match ($resource::class) {
+                    'realm' => \is_object($resource) ? match ($resource::class) {
                         Organization::class => $resource->realmId->toString(),
                         Role::class => $resource->realmId->toString(),
                         User::class => $resource->realmId->toString(),
                         Workspace::class => $resource->realmId->toString(),
                     } : null,
                     'uuid' => $data->toString(),
-                ]
+                ],
             ]),
             UserId::class => $this->iriConverter->getIriFromResource(User::class, context: [
                 'uri_variables' => [
-                    'realm' => is_object($resource) ? match ($resource::class) {
+                    'realm' => \is_object($resource) ? match ($resource::class) {
                         Organization::class => $resource->realmId->toString(),
                         Role::class => $resource->realmId->toString(),
                         User::class => $resource->realmId->toString(),
                         Workspace::class => $resource->realmId->toString(),
                     } : null,
                     'uuid' => $data->toString(),
-                ]
+                ],
             ]),
             RoleId::class => $this->iriConverter->getIriFromResource(Role::class, context: [
                 'uri_variables' => [
-                    'realm' => is_object($resource) ? match ($resource::class) {
+                    'realm' => \is_object($resource) ? match ($resource::class) {
                         Organization::class => $resource->realmId->toString(),
                         Role::class => $resource->realmId->toString(),
                         User::class => $resource->realmId->toString(),
                         Workspace::class => $resource->realmId->toString(),
                     } : null,
                     'uuid' => $data->toString(),
-                ]
+                ],
             ]),
             WorkspaceId::class => $this->iriConverter->getIriFromResource(Workspace::class, context: [
                 'uri_variables' => [
-                    'realm' => is_object($resource) ? match ($resource::class) {
+                    'realm' => \is_object($resource) ? match ($resource::class) {
                         Organization::class => $resource->realmId->toString(),
                         Role::class => $resource->realmId->toString(),
                         User::class => $resource->realmId->toString(),
                         Workspace::class => $resource->realmId->toString(),
                     } : null,
                     'uuid' => $data->toString(),
-                ]
+                ],
             ]),
         };
     }
@@ -114,7 +114,7 @@ final readonly class IdNormalizer implements NormalizerInterface, DenormalizerIn
             throw new InvalidArgumentException('The provided data type is not supported for denormalization');
         }
 
-        if (!array_key_exists('iri_only', $context) || $context['iri_only'] === false) {
+        if (!\array_key_exists('iri_only', $context) || false === $context['iri_only']) {
             return $type::fromString($data);
         }
 

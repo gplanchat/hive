@@ -12,7 +12,8 @@ final readonly class QuerySeveralUserHandler
 {
     public function __construct(
         private UserRepositoryInterface $userRepository,
-    ) {}
+    ) {
+    }
 
     public function __invoke(QuerySeveralUser $query): UserPage
     {

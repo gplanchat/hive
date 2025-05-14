@@ -6,7 +6,6 @@ namespace App\Authentication\Infrastructure\Organization\Command\Keycloak;
 
 use App\Authentication\Domain\Organization\Command\DeclaredEvent;
 use App\Authentication\Domain\Organization\Query\OrganizationRepositoryInterface;
-use App\Authentication\Domain\Realm\Query\RealmRepositoryInterface;
 use App\Authentication\Infrastructure\Keycloak\KeycloakInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 

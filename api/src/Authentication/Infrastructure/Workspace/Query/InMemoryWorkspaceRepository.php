@@ -42,13 +42,14 @@ final class InMemoryWorkspaceRepository implements WorkspaceRepositoryInterface
         $result = $this->storage->getValues()
             ->filter(fn (mixed $value): bool => $value instanceof Workspace)
             ->filter(fn (Workspace $workspace) => $workspace->realmId->equals($realmId))
-            ->toArray();
+            ->toArray()
+        ;
 
         return new WorkspacePage(
             $currentPage,
             $pageSize,
-            count($result),
-            ...array_slice($result, ($currentPage - 1) * $pageSize, $pageSize)
+            \count($result),
+            ...\array_slice($result, ($currentPage - 1) * $pageSize, $pageSize)
         );
     }
 
@@ -58,13 +59,14 @@ final class InMemoryWorkspaceRepository implements WorkspaceRepositoryInterface
             ->filter(fn (mixed $value): bool => $value instanceof Workspace)
             ->filter(fn (Workspace $workspace) => $workspace->realmId->equals($realmId))
             ->filter(fn (Workspace $workspace) => $workspace->organizationId->equals($organizationId))
-            ->toArray();
+            ->toArray()
+        ;
 
         return new WorkspacePage(
             $currentPage,
             $pageSize,
-            count($result),
-            ...array_slice($result, ($currentPage - 1) * $pageSize, $pageSize)
+            \count($result),
+            ...\array_slice($result, ($currentPage - 1) * $pageSize, $pageSize)
         );
     }
 }

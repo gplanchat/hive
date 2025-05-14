@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Authentication\Domain\Realm\Query;
 
 use App\Authentication\Domain\NotFoundException;
@@ -10,5 +12,6 @@ interface RealmRepositoryInterface
 {
     /** @throws NotFoundException */
     public function get(RealmId $realmId): Realm;
+
     public function list(int $currentPage = 1, int $pageSize = 25): RealmPage;
 }

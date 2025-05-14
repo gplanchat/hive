@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace App\Authentication\Infrastructure\Realm;
 
+use App\Authentication\Domain\NotFoundException;
 use App\Authentication\Domain\Realm\Query\Realm;
-use App\Authentication\Domain\Realm\RealmId;
 use App\Authentication\Domain\Realm\Query\RealmRepositoryInterface;
 use App\Authentication\Domain\Realm\Query\UseCases\RealmPage;
-use App\Authentication\Domain\NotFoundException;
+use App\Authentication\Domain\Realm\RealmId;
 use App\Shared\Infrastructure\Collection\Collection;
 
 final class InMemoryRealmRepository implements RealmRepositoryInterface
@@ -25,7 +25,8 @@ final class InMemoryRealmRepository implements RealmRepositoryInterface
     {
         $result = Collection::fromArray($this->storage)
             ->filter(fn (Realm $realm) => $realm->code->equals($realmId))
-            ->toArray();
+            ->toArray()
+        ;
 
         return array_shift($result) ?? throw new NotFoundException();
     }
@@ -37,8 +38,8 @@ final class InMemoryRealmRepository implements RealmRepositoryInterface
         return new RealmPage(
             $currentPage,
             $pageSize,
-            count($result),
-            ...array_slice($result, ($currentPage - 1) * $pageSize, $pageSize)
+            \count($result),
+            ...\array_slice($result, ($currentPage - 1) * $pageSize, $pageSize)
         );
     }
 

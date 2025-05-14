@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App;
 
 use Doctrine\DBAL\Connection;
@@ -18,6 +20,7 @@ class Kernel extends BaseKernel
     {
         $container->setDefinition('db.driver.pdo_pgsql', new Definition(Driver::class));
 
+        // FIXME: make this dynamic
         $container->setDefinition('db.connection', new Definition(Connection::class, [
             [
                 'user' => 'app',

@@ -15,7 +15,8 @@ final readonly class CreatePendingUserHandler
     public function __construct(
         private UserRepositoryInterface $userRepository,
         private OrganizationRepositoryInterface $organizationRepository,
-    ) {}
+    ) {
+    }
 
     public function __invoke(CreatePendingUser $command): void
     {

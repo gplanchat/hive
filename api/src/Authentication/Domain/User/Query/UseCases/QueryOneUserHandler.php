@@ -13,7 +13,8 @@ final readonly class QueryOneUserHandler
 {
     public function __construct(
         private UserRepositoryInterface $userRepository,
-    ) {}
+    ) {
+    }
 
     public function __invoke(QueryOneUser $query): User
     {

@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Authentication\Domain\Workspace\Command\UseCases;
 
 use App\Authentication\Domain\Workspace\Command\WorkspaceRepositoryInterface;
-use App\Authentication\Domain\Workspace\Command\UseCases\DeleteWorkspace;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
 #[AsMessageHandler(bus: 'command.bus')]

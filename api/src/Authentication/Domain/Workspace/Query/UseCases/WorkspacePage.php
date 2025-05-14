@@ -14,7 +14,7 @@ final readonly class WorkspacePage implements \IteratorAggregate, \Countable
         public int $page,
         public int $pageSize,
         public int $totalItems,
-        Workspace ...$workspaces
+        Workspace ...$workspaces,
     ) {
         $this->workspaces = $workspaces;
     }
@@ -26,6 +26,6 @@ final readonly class WorkspacePage implements \IteratorAggregate, \Countable
 
     public function count(): int
     {
-        return count($this->workspaces);
+        return \count($this->workspaces);
     }
 }

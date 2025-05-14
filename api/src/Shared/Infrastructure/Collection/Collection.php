@@ -14,7 +14,8 @@ final class Collection
      */
     private function __construct(
         private readonly \Iterator $items,
-    ) {}
+    ) {
+    }
 
     /**
      * @param \Iterator<array-key, Type> $data
@@ -86,13 +87,12 @@ final class Collection
         $right = self::fromArray($values);
 
         $index = 0;
+
         return $left->filter(function ($current) use ($callable, $right, &$index) {
             try {
                 $slice = $right->offset(++$index);
 
-                return $slice->none(function ($cloned) use ($callable, $current) {
-                    return $callable($current, $cloned);
-                });
+                return $slice->none(fn ($cloned) => $callable($current, $cloned));
             } catch (\OutOfBoundsException) {
                 return true;
             }

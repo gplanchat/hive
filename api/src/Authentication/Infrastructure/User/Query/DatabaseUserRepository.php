@@ -24,11 +24,12 @@ final readonly class DatabaseUserRepository implements UserRepositoryInterface
     public function __construct(
         #[Autowire('@db.connection')]
         private Connection $connection,
-    ) {}
+    ) {
+    }
 
     public function get(UserId $userId, RealmId $realmId): User
     {
-        $sql =<<<SQL
+        $sql = <<<'SQL'
             SELECT uuid, realm_id, authorization_context, organization_id, workspace_ids, role_ids, username, firstname, lastname, email, enabled
             FROM users
             WHERE uuid = :uuid
@@ -50,7 +51,7 @@ final readonly class DatabaseUserRepository implements UserRepositoryInterface
 
     public function list(RealmId $realmId, int $currentPage = 1, int $pageSize = 25): UserPage
     {
-        $sql =<<<SQL
+        $sql = <<<'SQL'
             SELECT uuid, realm_id, authorization_context, organization_id, workspace_ids, role_ids, username, firstname, lastname, email, enabled
             FROM users
             WHERE realm_id = :realm_id
@@ -73,7 +74,7 @@ final readonly class DatabaseUserRepository implements UserRepositoryInterface
 
     public function listFromOrganization(RealmId $realmId, OrganizationId $organizationId, int $currentPage = 1, int $pageSize = 25): UserPage
     {
-        $sql =<<<SQL
+        $sql = <<<'SQL'
             SELECT uuid, realm_id, authorization_context, organization_id, workspace_ids, role_ids, username, firstname, lastname, email, enabled
             FROM users
             WHERE organization_id = :organization_id
@@ -98,7 +99,7 @@ final readonly class DatabaseUserRepository implements UserRepositoryInterface
 
     public function listFromWorkspace(RealmId $realmId, WorkspaceId $workspaceId, int $currentPage = 1, int $pageSize = 25): UserPage
     {
-        $sql =<<<SQL
+        $sql = <<<'SQL'
             SELECT uuid, realm_id, authorization_context, organization_id, workspace_ids, role_ids, username, firstname, lastname, email, enabled
             FROM users
             WHERE workspace_ids::jsonb ? :workspace_id
@@ -130,11 +131,11 @@ final readonly class DatabaseUserRepository implements UserRepositoryInterface
             OrganizationId::fromString($user['organization_id']),
             workspaceIds: array_map(
                 fn (string $workspaceId): WorkspaceId => WorkspaceId::fromString($workspaceId),
-                json_decode($user['workspace_ids'], true, JSON_THROW_ON_ERROR)
+                json_decode($user['workspace_ids'], true, \JSON_THROW_ON_ERROR)
             ),
             roleIds: array_map(
                 fn (string $roleId): RoleId => RoleId::fromString($roleId),
-                json_decode($user['role_ids'], true, JSON_THROW_ON_ERROR)
+                json_decode($user['role_ids'], true, \JSON_THROW_ON_ERROR)
             ),
             username: $user['username'],
             firstName: $user['firstname'],

@@ -16,7 +16,7 @@ final readonly class CreateEnabledWorkspace
         public OrganizationId $organizationId,
         public string $name,
         public string $slug,
-        public \DateTimeImmutable $validUntil,
+        public \DateTimeInterface $validUntil,
     ) {
     }
 }

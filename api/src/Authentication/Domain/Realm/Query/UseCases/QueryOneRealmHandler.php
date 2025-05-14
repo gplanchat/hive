@@ -13,7 +13,8 @@ final readonly class QueryOneRealmHandler
 {
     public function __construct(
         private Keycloak $keycloak,
-    ) {}
+    ) {
+    }
 
     public function __invoke(QueryOneRealm $query): Realm
     {

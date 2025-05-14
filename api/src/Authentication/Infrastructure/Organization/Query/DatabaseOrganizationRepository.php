@@ -21,11 +21,12 @@ final readonly class DatabaseOrganizationRepository implements OrganizationRepos
     public function __construct(
         #[Autowire('@db.connection')]
         private Connection $connection,
-    ) {}
+    ) {
+    }
 
     public function get(OrganizationId $organizationId, RealmId $realmId): Organization
     {
-        $sql =<<<SQL
+        $sql = <<<'SQL'
             SELECT uuid, realm_id, name, slug, valid_until, feature_rollout_ids, enabled
             FROM organizations
             WHERE uuid = :uuid
@@ -47,7 +48,7 @@ final readonly class DatabaseOrganizationRepository implements OrganizationRepos
 
     public function list(RealmId $realmId, int $currentPage = 1, int $pageSize = 25): OrganizationPage
     {
-        $sql =<<<SQL
+        $sql = <<<'SQL'
             SELECT uuid, realm_id, name, slug, valid_until, feature_rollout_ids, enabled
             FROM organizations
             WHERE realm_id = :realm_id
@@ -75,12 +76,12 @@ final readonly class DatabaseOrganizationRepository implements OrganizationRepos
             realmId: RealmId::fromString($organization['realm_id']),
             name: $organization['name'],
             slug: $organization['slug'],
-            validUntil: $organization['valid_until'] !== null
+            validUntil: null !== $organization['valid_until']
                 ? \DateTimeImmutable::createFromFormat('Y-m-d', $organization['valid_until'], new \DateTimeZone('UTC'))
                 : null,
             featureRolloutIds: array_map(
                 fn (string $featureRolloutId): FeatureRolloutId => FeatureRolloutId::fromString($featureRolloutId),
-                json_decode($organization['feature_rollout_ids'], true, JSON_THROW_ON_ERROR)
+                json_decode($organization['feature_rollout_ids'], true, \JSON_THROW_ON_ERROR)
             ),
             enabled: $organization['enabled'] ?? false,
         );

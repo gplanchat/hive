@@ -8,28 +8,33 @@ use App\Authentication\Domain\Realm\RealmId;
 use App\Shared\Infrastructure\Collection\Collection;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @internal
+ *
+ * @coversNothing
+ */
 final class CollectionTest extends TestCase
 {
     /** @test */
     public function itChecksAnyValue(): void
     {
-        $this->assertTrue(Collection::fromArray(['lorem', 'ipsum', 'dolor'])->any(fn (string $current) => strcmp($current, 'lorem') === 0));
-        $this->assertFalse(Collection::fromArray(['lorem', 'ipsum', 'dolor'])->any(fn (string $current) => strcmp($current, 'sit amet') === 0));
+        $this->assertTrue(Collection::fromArray(['lorem', 'ipsum', 'dolor'])->any(fn (string $current) => 0 === strcmp($current, 'lorem')));
+        $this->assertFalse(Collection::fromArray(['lorem', 'ipsum', 'dolor'])->any(fn (string $current) => 0 === strcmp($current, 'sit amet')));
     }
 
     /** @test */
     public function itChecksNoValue(): void
     {
-        $this->assertTrue(Collection::fromArray(['lorem', 'ipsum', 'dolor'])->none(fn (string $current) => strcmp($current, 'sit amet') === 0));
-        $this->assertFalse(Collection::fromArray(['lorem', 'ipsum', 'dolor'])->none(fn (string $current) => strcmp($current, 'lorem') === 0));
+        $this->assertTrue(Collection::fromArray(['lorem', 'ipsum', 'dolor'])->none(fn (string $current) => 0 === strcmp($current, 'sit amet')));
+        $this->assertFalse(Collection::fromArray(['lorem', 'ipsum', 'dolor'])->none(fn (string $current) => 0 === strcmp($current, 'lorem')));
     }
 
     /** @test */
     public function itChecksAllValues(): void
     {
-        $this->assertTrue(Collection::fromArray(['lorem', 'ipsum', 'dolor'])->all(fn (string $current) => is_string($current)));
-        $this->assertFalse(Collection::fromArray(['lorem', 'ipsum', 'dolor'])->all(fn (string $current) => is_int($current)));
-        $this->assertFalse(Collection::fromArray(['lorem', 'ipsum', 'dolor'])->all(fn (string $current) => strcmp($current, 'lorem') === 0));
+        $this->assertTrue(Collection::fromArray(['lorem', 'ipsum', 'dolor'])->all(fn (string $current) => \is_string($current)));
+        $this->assertFalse(Collection::fromArray(['lorem', 'ipsum', 'dolor'])->all(fn (string $current) => \is_int($current)));
+        $this->assertFalse(Collection::fromArray(['lorem', 'ipsum', 'dolor'])->all(fn (string $current) => 0 === strcmp($current, 'lorem')));
     }
 
     /** @test */
@@ -38,7 +43,7 @@ final class CollectionTest extends TestCase
         $this->assertEquals(
             ['lorem', 'lorem', 'lorem'],
             Collection::fromArray(['lorem', 'ipsum', 'dolor', 'lorem', 'dolor', 'lorem', 'ipsum', 'dolor'])
-                ->filter(fn (string $current) => strcmp($current, 'lorem') === 0)
+                ->filter(fn (string $current) => 0 === strcmp($current, 'lorem'))
                 ->toArray()
         );
         $this->assertEquals(
@@ -64,7 +69,7 @@ final class CollectionTest extends TestCase
         $this->assertEquals(
             ['lorem', 'ipsum', 'dolor'],
             Collection::fromArray(['lorem', 'ipsum', 'dolor', 'lorem', 'dolor', 'lorem', 'ipsum', 'dolor'])
-                ->unique(fn (string $left, string $right) => strcmp($left, $right) === 0)
+                ->unique(fn (string $left, string $right) => 0 === strcmp($left, $right))
                 ->toArray()
         );
         $this->assertEquals(

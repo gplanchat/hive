@@ -9,7 +9,6 @@ use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
-use ApiPlatform\Metadata\QueryParameter;
 use ApiPlatform\OpenApi\Model\Operation;
 use ApiPlatform\OpenApi\Model\Parameter;
 use App\Authentication\Domain\Organization\OrganizationId;
@@ -26,6 +25,18 @@ use App\Authentication\UserInterface\Role\QuerySeveralRoleProvider;
 use Symfony\Component\Routing\Requirement\Requirement;
 use Symfony\Component\Serializer\Attribute\Context;
 
+#[Delete(
+    uriTemplate: '/authentication/{realm}/roles/{uuid}',
+    uriVariables: [
+        'realm' => 'realmId',
+        'uuid',
+    ],
+    security: 'is_granted("IS_AUTHENTICATED")',
+    input: false,
+    output: false,
+    provider: QueryOneRoleProvider::class,
+    processor: DeleteRoleProcessor::class,
+)]
 #[Get(
     uriTemplate: '/authentication/{realm}/roles/{uuid}',
     uriVariables: [
@@ -134,18 +145,6 @@ use Symfony\Component\Serializer\Attribute\Context;
     processor: CreateRoleProcessor::class,
     itemUriTemplate: '/authentication/{realm}/roles/{uuid}',
 )]
-#[Delete(
-    uriTemplate: '/authentication/{realm}/roles/{uuid}',
-    uriVariables: [
-        'realm' => 'realmId',
-        'uuid',
-    ],
-    security: 'is_granted("IS_AUTHENTICATED")',
-    input: false,
-    output: false,
-    provider: QueryOneRoleProvider::class,
-    processor: DeleteRoleProcessor::class,
-)]
 final readonly class Role
 {
     /** @var ResourceAccess[] */
@@ -184,7 +183,7 @@ final readonly class Role
             description: 'Resource accesses specifications',
             schema: ['type' => 'string', 'minLength' => 3, 'maxLength' => 150],
         )]
-        array $resourceAccesses = []
+        array $resourceAccesses = [],
     ) {
         $this->resourceAccesses = $resourceAccesses;
     }

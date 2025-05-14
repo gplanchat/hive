@@ -14,7 +14,7 @@ final class Organization
 {
     /**
      * @param FeatureRolloutId[] $featureRolloutIds
-     * @param object[] $events
+     * @param object[]           $events
      */
     public function __construct(
         public readonly OrganizationId $uuid,
@@ -41,7 +41,7 @@ final class Organization
     private function recordThat(object $event): void
     {
         $this->events[] = $event;
-        $this->version++;
+        ++$this->version;
         $this->apply($event);
     }
 
@@ -49,6 +49,7 @@ final class Organization
     {
         $releasedEvents = $this->events;
         $this->events = [];
+
         return $releasedEvents;
     }
 
@@ -162,7 +163,8 @@ final class Organization
     {
         $this->featureRolloutIds = Collection::fromArray([...$this->featureRolloutIds, ...$event->featureRolloutIds])
             ->unique(fn (FeatureRolloutId $left, FeatureRolloutId $right) => $left->equals($right))
-            ->toArray();
+            ->toArray()
+        ;
     }
 
     public function removeFeatureRollouts(FeatureRolloutId ...$featureRolloutIds): void
@@ -179,7 +181,8 @@ final class Organization
         $this->featureRolloutIds = Collection::fromArray($this->featureRolloutIds)
             ->filter(fn (FeatureRolloutId $current) => Collection::fromArray($event->featureRolloutIds)
                 ->none(fn (FeatureRolloutId $toRemove) => $current->equals($toRemove)))
-            ->toArray();
+            ->toArray()
+        ;
     }
 
     public function delete(): void

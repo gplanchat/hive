@@ -12,7 +12,8 @@ final readonly class QuerySeveralRealmHandler
 {
     public function __construct(
         private Keycloak $keycloak,
-    ) {}
+    ) {
+    }
 
     public function __invoke(QuerySeveralRealm $query): RealmPage
     {

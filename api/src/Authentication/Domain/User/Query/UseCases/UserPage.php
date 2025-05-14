@@ -14,7 +14,7 @@ final readonly class UserPage implements \IteratorAggregate, \Countable
         public int $page,
         public int $pageSize,
         public int $totalItems,
-        User ...$users
+        User ...$users,
     ) {
         $this->users = $users;
     }
@@ -26,6 +26,6 @@ final readonly class UserPage implements \IteratorAggregate, \Countable
 
     public function count(): int
     {
-        return count($this->users);
+        return \count($this->users);
     }
 }

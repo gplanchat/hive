@@ -36,7 +36,7 @@ final class Role
     private function recordThat(object $event): void
     {
         $this->events[] = $event;
-        $this->version++;
+        ++$this->version;
         $this->apply($event);
     }
 
@@ -44,6 +44,7 @@ final class Role
     {
         $releasedEvents = $this->events;
         $this->events = [];
+
         return $releasedEvents;
     }
 

@@ -12,7 +12,8 @@ final readonly class DeleteRoleHandler
 {
     public function __construct(
         private RoleRepositoryInterface $roleRepository,
-    ) {}
+    ) {
+    }
 
     public function __invoke(DeleteRole $command): void
     {

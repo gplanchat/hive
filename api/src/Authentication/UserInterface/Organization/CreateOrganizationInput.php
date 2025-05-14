@@ -20,15 +20,15 @@ final readonly class CreateOrganizationInput
             description: 'Name of the Organization',
             schema: ['type' => 'string'],
         )]
-        #[Assert\NotBlank]
         #[Assert\Length(min: 5, max: 255)]
+        #[Assert\NotBlank]
         public string $name,
         #[ApiProperty(
             description: 'URL slug of the Organization, will be used as the authentication realm',
             schema: ['type' => 'string', 'format' => Requirement::ASCII_SLUG],
         )]
-        #[Assert\NotBlank]
         #[Assert\Length(min: 5, max: 255)]
+        #[Assert\NotBlank]
         public string $slug,
         #[ApiProperty(
             description: 'End date of validity of all subscriptions',
@@ -38,7 +38,7 @@ final readonly class CreateOrganizationInput
             'expression' => 'this.enabled == true',
             'constraints' => [
                 new Assert\NotNull(),
-            ]
+            ],
         ])]
         #[Context(['datetime_format' => 'Y-m-d'])]
         public ?\DateTimeInterface $validUntil = null,

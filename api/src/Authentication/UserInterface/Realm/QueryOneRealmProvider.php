@@ -6,8 +6,8 @@ namespace App\Authentication\UserInterface\Realm;
 
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
-use App\Authentication\Domain\Realm\Query\Realm;
 use App\Authentication\Domain\QueryBusInterface;
+use App\Authentication\Domain\Realm\Query\Realm;
 use App\Authentication\Domain\Realm\Query\UseCases\QueryOneRealm;
 use App\Authentication\Domain\Realm\RealmId;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;

@@ -10,7 +10,6 @@ use App\Authentication\Domain\Realm\Query\UseCases\RealmPage;
 use App\Authentication\Domain\Realm\RealmId;
 use App\Authentication\Domain\User\Query\User;
 use Firebase\JWT\JWT;
-use Firebase\JWT\Key;
 use Psr\Clock\ClockInterface;
 
 final readonly class KeycloakMock implements KeycloakInterface
@@ -75,15 +74,15 @@ final readonly class KeycloakMock implements KeycloakInterface
         return JWT::encode(
             [
                 ...[
-                    'exp'  => $this->clock->now()->add($expiration)->getTimestamp(),
-                    'nbf'  => $this->clock->now()->getTimestamp(),
+                    'exp' => $this->clock->now()->add($expiration)->getTimestamp(),
+                    'nbf' => $this->clock->now()->getTimestamp(),
                     'sub' => $subject,
                 ],
-                ...$payload
+                ...$payload,
             ],
             $certificates[$keyId]->getKeyMaterial(),
             $certificates[$keyId]->getAlgorithm(),
-            strval($keyId),
+            \sprintf('%d', $keyId),
             $headers,
         );
     }

@@ -12,7 +12,8 @@ final readonly class DeleteUserHandler
 {
     public function __construct(
         private UserRepositoryInterface $userRepository,
-    ) {}
+    ) {
+    }
 
     public function __invoke(DeleteUser $command): void
     {

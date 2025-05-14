@@ -15,7 +15,7 @@ final readonly class CreatePendingUser
 {
     /**
      * @param WorkspaceId[] $workspaceIds
-     * @param RoleId[] $roleIds
+     * @param RoleId[]      $roleIds
      */
     public function __construct(
         public UserId $uuid,

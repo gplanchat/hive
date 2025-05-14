@@ -44,13 +44,14 @@ final class InMemoryUserRepository implements UserRepositoryInterface
         $result = $this->storage->getValues()
             ->filter(fn (mixed $value): bool => $value instanceof User)
             ->filter(fn (User $user): bool => $user->realmId->equals($realmId))
-            ->toArray();
+            ->toArray()
+        ;
 
         return new UserPage(
             $currentPage,
             $pageSize,
-            count($result),
-            ...array_slice($result, ($currentPage - 1) * $pageSize, $pageSize)
+            \count($result),
+            ...\array_slice($result, ($currentPage - 1) * $pageSize, $pageSize)
         );
     }
 
@@ -60,13 +61,14 @@ final class InMemoryUserRepository implements UserRepositoryInterface
             ->filter(fn (mixed $value): bool => $value instanceof User)
             ->filter(fn (User $user): bool => $user->realmId->equals($realmId))
             ->filter(fn (User $user): bool => $user->organizationId->equals($organizationId))
-            ->toArray();
+            ->toArray()
+        ;
 
         return new UserPage(
             $currentPage,
             $pageSize,
-            count($result),
-            ...array_slice($result, ($currentPage - 1) * $pageSize, $pageSize)
+            \count($result),
+            ...\array_slice($result, ($currentPage - 1) * $pageSize, $pageSize)
         );
     }
 
@@ -76,13 +78,14 @@ final class InMemoryUserRepository implements UserRepositoryInterface
             ->filter(fn (mixed $value): bool => $value instanceof User)
             ->filter(fn (User $user): bool => $user->realmId->equals($realmId))
             ->filter(fn (User $user): bool => Collection::fromArray($user->workspaceIds)->any(fn (WorkspaceId $current) => $current->equals($workspaceId)))
-            ->toArray();
+            ->toArray()
+        ;
 
         return new UserPage(
             $currentPage,
             $pageSize,
-            count($result),
-            ...array_slice($result, ($currentPage - 1) * $pageSize, $pageSize)
+            \count($result),
+            ...\array_slice($result, ($currentPage - 1) * $pageSize, $pageSize)
         );
     }
 }

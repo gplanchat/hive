@@ -29,6 +29,15 @@ use App\Authentication\UserInterface\Workspace\QuerySeveralWorkspaceInOrganizati
 use App\Authentication\UserInterface\Workspace\QuerySeveralWorkspaceProvider;
 use Symfony\Component\Serializer\Attribute\Context;
 
+#[Delete(
+    uriTemplate: '/authentication/{realm}/workspaces/{uuid}',
+    uriVariables: ['realm', 'uuid'],
+    security: 'is_granted("IS_AUTHENTICATED")',
+    input: false,
+    output: false,
+    provider: QueryOneWorkspaceProvider::class,
+    processor: DeleteWorkspaceProcessor::class,
+)]
 #[Get(
     uriTemplate: '/authentication/{realm}/workspaces/{uuid}',
     uriVariables: [
@@ -114,30 +123,6 @@ use Symfony\Component\Serializer\Attribute\Context;
     provider: QuerySeveralWorkspaceInOrganizationProvider::class,
     itemUriTemplate: '/authentication/{realm}/workspace/{uuid}',
 )]
-#[Post(
-    uriTemplate: '/authentication/{realm}/workspaces',
-    uriVariables: [
-        'realm' => 'realmId',
-    ],
-    class: QueryWorkspace::class,
-    security: 'is_granted("IS_AUTHENTICATED")',
-    input: CreateWorkspaceInput::class,
-    output: QueryWorkspace::class,
-    processor: CreateWorkspaceProcessor::class,
-    itemUriTemplate: '/authentication/{realm}/workspaces/{uuid}',
-)]
-#[Post(
-    uriTemplate: '/authentication/{realm}/organizations/{organizationId}/workspaces',
-    uriVariables: [
-        'realm' => 'realmId',
-        'organizationId',
-    ],
-    security: 'is_granted("IS_AUTHENTICATED")',
-    input: CreateWorkspaceWithinOrganizationInput::class,
-    output: QueryWorkspace::class,
-    processor: CreateWorkspaceProcessor::class,
-    itemUriTemplate: '/authentication/{realm}/workspaces/{uuid}',
-)]
 #[Patch(
     uriTemplate: '/authentication/{realm}/workspaces/{uuid}/enable',
     uriVariables: [
@@ -162,14 +147,29 @@ use Symfony\Component\Serializer\Attribute\Context;
     provider: QueryOneWorkspaceProvider::class,
     processor: DisableWorkspaceProcessor::class,
 )]
-#[Delete(
-    uriTemplate: '/authentication/{realm}/workspaces/{uuid}',
-    uriVariables: ['realm', 'uuid'],
+#[Post(
+    uriTemplate: '/authentication/{realm}/workspaces',
+    uriVariables: [
+        'realm' => 'realmId',
+    ],
+    class: QueryWorkspace::class,
     security: 'is_granted("IS_AUTHENTICATED")',
-    input: false,
-    output: false,
-    provider: QueryOneWorkspaceProvider::class,
-    processor: DeleteWorkspaceProcessor::class,
+    input: CreateWorkspaceInput::class,
+    output: QueryWorkspace::class,
+    processor: CreateWorkspaceProcessor::class,
+    itemUriTemplate: '/authentication/{realm}/workspaces/{uuid}',
+)]
+#[Post(
+    uriTemplate: '/authentication/{realm}/organizations/{organizationId}/workspaces',
+    uriVariables: [
+        'realm' => 'realmId',
+        'organizationId',
+    ],
+    security: 'is_granted("IS_AUTHENTICATED")',
+    input: CreateWorkspaceWithinOrganizationInput::class,
+    output: QueryWorkspace::class,
+    processor: CreateWorkspaceProcessor::class,
+    itemUriTemplate: '/authentication/{realm}/workspaces/{uuid}',
 )]
 final readonly class Workspace
 {
@@ -213,5 +213,6 @@ final readonly class Workspace
             schema: ['type' => 'boolean'],
         )]
         public bool $enabled = true,
-    ) {}
+    ) {
+    }
 }

@@ -12,7 +12,6 @@ use ApiPlatform\State\ProviderInterface;
 use App\Authentication\Domain\Organization\OrganizationId;
 use App\Authentication\Domain\QueryBusInterface;
 use App\Authentication\Domain\Realm\RealmId;
-use App\Authentication\Domain\Role\Query\UseCases\QuerySeveralRole;
 use App\Authentication\Domain\Role\Query\UseCases\QuerySeveralRoleInOrganization;
 use App\Authentication\Domain\Role\Query\UseCases\RolePage;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;

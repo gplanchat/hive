@@ -41,13 +41,14 @@ final class InMemoryOrganizationRepository implements OrganizationRepositoryInte
         $result = $this->storage->getValues()
             ->filter(fn (mixed $value): bool => $value instanceof Organization)
             ->filter(fn (Organization $organization) => $organization->realmId->equals($realmId))
-            ->toArray();
+            ->toArray()
+        ;
 
         return new OrganizationPage(
             $currentPage,
             $pageSize,
-            count($result),
-            ...array_slice(array_values($result), ($currentPage - 1) * $pageSize, $pageSize)
+            \count($result),
+            ...\array_slice(array_values($result), ($currentPage - 1) * $pageSize, $pageSize)
         );
     }
 }

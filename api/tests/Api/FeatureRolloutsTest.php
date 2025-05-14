@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Tests\Api;
 
 use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
@@ -8,11 +10,15 @@ use App\Authentication\Infrastructure\Keycloak\KeycloakMock;
 use App\Authentication\Infrastructure\Role\DataFixtures\RoleFixtures;
 use App\Authentication\Infrastructure\StorageMock;
 use App\Authentication\Infrastructure\User\DataFixtures\UserFixtures;
-use Psr\Clock\ClockInterface;
 
+/**
+ * @internal
+ *
+ * @coversNothing
+ */
 class FeatureRolloutsTest extends ApiTestCase
 {
-    static ?bool $alwaysBootKernel = false;
+    public static ?bool $alwaysBootKernel = false;
 
     private ?UserFixtures $userFixtures = null;
     private ?RoleFixtures $roleFixtures = null;
@@ -25,13 +31,13 @@ class FeatureRolloutsTest extends ApiTestCase
         $this->roleFixtures = new RoleFixtures(
             self::getContainer()->get(StorageMock::class)
         );
-        assert($this->roleFixtures instanceof RoleFixtures);
+        \assert($this->roleFixtures instanceof RoleFixtures);
         $this->roleFixtures->load();
 
         $this->userFixtures = new UserFixtures(
             self::getContainer()->get(StorageMock::class)
         );
-        assert($this->userFixtures instanceof UserFixtures);
+        \assert($this->userFixtures instanceof UserFixtures);
         $this->userFixtures->load();
     }
 
@@ -49,7 +55,7 @@ class FeatureRolloutsTest extends ApiTestCase
     private static function getTokenFor(string $username): string
     {
         $keycloak = self::getContainer()->get(KeycloakInterface::class);
-        assert($keycloak instanceof KeycloakMock);
+        \assert($keycloak instanceof KeycloakMock);
 
         return $keycloak->generateJWT($username);
     }

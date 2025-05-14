@@ -27,6 +27,6 @@ final readonly class FeatureRolloutPage implements \IteratorAggregate, \Countabl
 
     public function count(): int
     {
-        return count($this->featureRollouts);
+        return \count($this->featureRollouts);
     }
 }

@@ -30,7 +30,7 @@ final class KeycloakAdminClient implements KeycloakAdminClientInterface
         $options = array_merge($options, [
             'headers' => array_merge($options['headers'] ?? [], [
                 'authorization' => "bearer {$this->authenticateWithAccessToken()}",
-            ])
+            ]),
         ]);
 
         return $this->decorated->request($method, $url, $options);
@@ -43,13 +43,13 @@ final class KeycloakAdminClient implements KeycloakAdminClientInterface
 
     private function authenticateWithAccessToken(): string
     {
-        if ($this->expiration !== null && $this->clock->now() < $this->expiration) {
+        if (null !== $this->expiration && $this->clock->now() < $this->expiration) {
             return $this->accessToken;
         }
 
         $now = $this->clock->now();
 
-        if ($this->refreshExpiration !== null && $this->clock->now() < $this->refreshExpiration) {
+        if (null !== $this->refreshExpiration && $this->clock->now() < $this->refreshExpiration) {
             // FIXME: change Keycloak URI
             $response = $this->decorated->request('POST', 'http://keycloak:7080/realms/master/protocol/openid-connect/token', [
                 'body' => [
@@ -59,7 +59,7 @@ final class KeycloakAdminClient implements KeycloakAdminClientInterface
                 ],
             ]);
 
-            if ($response->getStatusCode() === 200) {
+            if (200 === $response->getStatusCode()) {
                 $this->storeRefreshToken($response, $now);
 
                 return $this->accessToken;
@@ -76,7 +76,7 @@ final class KeycloakAdminClient implements KeycloakAdminClientInterface
             ],
         ]);
 
-        if ($response->getStatusCode() === 200) {
+        if (200 === $response->getStatusCode()) {
             $this->storeRefreshToken($response, $now);
 
             return $this->accessToken;

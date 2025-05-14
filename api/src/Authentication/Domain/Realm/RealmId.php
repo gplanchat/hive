@@ -8,9 +8,9 @@ use App\Authentication\Domain\IdInterface;
 
 final class RealmId implements IdInterface
 {
-    const string REQUIREMENT = '[A-Za-z0-9]+(?:[-.][A-Za-z0-9]+)*';
-    const string URI_REQUIREMENT = '\/authentication\/realm\/[A-Za-z0-9]+(?:[-.][A-Za-z0-9]+)*';
-    const string PARSE = '/\/authentication\/realm\/(?<reference>[A-Za-z0-9]+(?:[-.][A-Za-z0-9]+)*)/';
+    public const string REQUIREMENT = '[A-Za-z0-9]+(?:[-.][A-Za-z0-9]+)*';
+    public const string URI_REQUIREMENT = '\/authentication\/realm\/[A-Za-z0-9]+(?:[-.][A-Za-z0-9]+)*';
+    public const string PARSE = '/\/authentication\/realm\/(?<reference>[A-Za-z0-9]+(?:[-.][A-Za-z0-9]+)*)/';
 
     private function __construct(
         private readonly string $reference,

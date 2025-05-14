@@ -15,6 +15,7 @@ final readonly class CreatePendingWorkspaceHandler
         private WorkspaceRepositoryInterface $workspaceRepository,
     ) {
     }
+
     public function __invoke(CreatePendingWorkspace $command): void
     {
         $workspace = Workspace::declareDisabled(

@@ -12,7 +12,6 @@ use App\Authentication\Domain\User\Query\User;
 use Firebase\JWT\JWK;
 use Http\Discovery\Psr17FactoryDiscovery;
 use Psr\Http\Message\UriInterface;
-use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 final readonly class Keycloak implements KeycloakInterface
 {
@@ -21,7 +20,7 @@ final readonly class Keycloak implements KeycloakInterface
 
     public function __construct(
         private KeycloakAdminClientInterface $httpClient,
-        private UriInterface                 $baseUri,
+        private UriInterface $baseUri,
         RealmId ...$allowedRealmIds,
     ) {
         $this->allowedRealmIds = $allowedRealmIds;
@@ -44,16 +43,11 @@ final readonly class Keycloak implements KeycloakInterface
         $response = $this->httpClient->request('GET', "{$this->baseUri}/admin/realms", [
             'headers' => [
                 'content-type' => 'application/json',
-            ]
+            ],
         ]);
 
-        if ($response->getStatusCode() !== 200) {
-            throw new \RuntimeException(strtr(
-                'Could not list Realms on the Keycloak instance %keycloakUri%',
-                [
-                    '%keycloakUri%' => $this->baseUri,
-                ]
-            ));
+        if (200 !== $response->getStatusCode()) {
+            throw new \RuntimeException(strtr('Could not list Realms on the Keycloak instance %keycloakUri%', ['%keycloakUri%' => $this->baseUri]));
         }
 
         $items = array_map(
@@ -67,7 +61,7 @@ final readonly class Keycloak implements KeycloakInterface
             ),
         );
 
-        return new RealmPage(1, 100, count($items), ...$items);
+        return new RealmPage(1, 100, \count($items), ...$items);
     }
 
     public function createOrganizationInsideRealm(RealmId $realmId, Organization $organization): void
@@ -95,19 +89,15 @@ final readonly class Keycloak implements KeycloakInterface
         $response = $this->httpClient->request('GET', $url, [
             'headers' => [
                 'content-type' => 'application/json',
-            ]
+            ],
         ]);
 
-        if ($response->getStatusCode() !== 200) {
-            throw new \RuntimeException(strtr(
-                'Could not list Realms on the Keycloak instance %keycloakUri%',
-                [
-                    '%keycloakUri%' => $this->baseUri,
-                ]
-            ));
+        if (200 !== $response->getStatusCode()) {
+            throw new \RuntimeException(strtr('Could not list Realms on the Keycloak instance %keycloakUri%', ['%keycloakUri%' => $this->baseUri]));
         }
 
         $item = $response->toArray();
+
         return new Realm(
             code: RealmId::fromString($item['realm']),
             displayName: $item['displayName'],
@@ -121,7 +111,7 @@ final readonly class Keycloak implements KeycloakInterface
             'headers' => [
                 'content-type' => 'application/json',
             ],
-            'body' => \json_encode([
+            'body' => json_encode([
                 'id' => $realm->code->toString(),
                 'realm' => $realm->slug,
                 'notBefore' => 0,
@@ -135,25 +125,15 @@ final readonly class Keycloak implements KeycloakInterface
                 'resetPasswordAllowed' => false,
                 'editUsernameAllowed' => false,
                 'bruteForceProtected' => true,
-            ], JSON_THROW_ON_ERROR),
+            ], \JSON_THROW_ON_ERROR),
         ]);
 
-        if ($response->getStatusCode() !== 409) {
-            throw new ConflictException(strtr(
-                'Could not create Realm on the Keycloak instance %keycloakUri%, as another realm already uses this name.',
-                [
-                    '%keycloakUri%' => $this->baseUri,
-                ]
-            ));
+        if (409 !== $response->getStatusCode()) {
+            throw new ConflictException(strtr('Could not create Realm on the Keycloak instance %keycloakUri%, as another realm already uses this name.', ['%keycloakUri%' => $this->baseUri]));
         }
 
-        if ($response->getStatusCode() !== 201) {
-            throw new \RuntimeException(strtr(
-                'Could not create Realm on the Keycloak instance %keycloakUri%',
-                [
-                    '%keycloakUri%' => $this->baseUri,
-                ]
-            ));
+        if (201 !== $response->getStatusCode()) {
+            throw new \RuntimeException(strtr('Could not create Realm on the Keycloak instance %keycloakUri%', ['%keycloakUri%' => $this->baseUri]));
         }
     }
 
@@ -172,24 +152,18 @@ final readonly class Keycloak implements KeycloakInterface
             'headers' => [
                 'content-type' => 'application/json',
             ],
-            'body' => \json_encode([
+            'body' => json_encode([
                 'id' => $user->uuid->toString(),
                 'username' => $user->username,
                 'firstName' => $user->firstName,
                 'lastName' => $user->lastName,
                 'email' => $user->email,
                 'enabled' => $user->enabled,
-            ], JSON_THROW_ON_ERROR),
+            ], \JSON_THROW_ON_ERROR),
         ]);
 
-        if ($response->getStatusCode() !== 201) {
-            throw new \RuntimeException(strtr(
-                'Could not create User in the %realm% on the Keycloak instance %keycloakUri%',
-                [
-                    '%keycloakUri%' => $this->baseUri,
-                    '%realm%' => $realm->code->toString(),
-                ]
-            ));
+        if (201 !== $response->getStatusCode()) {
+            throw new \RuntimeException(strtr('Could not create User in the %realm% on the Keycloak instance %keycloakUri%', ['%keycloakUri%' => $this->baseUri, '%realm%' => $realm->code->toString()]));
         }
     }
 
@@ -208,14 +182,8 @@ final readonly class Keycloak implements KeycloakInterface
             ],
         ]);
 
-        if ($response->getStatusCode() !== 200) {
-            throw new \RuntimeException(strtr(
-                'Could not create User in the %realm% on the Keycloak instance %keycloakUri%',
-                [
-                    '%keycloakUri%' => $this->baseUri,
-                    '%realm%' => $realmId->toString(),
-                ]
-            ));
+        if (200 !== $response->getStatusCode()) {
+            throw new \RuntimeException(strtr('Could not create User in the %realm% on the Keycloak instance %keycloakUri%', ['%keycloakUri%' => $this->baseUri, '%realm%' => $realmId->toString()]));
         }
 
         return JWK::parseKeySet($response->toArray(false));

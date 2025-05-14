@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Authentication\Domain\Role;
 
 use ApiPlatform\Metadata\ApiProperty;
-use Symfony\Component\Routing\Requirement\Requirement;
 
 final readonly class ResourceAccess
 {
@@ -22,7 +21,7 @@ final readonly class ResourceAccess
             schema: ['type' => 'string', 'pattern' => ResourceInterface::REQUIREMENT, 'minLength' => 3, 'maxLength' => 100],
         )]
         public ResourceInterface $resource,
-        ActionInterface ...$actions
+        ActionInterface ...$actions,
     ) {
         $this->actions = $actions;
     }

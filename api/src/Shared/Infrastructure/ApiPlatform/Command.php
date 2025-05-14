@@ -6,5 +6,4 @@ namespace App\Shared\Infrastructure\ApiPlatform;
 
 abstract class Command extends DomainOperation
 {
-
 }

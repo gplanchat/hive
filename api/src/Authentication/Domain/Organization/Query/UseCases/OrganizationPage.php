@@ -14,7 +14,7 @@ final readonly class OrganizationPage implements \IteratorAggregate, \Countable
         public int $page,
         public int $pageSize,
         public int $totalItems,
-        Organization ...$organizations
+        Organization ...$organizations,
     ) {
         $this->organizations = $organizations;
     }
@@ -26,6 +26,6 @@ final readonly class OrganizationPage implements \IteratorAggregate, \Countable
 
     public function count(): int
     {
-        return count($this->organizations);
+        return \count($this->organizations);
     }
 }

@@ -8,10 +8,10 @@ use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\Pagination\PaginatorInterface;
 use ApiPlatform\State\Pagination\TraversablePaginator;
 use ApiPlatform\State\ProviderInterface;
-use App\Authentication\Domain\Realm\Query\UseCases\RealmPage;
-use App\Authentication\Domain\Realm\Query\UseCases\QuerySeveralRealm;
 use App\Authentication\Domain\NotFoundException;
 use App\Authentication\Domain\QueryBusInterface;
+use App\Authentication\Domain\Realm\Query\UseCases\QuerySeveralRealm;
+use App\Authentication\Domain\Realm\Query\UseCases\RealmPage;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 

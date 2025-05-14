@@ -20,15 +20,15 @@ final class AddFeatureRolloutsToOrganizationInputDenormalizer implements Denorma
 
     public function getSupportedTypes(?string $format): array
     {
-        return in_array($format, ['json', 'jsonld'], true) ? [
+        return \in_array($format, ['json', 'jsonld'], true) ? [
             AddFeatureRolloutsToOrganizationInput::class => false,
         ] : [];
     }
 
     public function denormalize(mixed $data, string $type, ?string $format = null, array $context = []): AddFeatureRolloutsToOrganizationInput
     {
-        if (!array_key_exists('featureRolloutIds', $data)
-            || !is_array($data['featureRolloutIds'])
+        if (!\array_key_exists('featureRolloutIds', $data)
+            || !\is_array($data['featureRolloutIds'])
             || !array_is_list($data['featureRolloutIds'])
         ) {
             throw new UnexpectedValueException();
@@ -43,6 +43,6 @@ final class AddFeatureRolloutsToOrganizationInputDenormalizer implements Denorma
 
     public function supportsDenormalization(mixed $data, string $type, ?string $format = null, array $context = []): bool
     {
-        return $type === AddFeatureRolloutsToOrganizationInput::class;
+        return AddFeatureRolloutsToOrganizationInput::class === $type;
     }
 }

@@ -30,6 +30,18 @@ use App\Authentication\UserInterface\Organization\RemoveFeatureRolloutsFromOrgan
 use App\Authentication\UserInterface\Organization\RemoveFeatureRolloutsFromOrganizationProcessor;
 use Symfony\Component\Serializer\Attribute\Context;
 
+#[Delete(
+    uriTemplate: '/authentication/{realm}/organizations/{uuid}',
+    uriVariables: [
+        'realm' => 'realmId',
+        'uuid',
+    ],
+    security: 'is_granted("IS_AUTHENTICATED")',
+    input: false,
+    output: false,
+    provider: QueryOneOrganizationProvider::class,
+    processor: DeleteOrganizationProcessor::class,
+)]
 #[Get(
     uriTemplate: '/authentication/{realm}/organizations/{uuid}',
     uriVariables: [
@@ -82,17 +94,6 @@ use Symfony\Component\Serializer\Attribute\Context;
     provider: QuerySeveralOrganizationProvider::class,
     itemUriTemplate: '/authentication/{realm}/organizations/{uuid}',
 )]
-#[Post(
-    uriTemplate: '/authentication/{realm}/organizations',
-    uriVariables: [
-        'realm' => 'realmId',
-    ],
-    security: 'is_granted("IS_AUTHENTICATED")',
-    input: CreateOrganizationInput::class,
-    output: self::class,
-    processor: CreateOrganizationProcessor::class,
-    itemUriTemplate: '/authentication/{realm}/organizations/{uuid}',
-)]
 #[Patch(
     uriTemplate: '/authentication/{realm}/organizations/{uuid}/enable',
     uriVariables: [
@@ -141,17 +142,16 @@ use Symfony\Component\Serializer\Attribute\Context;
     provider: QueryOneOrganizationProvider::class,
     processor: RemoveFeatureRolloutsFromOrganizationProcessor::class,
 )]
-#[Delete(
-    uriTemplate: '/authentication/{realm}/organizations/{uuid}',
+#[Post(
+    uriTemplate: '/authentication/{realm}/organizations',
     uriVariables: [
         'realm' => 'realmId',
-        'uuid',
     ],
     security: 'is_granted("IS_AUTHENTICATED")',
-    input: false,
-    output: false,
-    provider: QueryOneOrganizationProvider::class,
-    processor: DeleteOrganizationProcessor::class,
+    input: CreateOrganizationInput::class,
+    output: self::class,
+    processor: CreateOrganizationProcessor::class,
+    itemUriTemplate: '/authentication/{realm}/organizations/{uuid}',
 )]
 final readonly class Organization
 {

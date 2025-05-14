@@ -73,7 +73,7 @@ final readonly class InMemoryOrganizationRepository implements OrganizationRepos
 
     private function saveEvent(object $event): void
     {
-        $methodName = 'apply'.substr(get_class($event), strrpos(get_class($event), '\\') + 1);
+        $methodName = 'apply'.substr($event::class, strrpos($event::class, '\\') + 1);
         if (method_exists($this, $methodName)) {
             $this->{$methodName}($event);
         }
@@ -130,26 +130,26 @@ final readonly class InMemoryOrganizationRepository implements OrganizationRepos
     {
         $item = $this->storage->getItem(OrganizationFixtures::buildCacheKey($event->uuid, $event->realmId));
 
-            if (!$item->isHit()) {
-                throw new NotFoundException();
-            }
+        if (!$item->isHit()) {
+            throw new NotFoundException();
+        }
 
-            $current = $item->get();
-            if (!$current instanceof QueryOrganization) {
-                throw new NotFoundException();
-            }
+        $current = $item->get();
+        if (!$current instanceof QueryOrganization) {
+            throw new NotFoundException();
+        }
 
-            $item->set(new QueryOrganization(
-                uuid: $current->uuid,
-                realmId: $current->realmId,
-                name: $current->name,
-                slug: $current->slug,
-                validUntil: $event->validUntil,
-                featureRolloutIds: $current->featureRolloutIds,
-                enabled: false,
-            ));
+        $item->set(new QueryOrganization(
+            uuid: $current->uuid,
+            realmId: $current->realmId,
+            name: $current->name,
+            slug: $current->slug,
+            validUntil: $event->validUntil,
+            featureRolloutIds: $current->featureRolloutIds,
+            enabled: false,
+        ));
 
-            $this->storage->save($item);
+        $this->storage->save($item);
     }
 
     private function applyAddedFeatureRolloutsEvent(AddedFeatureRolloutsEvent $event): void

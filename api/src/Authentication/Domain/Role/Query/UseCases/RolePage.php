@@ -14,7 +14,7 @@ final readonly class RolePage implements \IteratorAggregate, \Countable
         public int $page,
         public int $pageSize,
         public int $totalItems,
-        Role ...$roles
+        Role ...$roles,
     ) {
         $this->roles = $roles;
     }
@@ -26,6 +26,6 @@ final readonly class RolePage implements \IteratorAggregate, \Countable
 
     public function count(): int
     {
-        return count($this->roles);
+        return \count($this->roles);
     }
 }

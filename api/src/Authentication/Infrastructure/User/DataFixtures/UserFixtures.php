@@ -17,7 +17,7 @@ use Symfony\Contracts\Cache\ItemInterface;
 
 final readonly class UserFixtures
 {
-    const TAG = 'tests.data-fixtures.user';
+    public const TAG = 'tests.data-fixtures.user';
 
     public function __construct(
         private StorageMock $storage,

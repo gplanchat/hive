@@ -16,5 +16,6 @@ final readonly class AddFeatureRolloutsToOrganizationInput
             schema: ['type' => 'array', 'items' => ['type' => 'string', 'format' => FeatureRolloutId::URI_REQUIREMENT]],
         )]
         public array $featureRolloutIds,
-    ) {}
+    ) {
+    }
 }

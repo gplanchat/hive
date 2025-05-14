@@ -15,7 +15,7 @@ final readonly class CreateEnabledUser
 {
     /**
      * @param WorkspaceId[] $workspaceIds
-     * @param RoleId[] $roleIds
+     * @param RoleId[]      $roleIds
      */
     public function __construct(
         public UserId $uuid,

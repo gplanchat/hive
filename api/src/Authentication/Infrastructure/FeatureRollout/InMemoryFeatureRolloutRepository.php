@@ -35,8 +35,8 @@ final class InMemoryFeatureRolloutRepository implements FeatureRolloutRepository
         return new FeatureRolloutPage(
             $currentPage,
             $pageSize,
-            count($result),
-            ...array_slice($result, ($currentPage - 1) * $pageSize, $pageSize)
+            \count($result),
+            ...\array_slice($result, ($currentPage - 1) * $pageSize, $pageSize)
         );
     }
 

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Shared\Infrastructure\ApiPlatform;
 
 use ApiPlatform\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
@@ -8,19 +10,15 @@ use ApiPlatform\Metadata\Util\ReflectionClassRecursiveIterator;
 
 readonly class DomainResourceNameCollectionFactory implements ResourceNameCollectionFactoryInterface
 {
-
     /**
      * @param string[] $paths
      */
     public function __construct(
         private array $paths,
-        private ?ResourceNameCollectionFactoryInterface $decorated = null
+        private ?ResourceNameCollectionFactoryInterface $decorated = null,
     ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function create(): ResourceNameCollection
     {
         $classes = [];
@@ -44,7 +42,7 @@ readonly class DomainResourceNameCollectionFactory implements ResourceNameCollec
     {
         foreach ($reflectionClass->getAttributes(DomainOperation::class, \ReflectionAttribute::IS_INSTANCEOF) as $attribute) {
             $resource = $attribute->newInstance();
-            assert($resource instanceof DomainOperation);
+            \assert($resource instanceof DomainOperation);
             yield $resource->getClass() ?? throw new \InvalidArgumentException('The class attribute should be declared in the DomainOperation.');
         }
     }

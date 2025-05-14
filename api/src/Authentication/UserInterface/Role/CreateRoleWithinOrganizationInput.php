@@ -5,14 +5,9 @@ declare(strict_types=1);
 namespace App\Authentication\UserInterface\Role;
 
 use ApiPlatform\Metadata\ApiProperty;
-use App\Authentication\Domain\Organization\OrganizationId;
 use App\Authentication\Domain\Role\ActionInterface;
 use App\Authentication\Domain\Role\ResourceAccess;
 use App\Authentication\Domain\Role\ResourceInterface;
-use App\Authentication\Domain\Role\RoleId;
-use App\Authentication\Domain\Workspace\WorkspaceId;
-use Symfony\Component\Routing\Requirement\Requirement;
-use Symfony\Component\Serializer\Attribute\Context;
 use Symfony\Component\Validator\Constraints as Assert;
 
 final readonly class CreateRoleWithinOrganizationInput
@@ -25,8 +20,8 @@ final readonly class CreateRoleWithinOrganizationInput
             description: 'Role\'s display name',
             schema: ['type' => 'string'],
         )]
-        #[Assert\Regex('/[A-Za-z0-9]+(?:[-.][A-Za-z0-9]+)*/')]
         #[Assert\Length(min: 3, max: 255)]
+        #[Assert\Regex('/[A-Za-z0-9]+(?:[-.][A-Za-z0-9]+)*/')]
         public ?string $identifier = null,
         #[ApiProperty(
             description: 'Role\'s first name',

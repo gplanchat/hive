@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Authentication\Domain\Organization\Query;
 
 use App\Authentication\Domain\NotFoundException;
@@ -11,5 +13,6 @@ interface OrganizationRepositoryInterface
 {
     /** @throws NotFoundException */
     public function get(OrganizationId $organizationId, RealmId $realmId): Organization;
+
     public function list(RealmId $realmId, int $currentPage = 1, int $pageSize = 25): OrganizationPage;
 }

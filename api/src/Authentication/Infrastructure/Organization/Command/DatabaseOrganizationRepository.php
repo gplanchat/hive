@@ -27,11 +27,12 @@ final class DatabaseOrganizationRepository implements OrganizationRepositoryInte
         #[Autowire('@db.connection')]
         private Connection $connection,
         private EventBusInterface $eventBus,
-    ) {}
+    ) {
+    }
 
     public function get(OrganizationId $organizationId, RealmId $realmId): Organization
     {
-        $sql =<<<SQL
+        $sql = <<<'SQL'
             SELECT uuid, realm_id, name, slug, valid_until, feature_rollout_ids, enabled, version
             FROM organizations
             WHERE uuid = :uuid
@@ -54,12 +55,12 @@ final class DatabaseOrganizationRepository implements OrganizationRepositoryInte
             OrganizationId::fromString($organization['uuid']),
             realmId: RealmId::fromString($organization['realm_id']),
             name: $organization['name'],
-            validUntil: $organization['valid_until'] !== null
+            validUntil: null !== $organization['valid_until']
                 ? \DateTimeImmutable::createFromFormat('Y-m-d', $organization['valid_until'], new \DateTimeZone('UTC'))
                 : null,
             featureRolloutIds: array_map(
                 fn (string $featureRolloutId): FeatureRolloutId => FeatureRolloutId::fromString($featureRolloutId),
-                json_decode($organization['feature_rollout_ids'], true, JSON_THROW_ON_ERROR)
+                json_decode($organization['feature_rollout_ids'], true, \JSON_THROW_ON_ERROR)
             ),
             enabled: $organization['enabled'],
             version: $organization['version'],
@@ -86,7 +87,7 @@ final class DatabaseOrganizationRepository implements OrganizationRepositoryInte
 
     private function saveEvent(object $event): void
     {
-        $methodName = 'apply'.substr(get_class($event), strrpos(get_class($event), '\\') + 1);
+        $methodName = 'apply'.substr($event::class, strrpos($event::class, '\\') + 1);
         if (method_exists($this, $methodName)) {
             $this->{$methodName}($event);
         }
@@ -94,7 +95,7 @@ final class DatabaseOrganizationRepository implements OrganizationRepositoryInte
 
     private function applyDeclaredEvent(DeclaredEvent $event): void
     {
-        $statement = $this->connection->prepare(<<<SQL
+        $statement = $this->connection->prepare(<<<'SQL'
             INSERT INTO organizations (uuid, realm_id, name, valid_until, feature_rollout_ids, enabled, version)
             VALUES (:uuid, :realm_id, :name, :valid_until, :feature_rollout_ids, :enabled, 1)
             SQL
@@ -106,20 +107,20 @@ final class DatabaseOrganizationRepository implements OrganizationRepositoryInte
         $statement->bindValue(':valid_until', $event->validUntil?->format('Y-m-d'), ParameterType::STRING);
         $statement->bindValue(':feature_rollout_ids', json_encode(
             array_map(fn (FeatureRolloutId $featureRolloutId) => $featureRolloutId->toString(), $event->featureRolloutIds),
-            JSON_THROW_ON_ERROR,
+            \JSON_THROW_ON_ERROR,
         ), ParameterType::STRING);
         $statement->bindValue(':enabled', $event->enabled, ParameterType::BOOLEAN);
 
         $result = $statement->executeQuery();
 
-        if ($result->rowCount() !== 1) {
+        if (1 !== $result->rowCount()) {
             throw new \RuntimeException('Version mismatch. This happens in case of concurrency between several processes.');
         }
     }
 
     private function applyEnabledEvent(EnabledEvent $event): void
     {
-        $statement = $this->connection->prepare(<<<SQL
+        $statement = $this->connection->prepare(<<<'SQL'
             UPDATE organizations
             SET enabled = true,
                 version = :version
@@ -135,14 +136,14 @@ final class DatabaseOrganizationRepository implements OrganizationRepositoryInte
 
         $result = $statement->executeQuery();
 
-        if ($result->rowCount() !== 1) {
+        if (1 !== $result->rowCount()) {
             throw new \RuntimeException('Version mismatch. This happens in case of concurrency between several processes.');
         }
     }
 
     private function applyDisabledEvent(DisabledEvent $event): void
     {
-        $statement = $this->connection->prepare(<<<SQL
+        $statement = $this->connection->prepare(<<<'SQL'
             UPDATE organizations
             SET enabled = false,
                 version = :version
@@ -158,14 +159,14 @@ final class DatabaseOrganizationRepository implements OrganizationRepositoryInte
 
         $result = $statement->executeQuery();
 
-        if ($result->rowCount() !== 1) {
+        if (1 !== $result->rowCount()) {
             throw new \RuntimeException('Version mismatch. This happens in case of concurrency between several processes.');
         }
     }
 
     private function applyAddedFeatureRolloutEvent(AddedFeatureRolloutsEvent $event): void
     {
-        $statement = $this->connection->prepare(<<<SQL
+        $statement = $this->connection->prepare(<<<'SQL'
             UPDATE organizations
             SET feature_rollout_ids = :feature_rollout_ids,
                 version = :version
@@ -180,13 +181,13 @@ final class DatabaseOrganizationRepository implements OrganizationRepositoryInte
         $statement->bindValue(':realm_id', $event->realmId->toString(), ParameterType::STRING);
         $statement->bindValue(':feature_rollout_ids', json_encode(
             array_map(fn (FeatureRolloutId $featureRolloutId) => $featureRolloutId->toString(), $event->featureRolloutIds),
-            JSON_THROW_ON_ERROR,
+            \JSON_THROW_ON_ERROR,
         ), ParameterType::STRING);
     }
 
     private function applyRemovedFeatureRolloutEvent(RemovedFeatureRolloutsEvent $event): void
     {
-        $statement = $this->connection->prepare(<<<SQL
+        $statement = $this->connection->prepare(<<<'SQL'
             UPDATE organizations
             SET feature_rollout_ids = :feature_rollout_ids,
                 version = :version
@@ -201,13 +202,13 @@ final class DatabaseOrganizationRepository implements OrganizationRepositoryInte
         $statement->bindValue(':realm_id', $event->realmId->toString(), ParameterType::STRING);
         $statement->bindValue(':feature_rollout_ids', json_encode(
             array_map(fn (FeatureRolloutId $featureRolloutId) => $featureRolloutId->toString(), $event->featureRolloutIds),
-            JSON_THROW_ON_ERROR,
+            \JSON_THROW_ON_ERROR,
         ), ParameterType::STRING);
     }
 
     private function applyDeletedEvent(DeletedEvent $event): void
     {
-        $statement = $this->connection->prepare(<<<SQL
+        $statement = $this->connection->prepare(<<<'SQL'
             DELETE FROM organizations
             WHERE uuid = :uuid
               AND version=(:version - 1)
@@ -221,7 +222,7 @@ final class DatabaseOrganizationRepository implements OrganizationRepositoryInte
 
         $result = $statement->executeQuery();
 
-        if ($result->rowCount() !== 1) {
+        if (1 !== $result->rowCount()) {
             throw new \RuntimeException('Version mismatch. This happens in case of concurrency between several processes.');
         }
     }
