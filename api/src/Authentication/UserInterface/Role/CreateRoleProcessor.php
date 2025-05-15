@@ -16,6 +16,7 @@ use App\Authentication\Domain\Role\RoleId;
 use Symfony\Component\HttpFoundation\Exception\LogicException;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\String\Slugger\SluggerInterface;
 
 /**
  * @implements ProcessorInterface<CreateRoleInput, Role>
@@ -25,6 +26,7 @@ final readonly class CreateRoleProcessor implements ProcessorInterface
     public function __construct(
         private CommandBusInterface $commandBus,
         private RoleRepositoryInterface $userRepository,
+        private SluggerInterface $slugger,
     ) {
     }
 
@@ -42,7 +44,7 @@ final readonly class CreateRoleProcessor implements ProcessorInterface
                     RoleId::generateRandom(),
                     $realmId,
                     $organizationId,
-                    $data->identifier,
+                    $data->identifier ?? $this->slugger->slug($data->label)->toString(),
                     $data->label,
                     $data->resourceAccesses,
                 );
@@ -51,7 +53,7 @@ final readonly class CreateRoleProcessor implements ProcessorInterface
                     RoleId::generateRandom(),
                     $realmId,
                     $data->organizationId,
-                    $data->identifier,
+                    $data->identifier ?? $this->slugger->slug($data->label)->toString(),
                     $data->label,
                     $data->resourceAccesses,
                 );

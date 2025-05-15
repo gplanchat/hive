@@ -45,7 +45,7 @@ final readonly class CreateWorkspaceProcessor implements ProcessorInterface
                         $organizationId,
                         $data->name,
                         $data->slug,
-                        $data->validUntil,
+                        $data->validUntil ?? throw new BadRequestHttpException(),
                     )
                     : new CreatePendingWorkspace(
                         WorkspaceId::generateRandom(),
@@ -62,7 +62,7 @@ final readonly class CreateWorkspaceProcessor implements ProcessorInterface
                         $data->organizationId,
                         $data->name,
                         $data->slug,
-                        $data->validUntil,
+                        $data->validUntil ?? throw new BadRequestHttpException(),
                     )
                     : new CreatePendingWorkspace(
                         WorkspaceId::generateRandom(),

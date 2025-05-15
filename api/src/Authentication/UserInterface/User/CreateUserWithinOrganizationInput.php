@@ -18,7 +18,15 @@ final readonly class CreateUserWithinOrganizationInput
      */
     public function __construct(
         #[ApiProperty(
-            description: 'List of workspaces in which the user has access',
+            description: 'User\'s display name',
+            schema: ['type' => 'string'],
+        )]
+        #[Assert\Length(min: 3, max: 255)]
+        #[Assert\Regex('/[A-Za-z0-9]+(?:[-.][A-Za-z0-9]+)*/')]
+        #[Assert\NotBlank()]
+        public string $username,
+        #[ApiProperty(
+            description: 'List of workspaces in which the User has access',
             schema: ['type' => 'array', 'items' => ['type' => 'string', 'pattern' => WorkspaceId::URI_REQUIREMENT]],
         )]
         #[Assert\All(constraints: [
@@ -28,7 +36,7 @@ final readonly class CreateUserWithinOrganizationInput
         #[Context(['iri_only' => true])]
         public array $workspaceIds = [],
         #[ApiProperty(
-            description: 'List of roles assigned to the user',
+            description: 'List of roles assigned to the User',
             schema: ['type' => 'array', 'items' => ['type' => 'string', 'pattern' => RoleId::URI_REQUIREMENT]],
         )]
         #[Assert\All(constraints: [
@@ -37,13 +45,6 @@ final readonly class CreateUserWithinOrganizationInput
         ])]
         #[Context(['iri_only' => true])]
         public array $roleIds = [],
-        #[ApiProperty(
-            description: 'User\'s display name',
-            schema: ['type' => 'string'],
-        )]
-        #[Assert\Length(min: 3, max: 255)]
-        #[Assert\Regex('/[A-Za-z0-9]+(?:[-.][A-Za-z0-9]+)*/')]
-        public ?string $username = null,
         #[ApiProperty(
             description: 'User\'s first name',
             schema: ['type' => 'string'],

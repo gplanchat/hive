@@ -54,7 +54,7 @@ final readonly class IdNormalizer implements NormalizerInterface, DenormalizerIn
                 'uri_variables' => [
                     'code' => $data->toString(),
                 ],
-            ]),
+            ]) ?: throw new InvalidArgumentException('The provided data type is not supported for normalization.'),
             OrganizationId::class => $this->iriConverter->getIriFromResource(Organization::class, context: [
                 'uri_variables' => [
                     'realm' => \is_object($resource) ? match ($resource::class) {
@@ -66,7 +66,7 @@ final readonly class IdNormalizer implements NormalizerInterface, DenormalizerIn
                     } : null,
                     'uuid' => $data->toString(),
                 ],
-            ]),
+            ]) ?: throw new InvalidArgumentException('The provided data type is not supported for normalization.'),
             UserId::class => $this->iriConverter->getIriFromResource(User::class, context: [
                 'uri_variables' => [
                     'realm' => \is_object($resource) ? match ($resource::class) {
@@ -78,7 +78,7 @@ final readonly class IdNormalizer implements NormalizerInterface, DenormalizerIn
                     } : null,
                     'uuid' => $data->toString(),
                 ],
-            ]),
+            ]) ?: throw new InvalidArgumentException('The provided data type is not supported for normalization.'),
             RoleId::class => $this->iriConverter->getIriFromResource(Role::class, context: [
                 'uri_variables' => [
                     'realm' => \is_object($resource) ? match ($resource::class) {
@@ -90,7 +90,7 @@ final readonly class IdNormalizer implements NormalizerInterface, DenormalizerIn
                     } : null,
                     'uuid' => $data->toString(),
                 ],
-            ]),
+            ]) ?: throw new InvalidArgumentException('The provided data type is not supported for normalization.'),
             WorkspaceId::class => $this->iriConverter->getIriFromResource(Workspace::class, context: [
                 'uri_variables' => [
                     'realm' => \is_object($resource) ? match ($resource::class) {
@@ -102,7 +102,7 @@ final readonly class IdNormalizer implements NormalizerInterface, DenormalizerIn
                     } : null,
                     'uuid' => $data->toString(),
                 ],
-            ]),
+            ]) ?: throw new InvalidArgumentException('The provided data type is not supported for normalization.'),
             default => throw new InvalidArgumentException('The provided data type is not supported for normalization.')
         };
     }

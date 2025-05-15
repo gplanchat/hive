@@ -26,6 +26,14 @@ final readonly class CreateUserInput
         #[Context(['iri_only' => true])]
         public OrganizationId $organizationId,
         #[ApiProperty(
+            description: 'User\'s display name',
+            schema: ['type' => 'string'],
+        )]
+        #[Assert\Length(min: 3, max: 255)]
+        #[Assert\Regex('/[A-Za-z0-9]+(?:[-.][A-Za-z0-9]+)*/')]
+        #[Assert\NotBlank()]
+        public string $username,
+        #[ApiProperty(
             description: 'List of workspaces in which the User has access',
             schema: ['type' => 'array', 'items' => ['type' => 'string', 'pattern' => WorkspaceId::URI_REQUIREMENT]],
         )]
@@ -45,13 +53,6 @@ final readonly class CreateUserInput
         ])]
         #[Context(['iri_only' => true])]
         public array $roleIds = [],
-        #[ApiProperty(
-            description: 'User\'s display name',
-            schema: ['type' => 'string'],
-        )]
-        #[Assert\Length(min: 3, max: 255)]
-        #[Assert\Regex('/[A-Za-z0-9]+(?:[-.][A-Za-z0-9]+)*/')]
-        public ?string $username = null,
         #[ApiProperty(
             description: 'User\'s first name',
             schema: ['type' => 'string'],

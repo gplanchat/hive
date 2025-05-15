@@ -24,6 +24,6 @@ final readonly class QueryBus implements QueryBusInterface
             new Envelope($query)
         );
 
-        return $envelope->last(HandledStamp::class)->getResult();
+        return $envelope->last(HandledStamp::class)?->getResult();
     }
 }

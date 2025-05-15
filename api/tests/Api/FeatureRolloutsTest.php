@@ -42,9 +42,11 @@ class FeatureRolloutsTest extends ApiTestCase
 
     protected function tearDown(): void
     {
+        assert($this->userFixtures instanceof UserFixtures);
         $this->userFixtures->unload();
         $this->userFixtures = null;
 
+        assert($this->roleFixtures instanceof RoleFixtures);
         $this->roleFixtures->unload();
         $this->roleFixtures = null;
 

@@ -26,9 +26,9 @@ final readonly class DeclaredEvent
         public array $workspaceIds,
         public array $roleIds,
         public string $username,
-        public string $firstName,
-        public string $lastName,
-        public string $email,
+        public ?string $firstName,
+        public ?string $lastName,
+        public ?string $email,
         public bool $enabled = true,
     ) {
     }

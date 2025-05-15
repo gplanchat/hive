@@ -41,7 +41,7 @@ final readonly class CreateOrganizationProcessor implements ProcessorInterface
                     RealmId::fromString($uriVariables['realm']),
                     $data->name,
                     $data->slug,
-                    $data->validUntil,
+                    $data->validUntil ?? throw new BadRequestHttpException(),
                     $data->featureRolloutIds,
                 )
                 : new CreatePendingOrganization(

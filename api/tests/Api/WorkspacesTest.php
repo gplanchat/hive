@@ -60,15 +60,19 @@ class WorkspacesTest extends ApiTestCase
 
     protected function tearDown(): void
     {
+        assert($this->organizationFixtures instanceof OrganizationFixtures);
         $this->organizationFixtures->unload();
         $this->organizationFixtures = null;
 
+        assert($this->workspaceFixtures instanceof WorkspaceFixtures);
         $this->workspaceFixtures->unload();
         $this->workspaceFixtures = null;
 
+        assert($this->roleFixtures instanceof RoleFixtures);
         $this->roleFixtures->unload();
         $this->roleFixtures = null;
 
+        assert($this->userFixtures instanceof UserFixtures);
         $this->userFixtures->unload();
         $this->userFixtures = null;
 
@@ -88,8 +92,6 @@ class WorkspacesTest extends ApiTestCase
     /** @test */
     public function itShouldListWorkspaces(): void
     {
-        $this->workspaceFixtures->load();
-
         static::createClient()->request('GET', '/authentication/acme-inc/workspaces', [
             'headers' => [
                 'authorization' => 'Bearer '.self::getTokenFor('/authentication/acme-inc/users/01966c5a-10ef-7abd-9c88-52b075bcae99'),
@@ -108,8 +110,6 @@ class WorkspacesTest extends ApiTestCase
     /** @test */
     public function itShouldListWorkspacesInOrganization(): void
     {
-        $this->workspaceFixtures->load();
-
         static::createClient()->request('GET', '/authentication/acme-inc/organizations/01966c5a-10ef-76f6-9513-e3b858c22f0a/workspaces', [
             'headers' => [
                 'authorization' => 'Bearer '.self::getTokenFor('/authentication/acme-inc/users/01966c5a-10ef-7abd-9c88-52b075bcae99'),
@@ -147,6 +147,7 @@ class WorkspacesTest extends ApiTestCase
     /** @test */
     public function itShouldCreateAnEnabledWorkspace(): void
     {
+        assert($this->clock instanceof ClockInterface);
         $validUntil = $this->clock->now()->add(new \DateInterval('P3M2D'))->format('Y-m-d');
 
         static::createClient()->request('POST', '/authentication/acme-inc/workspaces', [
@@ -226,6 +227,7 @@ class WorkspacesTest extends ApiTestCase
     /** @test */
     public function itShouldCreateAnEnabledWorkspaceWithinAnOrganization(): void
     {
+        assert($this->clock instanceof ClockInterface);
         $validUntil = $this->clock->now()->add(new \DateInterval('P3M2D'))->format('Y-m-d');
 
         static::createClient()->request('POST', '/authentication/acme-inc/organizations/01966c5a-10ef-7315-94f2-cbeec2f167d8/workspaces', [
@@ -302,6 +304,7 @@ class WorkspacesTest extends ApiTestCase
     /** @test */
     public function itShouldEnableADisabledWorkspace(): void
     {
+        assert($this->clock instanceof ClockInterface);
         $validUntil = $this->clock->now()->add(new \DateInterval('P3M2D'))->format('Y-m-d');
 
         static::createClient()->request('PATCH', '/authentication/acme-inc/workspaces/01966c5a-10ef-7795-9e13-7359dd58b49c/enable', [
@@ -332,6 +335,7 @@ class WorkspacesTest extends ApiTestCase
     /** @test */
     public function itShouldDisableAnEnabledWorkspace(): void
     {
+        assert($this->clock instanceof ClockInterface);
         $validUntil = $this->clock->now()->add(new \DateInterval('P3M2D'))->format('Y-m-d');
 
         static::createClient()->request('PATCH', '/authentication/acme-inc/workspaces/01966c5a-10ef-723c-bc33-2b1dc30d8963/disable', [

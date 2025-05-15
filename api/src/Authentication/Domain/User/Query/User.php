@@ -266,19 +266,19 @@ final readonly class User
             schema: ['type' => 'string'],
         )]
         #[Groups(['user:show'])]
-        public string $firstName,
+        public ?string $firstName = null,
         #[ApiProperty(
             description: 'User\'s last name',
             schema: ['type' => 'string'],
         )]
         #[Groups(['user:show'])]
-        public string $lastName,
+        public ?string $lastName = null,
         #[ApiProperty(
             description: 'User\'s email address',
             schema: ['type' => 'string', 'format' => 'email'],
         )]
         #[Groups(['user:show'])]
-        public string $email,
+        public ?string $email = null,
         #[ApiProperty(
             description: 'Wether the User is enabled or not',
             schema: ['type' => 'boolean'],

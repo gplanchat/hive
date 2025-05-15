@@ -26,18 +26,19 @@ final readonly class CreateRoleInput
         #[Context(['iri_only' => true])]
         public OrganizationId $organizationId,
         #[ApiProperty(
+            description: 'Role\'s first name',
+            schema: ['type' => 'string'],
+        )]
+        #[Assert\Length(min: 1, max: 255)]
+        #[Assert\NotBlank]
+        public string $label,
+        #[ApiProperty(
             description: 'Role\'s display name',
             schema: ['type' => 'string'],
         )]
         #[Assert\Length(min: 3, max: 255)]
         #[Assert\Regex('/[A-Za-z0-9]+(?:[-.][A-Za-z0-9]+)*/')]
         public ?string $identifier = null,
-        #[ApiProperty(
-            description: 'Role\'s first name',
-            schema: ['type' => 'string'],
-        )]
-        #[Assert\Length(min: 1, max: 255)]
-        public ?string $label = null,
         #[ApiProperty(
             description: 'List of resource authorizations',
             schema: [

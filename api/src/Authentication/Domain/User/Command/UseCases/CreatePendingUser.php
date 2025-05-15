@@ -20,11 +20,11 @@ final readonly class CreatePendingUser
     public function __construct(
         public UserId $uuid,
         public RealmId $realmId,
+        public string $username,
         public AuthorizationInterface $authorization,
         public OrganizationId $organizationId,
         public array $workspaceIds = [],
         public array $roleIds = [],
-        public ?string $username = null,
         public ?string $firstName = null,
         public ?string $lastName = null,
         public ?string $email = null,

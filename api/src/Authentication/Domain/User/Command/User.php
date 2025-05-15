@@ -65,9 +65,9 @@ final class User
         array $workspaceIds,
         array $roleIds,
         string $username,
-        string $firstName,
-        string $lastName,
-        string $email,
+        ?string $firstName,
+        ?string $lastName,
+        ?string $email,
     ): self {
         $instance = new self($uuid, $realmId, $organizationId);
         $instance->recordThat(new DeclaredEvent(
@@ -100,9 +100,9 @@ final class User
         array $workspaceIds,
         array $roleIds,
         string $username,
-        string $firstName,
-        string $lastName,
-        string $email,
+        ?string $firstName,
+        ?string $lastName,
+        ?string $email,
     ): self {
         $instance = new self($uuid, $realmId, $organizationId);
         $instance->recordThat(new DeclaredEvent(

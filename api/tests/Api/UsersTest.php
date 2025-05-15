@@ -54,12 +54,15 @@ class UsersTest extends ApiTestCase
 
     protected function tearDown(): void
     {
+        assert($this->organizationFixtures instanceof OrganizationFixtures);
         $this->organizationFixtures->unload();
         $this->organizationFixtures = null;
 
+        assert($this->roleFixtures instanceof RoleFixtures);
         $this->roleFixtures->unload();
         $this->roleFixtures = null;
 
+        assert($this->userFixtures instanceof UserFixtures);
         $this->userFixtures->unload();
         $this->userFixtures = null;
 
@@ -115,8 +118,6 @@ class UsersTest extends ApiTestCase
     /** @test */
     public function itShouldListUsersFromWorkspace(): void
     {
-        $this->userFixtures->load();
-
         static::createClient()->request('GET', '/authentication/acme-inc/workspaces/01966c5a-10ef-723c-bc33-2b1dc30d8963/users', [
             'headers' => [
                 'authorization' => 'Bearer '.self::getTokenFor('/authentication/acme-inc/users/01966c5a-10ef-7abd-9c88-52b075bcae99'),
