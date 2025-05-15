@@ -5,3 +5,9 @@ api_doc:
         _controller: 'api_platform.action.documentation'
         _format: ~
         _api_respond: true
+
+#oauth:
+#    resource:
+#        path: ../src/Authentication/Infrastructure/OAuth
+#        namespace: App\Authentication\Infrastructure\OAuth
+#    type: attribute

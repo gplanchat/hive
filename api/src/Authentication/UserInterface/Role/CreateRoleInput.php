@@ -9,9 +9,6 @@ use App\Authentication\Domain\Organization\OrganizationId;
 use App\Authentication\Domain\Role\ActionInterface;
 use App\Authentication\Domain\Role\ResourceAccess;
 use App\Authentication\Domain\Role\ResourceInterface;
-use App\Authentication\Domain\Role\RoleId;
-use App\Authentication\Domain\Workspace\WorkspaceId;
-use Symfony\Component\Routing\Requirement\Requirement;
 use Symfony\Component\Serializer\Attribute\Context;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -25,22 +22,23 @@ final readonly class CreateRoleInput
             description: 'Organization in which the user is assigned',
             schema: ['type' => 'string', 'pattern' => OrganizationId::URI_REQUIREMENT],
         )]
-        #[Context(['iri_only' => true])]
         #[Assert\NotBlank()]
+        #[Context(['iri_only' => true])]
         public OrganizationId $organizationId,
-        #[ApiProperty(
-            description: 'Role\'s display name',
-            schema: ['type' => 'string'],
-        )]
-        #[Assert\Regex('/[A-Za-z0-9]+(?:[-.][A-Za-z0-9]+)*/')]
-        #[Assert\Length(min: 3, max: 255)]
-        public ?string $identifier = null,
         #[ApiProperty(
             description: 'Role\'s first name',
             schema: ['type' => 'string'],
         )]
         #[Assert\Length(min: 1, max: 255)]
-        public ?string $label = null,
+        #[Assert\NotBlank]
+        public string $label,
+        #[ApiProperty(
+            description: 'Role\'s display name',
+            schema: ['type' => 'string'],
+        )]
+        #[Assert\Length(min: 3, max: 255)]
+        #[Assert\Regex('/[A-Za-z0-9]+(?:[-.][A-Za-z0-9]+)*/')]
+        public ?string $identifier = null,
         #[ApiProperty(
             description: 'List of resource authorizations',
             schema: [

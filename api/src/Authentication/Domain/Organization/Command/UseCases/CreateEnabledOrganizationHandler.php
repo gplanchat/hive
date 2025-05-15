@@ -15,10 +15,12 @@ final readonly class CreateEnabledOrganizationHandler
         private OrganizationRepositoryInterface $organizationRepository,
     ) {
     }
+
     public function __invoke(CreateEnabledOrganization $command): void
     {
         $organization = Organization::declareEnabled(
             $command->uuid,
+            $command->realmId,
             $command->name,
             $command->slug,
             $command->validUntil,

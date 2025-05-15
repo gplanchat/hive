@@ -5,11 +5,24 @@ declare(strict_types=1);
 namespace App\Authentication\Infrastructure\Keycloak;
 
 use App\Authentication\Domain\Organization\Query\Organization;
+use App\Authentication\Domain\Realm\Query\Realm;
+use App\Authentication\Domain\Realm\Query\UseCases\RealmPage;
+use App\Authentication\Domain\Realm\RealmId;
 use App\Authentication\Domain\User\Query\User;
+use Firebase\JWT\Key;
 
 interface KeycloakInterface
 {
-    public function createRealmFromOrganization(Organization $organization): void;
+    public function createRealm(Realm $realm): void;
 
-    public function createUserInsideRealmFromUser(Organization $organization, User $user): void;
+    public function queryAllRealms(): RealmPage;
+
+    public function queryOneRealm(RealmId $realmId): Realm;
+
+    public function createOrganizationInsideRealm(RealmId $realmId, Organization $organization): void;
+
+    public function createUserInsideRealm(Realm $realm, User $user): void;
+
+    /** @return Key[] */
+    public function fetchOpenidCertificates(RealmId $realmId): array;
 }

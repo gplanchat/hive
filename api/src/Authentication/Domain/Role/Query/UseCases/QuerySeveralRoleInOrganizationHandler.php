@@ -12,10 +12,11 @@ final readonly class QuerySeveralRoleInOrganizationHandler
 {
     public function __construct(
         private RoleRepositoryInterface $roleRepository,
-    ) {}
+    ) {
+    }
 
     public function __invoke(QuerySeveralRoleInOrganization $query): RolePage
     {
-        return $this->roleRepository->listFromOrganization($query->organizationId, $query->currentPage, $query->itemsPerPage);
+        return $this->roleRepository->listFromOrganization($query->realmId, $query->organizationId, $query->currentPage, $query->itemsPerPage);
     }
 }

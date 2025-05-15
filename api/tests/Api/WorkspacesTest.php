@@ -1,96 +1,158 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Tests\Api;
 
 use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
+use App\Authentication\Infrastructure\Keycloak\KeycloakInterface;
+use App\Authentication\Infrastructure\Keycloak\KeycloakMock;
 use App\Authentication\Infrastructure\Organization\DataFixtures\OrganizationFixtures;
-use App\Authentication\Infrastructure\Workspace\DataFixtures\WorkspaceFixtures;
+use App\Authentication\Infrastructure\Role\DataFixtures\RoleFixtures;
 use App\Authentication\Infrastructure\StorageMock;
+use App\Authentication\Infrastructure\User\DataFixtures\UserFixtures;
+use App\Authentication\Infrastructure\Workspace\DataFixtures\WorkspaceFixtures;
 use Psr\Clock\ClockInterface;
 
+/**
+ * @internal
+ *
+ * @coversNothing
+ */
 class WorkspacesTest extends ApiTestCase
 {
-    static ?bool $alwaysBootKernel = false;
+    public static ?bool $alwaysBootKernel = false;
 
     private ?ClockInterface $clock = null;
     private ?OrganizationFixtures $organizationFixtures = null;
     private ?WorkspaceFixtures $workspaceFixtures = null;
+    private ?UserFixtures $userFixtures = null;
+    private ?RoleFixtures $roleFixtures = null;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
-        self::bootKernel();
+        static::bootKernel();
 
-        $this->clock = self::getContainer()->get(ClockInterface::class);
-        assert($this->clock instanceof ClockInterface);
+        $clock = self::getContainer()->get(ClockInterface::class);
+        \assert($clock instanceof ClockInterface);
+        $this->clock = $clock;
 
-        $this->workspaceFixtures = new WorkspaceFixtures(
-            $this->clock,
-            self::getContainer()->get(StorageMock::class)
-        );
-        assert($this->workspaceFixtures instanceof WorkspaceFixtures);
+        $storageMock = self::getContainer()->get(StorageMock::class);
+        \assert($storageMock instanceof StorageMock);
+
+        $this->roleFixtures = new RoleFixtures($storageMock);
+        \assert($this->roleFixtures instanceof RoleFixtures);
+        $this->roleFixtures->load();
+
+        $this->userFixtures = new UserFixtures($storageMock);
+        \assert($this->userFixtures instanceof UserFixtures);
+        $this->userFixtures->load();
+
+        $this->workspaceFixtures = new WorkspaceFixtures($this->clock, $storageMock);
+        \assert($this->workspaceFixtures instanceof WorkspaceFixtures);
         $this->workspaceFixtures->load();
 
-        $this->organizationFixtures = new OrganizationFixtures(
-            $this->clock,
-            self::getContainer()->get(StorageMock::class)
-        );
-        assert($this->organizationFixtures instanceof OrganizationFixtures);
+        $this->organizationFixtures = new OrganizationFixtures($this->clock, $storageMock);
+        \assert($this->organizationFixtures instanceof OrganizationFixtures);
         $this->organizationFixtures->load();
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
+        \assert($this->organizationFixtures instanceof OrganizationFixtures);
         $this->organizationFixtures->unload();
         $this->organizationFixtures = null;
 
+        \assert($this->workspaceFixtures instanceof WorkspaceFixtures);
         $this->workspaceFixtures->unload();
         $this->workspaceFixtures = null;
+
+        \assert($this->roleFixtures instanceof RoleFixtures);
+        $this->roleFixtures->unload();
+        $this->roleFixtures = null;
+
+        \assert($this->userFixtures instanceof UserFixtures);
+        $this->userFixtures->unload();
+        $this->userFixtures = null;
 
         $this->clock = null;
 
         parent::tearDown();
     }
 
+    private static function getTokenFor(string $username): string
+    {
+        $keycloak = self::getContainer()->get(KeycloakInterface::class);
+        \assert($keycloak instanceof KeycloakMock);
+
+        return $keycloak->generateJWT($username);
+    }
+
     /** @test */
     public function itShouldListWorkspaces(): void
     {
-        $this->workspaceFixtures->load();
-
-        static::createClient()->request('GET', '/authentication/workspaces');
+        static::createClient()->request('GET', '/authentication/acme-inc/workspaces', [
+            'headers' => [
+                'authorization' => 'Bearer '.self::getTokenFor('/authentication/acme-inc/users/01966c5a-10ef-7abd-9c88-52b075bcae99'),
+            ],
+        ]);
 
         $this->assertResponseStatusCodeSame(200);
         $this->assertJsonContains([
             '@context' => '/contexts/Workspace',
-            '@id' => '/authentication/workspaces',
+            '@id' => '/authentication/acme-inc/workspaces',
             '@type' => 'hydra:Collection',
             'hydra:totalItems' => 6,
         ]);
     }
 
     /** @test */
+    public function itShouldListWorkspacesInOrganization(): void
+    {
+        static::createClient()->request('GET', '/authentication/acme-inc/organizations/01966c5a-10ef-76f6-9513-e3b858c22f0a/workspaces', [
+            'headers' => [
+                'authorization' => 'Bearer '.self::getTokenFor('/authentication/acme-inc/users/01966c5a-10ef-7abd-9c88-52b075bcae99'),
+            ],
+        ]);
+
+        $this->assertResponseStatusCodeSame(200);
+        $this->assertJsonContains([
+            '@context' => '/contexts/Workspace',
+            '@id' => '/authentication/acme-inc/organizations/01966c5a-10ef-76f6-9513-e3b858c22f0a/workspaces',
+            '@type' => 'hydra:Collection',
+            'hydra:totalItems' => 3,
+        ]);
+    }
+
+    /** @test */
     public function itShouldShowAWorkspace(): void
     {
-        static::createClient()->request('GET', '/authentication/workspaces/01966c5a-10ef-70ce-ab8c-c455e874c3fc');
+        static::createClient()->request('GET', '/authentication/acme-inc/workspaces/01966c5a-10ef-70ce-ab8c-c455e874c3fc', [
+            'headers' => [
+                'authorization' => 'Bearer '.self::getTokenFor('/authentication/acme-inc/users/01966c5a-10ef-7abd-9c88-52b075bcae99'),
+            ],
+        ]);
 
         $this->assertResponseStatusCodeSame(200);
         $this->assertJsonContains([
             '@context' => '/contexts/Workspace',
             '@type' => 'Workspace',
-            '@id' => '/authentication/workspaces/01966c5a-10ef-70ce-ab8c-c455e874c3fc',
+            '@id' => '/authentication/acme-inc/workspaces/01966c5a-10ef-70ce-ab8c-c455e874c3fc',
             'uuid' => '01966c5a-10ef-70ce-ab8c-c455e874c3fc',
-            'organizationId' => '/authentication/organizations/01966c5a-10ef-76f6-9513-e3b858c22f0a',
+            'organizationId' => '/authentication/acme-inc/organizations/01966c5a-10ef-76f6-9513-e3b858c22f0a',
         ]);
     }
 
     /** @test */
     public function itShouldCreateAnEnabledWorkspace(): void
     {
+        \assert($this->clock instanceof ClockInterface);
         $validUntil = $this->clock->now()->add(new \DateInterval('P3M2D'))->format('Y-m-d');
 
-        static::createClient()->request('POST', '/authentication/workspaces', [
+        static::createClient()->request('POST', '/authentication/acme-inc/workspaces', [
             'json' => [
-                'organizationId' => '/authentication/organizations/01966c5a-10ef-7315-94f2-cbeec2f167d8',
+                'organizationId' => '/authentication/acme-inc/organizations/01966c5a-10ef-7315-94f2-cbeec2f167d8',
                 'name' => 'Project 101',
                 'slug' => 'project-101',
                 'validUntil' => $validUntil,
@@ -98,6 +160,7 @@ class WorkspacesTest extends ApiTestCase
             ],
             'headers' => [
                 'Content-Type' => 'application/ld+json',
+                'authorization' => 'Bearer '.self::getTokenFor('/authentication/acme-inc/users/01966c5a-10ef-7abd-9c88-52b075bcae99'),
             ],
         ]);
 
@@ -105,7 +168,7 @@ class WorkspacesTest extends ApiTestCase
         $this->assertJsonContains([
             '@context' => '/contexts/Workspace',
             '@type' => 'Workspace',
-            'organizationId' => '/authentication/organizations/01966c5a-10ef-7315-94f2-cbeec2f167d8',
+            'organizationId' => '/authentication/acme-inc/organizations/01966c5a-10ef-7315-94f2-cbeec2f167d8',
             'name' => 'Project 101',
             'slug' => 'project-101',
             'validUntil' => $validUntil,
@@ -116,15 +179,16 @@ class WorkspacesTest extends ApiTestCase
     /** @test */
     public function itShouldCreateAPendingWorkspace(): void
     {
-        static::createClient()->request('POST', '/authentication/workspaces', [
+        static::createClient()->request('POST', '/authentication/acme-inc/workspaces', [
             'json' => [
-                'organizationId' => '/authentication/organizations/01966c5a-10ef-7315-94f2-cbeec2f167d8',
+                'organizationId' => '/authentication/acme-inc/organizations/01966c5a-10ef-7315-94f2-cbeec2f167d8',
                 'name' => 'Project 101',
                 'slug' => 'project-101',
                 'enabled' => false,
             ],
             'headers' => [
                 'Content-Type' => 'application/ld+json',
+                'authorization' => 'Bearer '.self::getTokenFor('/authentication/acme-inc/users/01966c5a-10ef-7abd-9c88-52b075bcae99'),
             ],
         ]);
 
@@ -132,7 +196,7 @@ class WorkspacesTest extends ApiTestCase
         $this->assertJsonContains([
             '@context' => '/contexts/Workspace',
             '@type' => 'Workspace',
-            'organizationId' => '/authentication/organizations/01966c5a-10ef-7315-94f2-cbeec2f167d8',
+            'organizationId' => '/authentication/acme-inc/organizations/01966c5a-10ef-7315-94f2-cbeec2f167d8',
             'name' => 'Project 101',
             'slug' => 'project-101',
             'enabled' => false,
@@ -142,11 +206,12 @@ class WorkspacesTest extends ApiTestCase
     /** @test */
     public function itShouldRespondBadRequestOnIncompletePayloadOnCreation(): void
     {
-        static::createClient()->request('POST', '/authentication/workspaces', [
+        static::createClient()->request('POST', '/authentication/acme-inc/workspaces', [
             'json' => [
             ],
             'headers' => [
                 'Content-Type' => 'application/ld+json',
+                'authorization' => 'Bearer '.self::getTokenFor('/authentication/acme-inc/users/01966c5a-10ef-7abd-9c88-52b075bcae99'),
             ],
         ]);
 
@@ -162,9 +227,10 @@ class WorkspacesTest extends ApiTestCase
     /** @test */
     public function itShouldCreateAnEnabledWorkspaceWithinAnOrganization(): void
     {
+        \assert($this->clock instanceof ClockInterface);
         $validUntil = $this->clock->now()->add(new \DateInterval('P3M2D'))->format('Y-m-d');
 
-        static::createClient()->request('POST', '/authentication/organizations/01966c5a-10ef-7315-94f2-cbeec2f167d8/workspaces', [
+        static::createClient()->request('POST', '/authentication/acme-inc/organizations/01966c5a-10ef-7315-94f2-cbeec2f167d8/workspaces', [
             'json' => [
                 'name' => 'Project 101',
                 'slug' => 'project-101',
@@ -173,6 +239,7 @@ class WorkspacesTest extends ApiTestCase
             ],
             'headers' => [
                 'Content-Type' => 'application/ld+json',
+                'authorization' => 'Bearer '.self::getTokenFor('/authentication/acme-inc/users/01966c5a-10ef-7abd-9c88-52b075bcae99'),
             ],
         ]);
 
@@ -190,7 +257,7 @@ class WorkspacesTest extends ApiTestCase
     /** @test */
     public function itShouldCreateAPendingWorkspaceWithinAnOrganization(): void
     {
-        static::createClient()->request('POST', '/authentication/organizations/01966c5a-10ef-7315-94f2-cbeec2f167d8/workspaces', [
+        static::createClient()->request('POST', '/authentication/acme-inc/organizations/01966c5a-10ef-7315-94f2-cbeec2f167d8/workspaces', [
             'json' => [
                 'name' => 'Project 101',
                 'slug' => 'project-101',
@@ -198,6 +265,7 @@ class WorkspacesTest extends ApiTestCase
             ],
             'headers' => [
                 'Content-Type' => 'application/ld+json',
+                'authorization' => 'Bearer '.self::getTokenFor('/authentication/acme-inc/users/01966c5a-10ef-7abd-9c88-52b075bcae99'),
             ],
         ]);
 
@@ -205,7 +273,7 @@ class WorkspacesTest extends ApiTestCase
         $this->assertJsonContains([
             '@context' => '/contexts/Workspace',
             '@type' => 'Workspace',
-            'organizationId' => '/authentication/organizations/01966c5a-10ef-7315-94f2-cbeec2f167d8',
+            'organizationId' => '/authentication/acme-inc/organizations/01966c5a-10ef-7315-94f2-cbeec2f167d8',
             'name' => 'Project 101',
             'slug' => 'project-101',
             'enabled' => false,
@@ -215,11 +283,12 @@ class WorkspacesTest extends ApiTestCase
     /** @test */
     public function itShouldRespondBadRequestOnIncompletePayloadOnCreationWithinAnOrganization(): void
     {
-        static::createClient()->request('POST', '/authentication/organizations/01966c5a-10ef-7315-94f2-cbeec2f167d8/workspaces', [
+        static::createClient()->request('POST', '/authentication/acme-inc/organizations/01966c5a-10ef-7315-94f2-cbeec2f167d8/workspaces', [
             'json' => [
             ],
             'headers' => [
                 'Content-Type' => 'application/ld+json',
+                'authorization' => 'Bearer '.self::getTokenFor('/authentication/acme-inc/users/01966c5a-10ef-7abd-9c88-52b075bcae99'),
             ],
         ]);
 
@@ -235,15 +304,17 @@ class WorkspacesTest extends ApiTestCase
     /** @test */
     public function itShouldEnableADisabledWorkspace(): void
     {
+        \assert($this->clock instanceof ClockInterface);
         $validUntil = $this->clock->now()->add(new \DateInterval('P3M2D'))->format('Y-m-d');
 
-        static::createClient()->request('PATCH', '/authentication/workspaces/01966c5a-10ef-7795-9e13-7359dd58b49c/enable', [
+        static::createClient()->request('PATCH', '/authentication/acme-inc/workspaces/01966c5a-10ef-7795-9e13-7359dd58b49c/enable', [
             'json' => [
                 'enabled' => true,
                 'validUntil' => $validUntil,
             ],
             'headers' => [
                 'Content-Type' => 'application/merge-patch+json',
+                'authorization' => 'Bearer '.self::getTokenFor('/authentication/acme-inc/users/01966c5a-10ef-7abd-9c88-52b075bcae99'),
             ],
         ]);
 
@@ -251,9 +322,9 @@ class WorkspacesTest extends ApiTestCase
         $this->assertJsonContains([
             '@context' => '/contexts/Workspace',
             '@type' => 'Workspace',
-            '@id' => '/authentication/workspaces/01966c5a-10ef-7795-9e13-7359dd58b49c',
+            '@id' => '/authentication/acme-inc/workspaces/01966c5a-10ef-7795-9e13-7359dd58b49c',
             'uuid' => '01966c5a-10ef-7795-9e13-7359dd58b49c',
-            'organizationId' => '/authentication/organizations/01966c5a-10ef-7315-94f2-cbeec2f167d8',
+            'organizationId' => '/authentication/acme-inc/organizations/01966c5a-10ef-7315-94f2-cbeec2f167d8',
             'name' => 'Consectetur adipiscing elit',
             'slug' => 'consectetur-adipiscing-elit',
             'validUntil' => $validUntil,
@@ -264,15 +335,17 @@ class WorkspacesTest extends ApiTestCase
     /** @test */
     public function itShouldDisableAnEnabledWorkspace(): void
     {
+        \assert($this->clock instanceof ClockInterface);
         $validUntil = $this->clock->now()->add(new \DateInterval('P3M2D'))->format('Y-m-d');
 
-        static::createClient()->request('PATCH', '/authentication/workspaces/01966c5a-10ef-723c-bc33-2b1dc30d8963/disable', [
+        static::createClient()->request('PATCH', '/authentication/acme-inc/workspaces/01966c5a-10ef-723c-bc33-2b1dc30d8963/disable', [
             'json' => [
                 'enabled' => false,
                 'validUntil' => $validUntil,
             ],
             'headers' => [
                 'Content-Type' => 'application/merge-patch+json',
+                'authorization' => 'Bearer '.self::getTokenFor('/authentication/acme-inc/users/01966c5a-10ef-7abd-9c88-52b075bcae99'),
             ],
         ]);
 
@@ -280,9 +353,9 @@ class WorkspacesTest extends ApiTestCase
         $this->assertJsonContains([
             '@context' => '/contexts/Workspace',
             '@type' => 'Workspace',
-            '@id' => '/authentication/workspaces/01966c5a-10ef-723c-bc33-2b1dc30d8963',
+            '@id' => '/authentication/acme-inc/workspaces/01966c5a-10ef-723c-bc33-2b1dc30d8963',
             'uuid' => '01966c5a-10ef-723c-bc33-2b1dc30d8963',
-            'organizationId' => '/authentication/organizations/01966c5a-10ef-7315-94f2-cbeec2f167d8',
+            'organizationId' => '/authentication/acme-inc/organizations/01966c5a-10ef-7315-94f2-cbeec2f167d8',
             'name' => 'Lorem ipsum',
             'slug' => 'lorem-ipsum',
             'validUntil' => $validUntil,
@@ -293,9 +366,9 @@ class WorkspacesTest extends ApiTestCase
     /** @test */
     public function itShouldDeleteAWorkspace(): void
     {
-        static::createClient()->request('DELETE', '/authentication/workspaces/01966c5a-10ef-723c-bc33-2b1dc30d8963', [
+        static::createClient()->request('DELETE', '/authentication/acme-inc/workspaces/01966c5a-10ef-723c-bc33-2b1dc30d8963', [
             'headers' => [
-                'Content-Type' => 'application/merge-patch+json',
+                'authorization' => 'Bearer '.self::getTokenFor('/authentication/acme-inc/users/01966c5a-10ef-7abd-9c88-52b075bcae99'),
             ],
         ]);
 

@@ -14,9 +14,10 @@ final readonly class DisableWorkspaceHandler
         private WorkspaceRepositoryInterface $workspaceRepository,
     ) {
     }
+
     public function __invoke(DisableWorkspace $command): void
     {
-        $workspace = $this->workspaceRepository->get($command->uuid);
+        $workspace = $this->workspaceRepository->get($command->uuid, $command->realmId);
 
         $workspace->disable($command->validUntil);
 

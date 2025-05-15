@@ -14,6 +14,9 @@ use App\Authentication\Domain\Role\Query\Role;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
+/**
+ * @implements ProcessorInterface<Role, void>
+ */
 final readonly class DeleteRoleProcessor implements ProcessorInterface
 {
     public function __construct(
@@ -28,7 +31,7 @@ final readonly class DeleteRoleProcessor implements ProcessorInterface
         }
 
         try {
-            $command = new DeleteRole($data->uuid);
+            $command = new DeleteRole($data->uuid, $data->realmId);
             $this->commandBus->apply($command);
         } catch (InvalidRoleStateException $exception) {
             throw new BadRequestHttpException($exception->getMessage(), previous: $exception);

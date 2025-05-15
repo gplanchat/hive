@@ -21,7 +21,7 @@ final readonly class QueryOneOrganizationHandler
     public function __invoke(QueryOneOrganization $query): Organization
     {
         try {
-            return $this->organizationRepository->get($query->uuid);
+            return $this->organizationRepository->get($query->uuid, $query->realmId);
         } catch (NotFoundException $exception) {
             throw new UnrecoverableMessageHandlingException(previous: $exception);
         }

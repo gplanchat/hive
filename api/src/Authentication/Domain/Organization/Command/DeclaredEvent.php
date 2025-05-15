@@ -6,6 +6,7 @@ namespace App\Authentication\Domain\Organization\Command;
 
 use App\Authentication\Domain\FeatureRollout\FeatureRolloutId;
 use App\Authentication\Domain\Organization\OrganizationId;
+use App\Authentication\Domain\Realm\RealmId;
 
 final readonly class DeclaredEvent
 {
@@ -15,6 +16,7 @@ final readonly class DeclaredEvent
     public function __construct(
         public OrganizationId $uuid,
         public int $version,
+        public RealmId $realmId,
         public string $name,
         public string $slug,
         public ?\DateTimeInterface $validUntil = null,

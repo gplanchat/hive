@@ -4,10 +4,8 @@ declare(strict_types=1);
 
 namespace App\Authentication\Infrastructure\User\Command;
 
-use App\Authentication\Domain\Organization\OrganizationId;
 use App\Authentication\Domain\Role\RoleId;
 use App\Authentication\Domain\Workspace\WorkspaceId;
-use App\Authentication\UserInterface\User\CreateUserInput;
 use App\Authentication\UserInterface\User\CreateUserWithinOrganizationInput;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
@@ -22,17 +20,20 @@ final class CreateUserWithinOrganizationInputDenormalizer implements Denormalize
 
     public function getSupportedTypes(?string $format): array
     {
-        return in_array($format, ['json', 'jsonld'], true) ? [
+        return \in_array($format, ['json', 'jsonld'], true) ? [
             CreateUserWithinOrganizationInput::class => false,
         ] : [];
     }
 
+    /**
+     * @param array{} $context
+     */
     public function denormalize(mixed $data, string $type, ?string $format = null, array $context = []): CreateUserWithinOrganizationInput
     {
-        if (!array_key_exists('username', $data) || !is_string($data['username'])
-            || !array_key_exists('firstName', $data) || !is_string($data['firstName'])
-            || !array_key_exists('lastName', $data) || !is_string($data['lastName'])
-            || !array_key_exists('email', $data) || !is_string($data['email'])
+        if (!\array_key_exists('username', $data) || !\is_string($data['username'])
+            || !\array_key_exists('firstName', $data) || !\is_string($data['firstName'])
+            || !\array_key_exists('lastName', $data) || !\is_string($data['lastName'])
+            || !\array_key_exists('email', $data) || !\is_string($data['email'])
         ) {
             throw new UnexpectedValueException();
         }
@@ -48,8 +49,11 @@ final class CreateUserWithinOrganizationInputDenormalizer implements Denormalize
         );
     }
 
+    /**
+     * @param array{} $context
+     */
     public function supportsDenormalization(mixed $data, string $type, ?string $format = null, array $context = []): bool
     {
-        return $type === CreateUserWithinOrganizationInput::class;
+        return CreateUserWithinOrganizationInput::class === $type;
     }
 }

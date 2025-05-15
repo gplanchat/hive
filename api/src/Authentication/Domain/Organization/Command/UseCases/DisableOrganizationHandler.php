@@ -17,7 +17,7 @@ final readonly class DisableOrganizationHandler
 
     public function __invoke(DisableOrganization $command): void
     {
-        $organization = $this->organizationRepository->get($command->uuid);
+        $organization = $this->organizationRepository->get($command->uuid, $command->realmId);
         $organization->disable($command->validUntil);
         $this->organizationRepository->save($organization);
     }

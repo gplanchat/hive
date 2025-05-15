@@ -21,18 +21,21 @@ final class CreateUserInputDenormalizer implements DenormalizerInterface, Denorm
 
     public function getSupportedTypes(?string $format): array
     {
-        return in_array($format, ['json', 'jsonld'], true) ? [
+        return \in_array($format, ['json', 'jsonld'], true) ? [
             CreateUserInput::class => false,
         ] : [];
     }
 
+    /**
+     * @param array{} $context
+     */
     public function denormalize(mixed $data, string $type, ?string $format = null, array $context = []): CreateUserInput
     {
-        if (!array_key_exists('username', $data) || !is_string($data['username'])
-            || !array_key_exists('firstName', $data) || !is_string($data['firstName'])
-            || !array_key_exists('lastName', $data) || !is_string($data['lastName'])
-            || !array_key_exists('email', $data) || !is_string($data['email'])
-            || !array_key_exists('organizationId', $data) || !is_string($data['organizationId'])
+        if (!\array_key_exists('username', $data) || !\is_string($data['username'])
+            || !\array_key_exists('firstName', $data) || !\is_string($data['firstName'])
+            || !\array_key_exists('lastName', $data) || !\is_string($data['lastName'])
+            || !\array_key_exists('email', $data) || !\is_string($data['email'])
+            || !\array_key_exists('organizationId', $data) || !\is_string($data['organizationId'])
         ) {
             throw new UnexpectedValueException();
         }
@@ -49,8 +52,11 @@ final class CreateUserInputDenormalizer implements DenormalizerInterface, Denorm
         );
     }
 
+    /**
+     * @param array{} $context
+     */
     public function supportsDenormalization(mixed $data, string $type, ?string $format = null, array $context = []): bool
     {
-        return $type === CreateUserInput::class;
+        return CreateUserInput::class === $type;
     }
 }

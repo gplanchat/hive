@@ -16,5 +16,6 @@ final readonly class EnableOrganizationInput
         )]
         #[Context(['datetime_format' => 'Y-m-d'])]
         public ?\DateTimeInterface $validUntil = null,
-    ) {}
+    ) {
+    }
 }

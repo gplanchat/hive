@@ -14,12 +14,13 @@ final readonly class CommandBus implements CommandBusInterface
     public function __construct(
         #[Autowire('@command.bus')]
         private MessageBusInterface $messageBus,
-    ) {}
+    ) {
+    }
 
     public function apply(object $command): void
     {
         $this->messageBus->dispatch(
-            (new Envelope($command))
+            new Envelope($command)
         );
     }
 }

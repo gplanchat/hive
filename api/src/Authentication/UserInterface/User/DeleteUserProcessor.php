@@ -14,6 +14,9 @@ use App\Authentication\Domain\User\Query\User;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
+/**
+ * @implements ProcessorInterface<User, void>
+ */
 final readonly class DeleteUserProcessor implements ProcessorInterface
 {
     public function __construct(
@@ -28,7 +31,7 @@ final readonly class DeleteUserProcessor implements ProcessorInterface
         }
 
         try {
-            $command = new DeleteUser($data->uuid);
+            $command = new DeleteUser($data->uuid, $data->realmId);
             $this->commandBus->apply($command);
         } catch (InvalidUserStateException $exception) {
             throw new BadRequestHttpException($exception->getMessage(), previous: $exception);

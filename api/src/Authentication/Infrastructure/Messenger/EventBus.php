@@ -15,7 +15,8 @@ final readonly class EventBus implements EventBusInterface
     public function __construct(
         #[Autowire('@event.bus')]
         private MessageBusInterface $messageBus,
-    ) {}
+    ) {
+    }
 
     public function emit(object $event): void
     {

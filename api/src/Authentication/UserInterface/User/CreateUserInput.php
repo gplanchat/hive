@@ -15,43 +15,44 @@ final readonly class CreateUserInput
 {
     /**
      * @param WorkspaceId[] $workspaceIds
-     * @param RoleId[] $roleIds
+     * @param RoleId[]      $roleIds
      */
     public function __construct(
         #[ApiProperty(
             description: 'Organization in which the User is assigned',
             schema: ['type' => 'string', 'pattern' => OrganizationId::URI_REQUIREMENT],
         )]
-        #[Context(['iri_only' => true])]
         #[Assert\NotBlank()]
+        #[Context(['iri_only' => true])]
         public OrganizationId $organizationId,
+        #[ApiProperty(
+            description: 'User\'s display name',
+            schema: ['type' => 'string'],
+        )]
+        #[Assert\Length(min: 3, max: 255)]
+        #[Assert\NotBlank()]
+        #[Assert\Regex('/[A-Za-z0-9]+(?:[-.][A-Za-z0-9]+)*/')]
+        public string $username,
         #[ApiProperty(
             description: 'List of workspaces in which the User has access',
             schema: ['type' => 'array', 'items' => ['type' => 'string', 'pattern' => WorkspaceId::URI_REQUIREMENT]],
         )]
-        #[Context(['iri_only' => true])]
         #[Assert\All(constraints: [
             new Assert\NotBlank(),
             new Assert\Type(WorkspaceId::class),
         ])]
+        #[Context(['iri_only' => true])]
         public array $workspaceIds = [],
         #[ApiProperty(
             description: 'List of roles assigned to the User',
             schema: ['type' => 'array', 'items' => ['type' => 'string', 'pattern' => RoleId::URI_REQUIREMENT]],
         )]
-        #[Context(['iri_only' => true])]
         #[Assert\All(constraints: [
             new Assert\NotBlank(),
             new Assert\Type(RoleId::class),
         ])]
-        public array   $roleIds = [],
-        #[ApiProperty(
-            description: 'User\'s display name',
-            schema: ['type' => 'string'],
-        )]
-        #[Assert\Regex('/[A-Za-z0-9]+(?:[-.][A-Za-z0-9]+)*/')]
-        #[Assert\Length(min: 3, max: 255)]
-        public ?string $username = null,
+        #[Context(['iri_only' => true])]
+        public array $roleIds = [],
         #[ApiProperty(
             description: 'User\'s first name',
             schema: ['type' => 'string'],

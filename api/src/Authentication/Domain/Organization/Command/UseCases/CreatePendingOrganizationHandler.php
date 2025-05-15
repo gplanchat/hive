@@ -15,10 +15,12 @@ final readonly class CreatePendingOrganizationHandler
         private OrganizationRepositoryInterface $organizationRepository,
     ) {
     }
+
     public function __invoke(CreatePendingOrganization $command): void
     {
         $organization = Organization::declareDisabled(
             $command->uuid,
+            $command->realmId,
             $command->name,
             $command->slug,
             $command->featureRolloutIds,
