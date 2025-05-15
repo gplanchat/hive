@@ -35,7 +35,10 @@ use Symfony\Component\Serializer\Attribute\Groups;
 
 #[Delete(
     uriTemplate: '/authentication/{realm}/users/{uuid}',
-    uriVariables: ['realm', 'uuid'],
+    uriVariables: [
+        'realm' => 'realmId',
+        'uuid',
+    ],
     security: 'is_granted("IS_AUTHENTICATED")',
     input: false,
     output: false,

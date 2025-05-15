@@ -31,7 +31,10 @@ use Symfony\Component\Serializer\Attribute\Context;
 
 #[Delete(
     uriTemplate: '/authentication/{realm}/workspaces/{uuid}',
-    uriVariables: ['realm', 'uuid'],
+    uriVariables: [
+        'realm' => 'realmId',
+        'uuid',
+    ],
     security: 'is_granted("IS_AUTHENTICATED")',
     input: false,
     output: false,
