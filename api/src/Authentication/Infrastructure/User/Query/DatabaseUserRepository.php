@@ -47,21 +47,21 @@ final readonly class DatabaseUserRepository implements UserRepositoryInterface
         }
 
         $user = $result->fetchAssociative();
-        if ($user === false) {
+        if (false === $user) {
             throw new NotFoundException();
         }
 
-        assert(array_key_exists('uuid', $user) && is_string($user['uuid']));
-        assert(array_key_exists('realm_id', $user) && is_string($user['realm_id']));
-        assert(array_key_exists('authorization_context', $user) && is_string($user['authorization_context']));
-        assert(array_key_exists('organization_id', $user) && is_string($user['organization_id']));
-        assert(array_key_exists('workspace_ids', $user) && is_string($user['workspace_ids']));
-        assert(array_key_exists('role_ids', $user) && is_string($user['role_ids']));
-        assert(array_key_exists('username', $user) && is_string($user['username']));
-        assert(array_key_exists('firstname', $user) && is_string($user['firstname']));
-        assert(array_key_exists('lastname', $user) && is_string($user['lastname']));
-        assert(array_key_exists('email', $user) && is_string($user['email']));
-        assert(array_key_exists('enabled', $user) && is_bool($user['enabled']));
+        \assert(\array_key_exists('uuid', $user) && \is_string($user['uuid']));
+        \assert(\array_key_exists('realm_id', $user) && \is_string($user['realm_id']));
+        \assert(\array_key_exists('authorization_context', $user) && \is_string($user['authorization_context']));
+        \assert(\array_key_exists('organization_id', $user) && \is_string($user['organization_id']));
+        \assert(\array_key_exists('workspace_ids', $user) && \is_string($user['workspace_ids']));
+        \assert(\array_key_exists('role_ids', $user) && \is_string($user['role_ids']));
+        \assert(\array_key_exists('username', $user) && \is_string($user['username']));
+        \assert(\array_key_exists('firstname', $user) && \is_string($user['firstname']));
+        \assert(\array_key_exists('lastname', $user) && \is_string($user['lastname']));
+        \assert(\array_key_exists('email', $user) && \is_string($user['email']));
+        \assert(\array_key_exists('enabled', $user) && \is_bool($user['enabled']));
 
         return $this->hydrateOne($user);
     }
@@ -153,7 +153,6 @@ final readonly class DatabaseUserRepository implements UserRepositoryInterface
      *     email: string,
      *     enabled: bool,
      * } $user
-     * @return User
      */
     private function hydrateOne(array $user): User
     {
@@ -184,17 +183,17 @@ final readonly class DatabaseUserRepository implements UserRepositoryInterface
     private function hydrateAll(Result $result): \Traversable
     {
         foreach ($result->iterateAssociative() as $user) {
-            assert(array_key_exists('uuid', $user) && is_string($user['uuid']));
-            assert(array_key_exists('realm_id', $user) && is_string($user['realm_id']));
-            assert(array_key_exists('authorization_context', $user) && is_string($user['authorization_context']));
-            assert(array_key_exists('organization_id', $user) && is_string($user['organization_id']));
-            assert(array_key_exists('workspace_ids', $user) && is_string($user['workspace_ids']));
-            assert(array_key_exists('role_ids', $user) && is_string($user['role_ids']));
-            assert(array_key_exists('username', $user) && is_string($user['username']));
-            assert(array_key_exists('firstname', $user) && is_string($user['firstname']));
-            assert(array_key_exists('lastname', $user) && is_string($user['lastname']));
-            assert(array_key_exists('email', $user) && is_string($user['email']));
-            assert(array_key_exists('enabled', $user) && is_bool($user['enabled']));
+            \assert(\array_key_exists('uuid', $user) && \is_string($user['uuid']));
+            \assert(\array_key_exists('realm_id', $user) && \is_string($user['realm_id']));
+            \assert(\array_key_exists('authorization_context', $user) && \is_string($user['authorization_context']));
+            \assert(\array_key_exists('organization_id', $user) && \is_string($user['organization_id']));
+            \assert(\array_key_exists('workspace_ids', $user) && \is_string($user['workspace_ids']));
+            \assert(\array_key_exists('role_ids', $user) && \is_string($user['role_ids']));
+            \assert(\array_key_exists('username', $user) && \is_string($user['username']));
+            \assert(\array_key_exists('firstname', $user) && \is_string($user['firstname']));
+            \assert(\array_key_exists('lastname', $user) && \is_string($user['lastname']));
+            \assert(\array_key_exists('email', $user) && \is_string($user['email']));
+            \assert(\array_key_exists('enabled', $user) && \is_bool($user['enabled']));
 
             yield $this->hydrateOne($user);
         }

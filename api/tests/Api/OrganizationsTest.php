@@ -37,7 +37,7 @@ class OrganizationsTest extends ApiTestCase
         $this->clock = $clock;
 
         $storageMock = self::getContainer()->get(StorageMock::class);
-        assert($storageMock instanceof StorageMock);
+        \assert($storageMock instanceof StorageMock);
 
         $this->roleFixtures = new RoleFixtures($storageMock);
         \assert($this->roleFixtures instanceof RoleFixtures);
@@ -54,15 +54,15 @@ class OrganizationsTest extends ApiTestCase
 
     protected function tearDown(): void
     {
-        assert($this->organizationFixtures instanceof OrganizationFixtures);
+        \assert($this->organizationFixtures instanceof OrganizationFixtures);
         $this->organizationFixtures->unload();
         $this->organizationFixtures = null;
 
-        assert($this->userFixtures instanceof UserFixtures);
+        \assert($this->userFixtures instanceof UserFixtures);
         $this->userFixtures->unload();
         $this->userFixtures = null;
 
-        assert($this->roleFixtures instanceof RoleFixtures);
+        \assert($this->roleFixtures instanceof RoleFixtures);
         $this->roleFixtures->unload();
         $this->roleFixtures = null;
 
@@ -100,7 +100,7 @@ class OrganizationsTest extends ApiTestCase
     /** @test */
     public function itShouldShowAnOrganization(): void
     {
-        assert($this->clock instanceof ClockInterface);
+        \assert($this->clock instanceof ClockInterface);
         $validUntil = $this->clock->now()->add(new \DateInterval('P3M2D'));
 
         static::createClient()->request('GET', '/authentication/acme-inc/organizations/01966c5a-10ef-7315-94f2-cbeec2f167d8', [
@@ -132,7 +132,7 @@ class OrganizationsTest extends ApiTestCase
     /** @test */
     public function itShouldCreateAnEnabledOrganization(): void
     {
-        assert($this->clock instanceof ClockInterface);
+        \assert($this->clock instanceof ClockInterface);
         $validUntil = $this->clock->now()->add(new \DateInterval('P4M12D'));
 
         static::createClient()->request('POST', '/authentication/acme-inc/organizations', [
@@ -203,7 +203,7 @@ class OrganizationsTest extends ApiTestCase
     /** @test */
     public function itShouldRespondBadRequestOnIncompletePayloadOnCreation(): void
     {
-        assert($this->clock instanceof ClockInterface);
+        \assert($this->clock instanceof ClockInterface);
         $validUntil = $this->clock->now()->add(new \DateInterval('P4M12D'));
 
         static::createClient()->request('POST', '/authentication/acme-inc/organizations', [
@@ -232,7 +232,7 @@ class OrganizationsTest extends ApiTestCase
     /** @test */
     public function itShouldEnableADisabledOrganization(): void
     {
-        assert($this->clock instanceof ClockInterface);
+        \assert($this->clock instanceof ClockInterface);
         $validUntil = $this->clock->now()->add(new \DateInterval('P4M12D'));
 
         static::createClient()->request('PATCH', '/authentication/acme-inc/organizations/01966c5a-10ef-76f6-9513-e3b858c22f0a/enable', [

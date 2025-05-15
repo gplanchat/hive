@@ -45,17 +45,17 @@ final readonly class DatabaseOrganizationRepository implements OrganizationRepos
         }
 
         $organization = $result->fetchAssociative();
-        if ($organization === false) {
+        if (false === $organization) {
             throw new NotFoundException();
         }
 
-        assert(array_key_exists('uuid', $organization) && is_string($organization['uuid']));
-        assert(array_key_exists('realm_id', $organization) && is_string($organization['realm_id']));
-        assert(array_key_exists('name', $organization) && is_string($organization['name']));
-        assert(array_key_exists('slug', $organization) && is_string($organization['slug']));
-        assert(array_key_exists('valid_until', $organization) && is_string($organization['valid_until']));
-        assert(array_key_exists('feature_rollout_ids', $organization) && is_string($organization['feature_rollout_ids']));
-        assert(array_key_exists('enabled', $organization) && is_bool($organization['enabled']));
+        \assert(\array_key_exists('uuid', $organization) && \is_string($organization['uuid']));
+        \assert(\array_key_exists('realm_id', $organization) && \is_string($organization['realm_id']));
+        \assert(\array_key_exists('name', $organization) && \is_string($organization['name']));
+        \assert(\array_key_exists('slug', $organization) && \is_string($organization['slug']));
+        \assert(\array_key_exists('valid_until', $organization) && \is_string($organization['valid_until']));
+        \assert(\array_key_exists('feature_rollout_ids', $organization) && \is_string($organization['feature_rollout_ids']));
+        \assert(\array_key_exists('enabled', $organization) && \is_bool($organization['enabled']));
 
         return $this->hydrateOne($organization);
     }
@@ -93,7 +93,6 @@ final readonly class DatabaseOrganizationRepository implements OrganizationRepos
      *     feature_rollout_ids: string,
      *     enabled: bool,
      * } $organization
-     * @return Organization
      */
     private function hydrateOne(array $organization): Organization
     {
@@ -115,18 +114,19 @@ final readonly class DatabaseOrganizationRepository implements OrganizationRepos
 
     /**
      * @return \Traversable<mixed, Organization>
+     *
      * @throws Exception
      */
     private function hydrateAll(Result $result): \Traversable
     {
         foreach ($result->iterateAssociative() as $organization) {
-            assert(array_key_exists('uuid', $organization) && is_string($organization['uuid']));
-            assert(array_key_exists('realm_id', $organization) && is_string($organization['realm_id']));
-            assert(array_key_exists('name', $organization) && is_string($organization['name']));
-            assert(array_key_exists('slug', $organization) && is_string($organization['slug']));
-            assert(array_key_exists('valid_until', $organization) && is_string($organization['valid_until']));
-            assert(array_key_exists('feature_rollout_ids', $organization) && is_string($organization['feature_rollout_ids']));
-            assert(array_key_exists('enabled', $organization) && is_bool($organization['enabled']));
+            \assert(\array_key_exists('uuid', $organization) && \is_string($organization['uuid']));
+            \assert(\array_key_exists('realm_id', $organization) && \is_string($organization['realm_id']));
+            \assert(\array_key_exists('name', $organization) && \is_string($organization['name']));
+            \assert(\array_key_exists('slug', $organization) && \is_string($organization['slug']));
+            \assert(\array_key_exists('valid_until', $organization) && \is_string($organization['valid_until']));
+            \assert(\array_key_exists('feature_rollout_ids', $organization) && \is_string($organization['feature_rollout_ids']));
+            \assert(\array_key_exists('enabled', $organization) && \is_bool($organization['enabled']));
 
             yield $this->hydrateOne($organization);
         }

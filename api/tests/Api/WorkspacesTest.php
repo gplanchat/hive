@@ -39,7 +39,7 @@ class WorkspacesTest extends ApiTestCase
         $this->clock = $clock;
 
         $storageMock = self::getContainer()->get(StorageMock::class);
-        assert($storageMock instanceof StorageMock);
+        \assert($storageMock instanceof StorageMock);
 
         $this->roleFixtures = new RoleFixtures($storageMock);
         \assert($this->roleFixtures instanceof RoleFixtures);
@@ -60,19 +60,19 @@ class WorkspacesTest extends ApiTestCase
 
     protected function tearDown(): void
     {
-        assert($this->organizationFixtures instanceof OrganizationFixtures);
+        \assert($this->organizationFixtures instanceof OrganizationFixtures);
         $this->organizationFixtures->unload();
         $this->organizationFixtures = null;
 
-        assert($this->workspaceFixtures instanceof WorkspaceFixtures);
+        \assert($this->workspaceFixtures instanceof WorkspaceFixtures);
         $this->workspaceFixtures->unload();
         $this->workspaceFixtures = null;
 
-        assert($this->roleFixtures instanceof RoleFixtures);
+        \assert($this->roleFixtures instanceof RoleFixtures);
         $this->roleFixtures->unload();
         $this->roleFixtures = null;
 
-        assert($this->userFixtures instanceof UserFixtures);
+        \assert($this->userFixtures instanceof UserFixtures);
         $this->userFixtures->unload();
         $this->userFixtures = null;
 
@@ -147,7 +147,7 @@ class WorkspacesTest extends ApiTestCase
     /** @test */
     public function itShouldCreateAnEnabledWorkspace(): void
     {
-        assert($this->clock instanceof ClockInterface);
+        \assert($this->clock instanceof ClockInterface);
         $validUntil = $this->clock->now()->add(new \DateInterval('P3M2D'))->format('Y-m-d');
 
         static::createClient()->request('POST', '/authentication/acme-inc/workspaces', [
@@ -227,7 +227,7 @@ class WorkspacesTest extends ApiTestCase
     /** @test */
     public function itShouldCreateAnEnabledWorkspaceWithinAnOrganization(): void
     {
-        assert($this->clock instanceof ClockInterface);
+        \assert($this->clock instanceof ClockInterface);
         $validUntil = $this->clock->now()->add(new \DateInterval('P3M2D'))->format('Y-m-d');
 
         static::createClient()->request('POST', '/authentication/acme-inc/organizations/01966c5a-10ef-7315-94f2-cbeec2f167d8/workspaces', [
@@ -304,7 +304,7 @@ class WorkspacesTest extends ApiTestCase
     /** @test */
     public function itShouldEnableADisabledWorkspace(): void
     {
-        assert($this->clock instanceof ClockInterface);
+        \assert($this->clock instanceof ClockInterface);
         $validUntil = $this->clock->now()->add(new \DateInterval('P3M2D'))->format('Y-m-d');
 
         static::createClient()->request('PATCH', '/authentication/acme-inc/workspaces/01966c5a-10ef-7795-9e13-7359dd58b49c/enable', [
@@ -335,7 +335,7 @@ class WorkspacesTest extends ApiTestCase
     /** @test */
     public function itShouldDisableAnEnabledWorkspace(): void
     {
-        assert($this->clock instanceof ClockInterface);
+        \assert($this->clock instanceof ClockInterface);
         $validUntil = $this->clock->now()->add(new \DateInterval('P3M2D'))->format('Y-m-d');
 
         static::createClient()->request('PATCH', '/authentication/acme-inc/workspaces/01966c5a-10ef-723c-bc33-2b1dc30d8963/disable', [

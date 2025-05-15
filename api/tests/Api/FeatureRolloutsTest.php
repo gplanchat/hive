@@ -29,7 +29,7 @@ class FeatureRolloutsTest extends ApiTestCase
         static::bootKernel();
 
         $storageMock = self::getContainer()->get(StorageMock::class);
-        assert($storageMock instanceof StorageMock);
+        \assert($storageMock instanceof StorageMock);
 
         $this->roleFixtures = new RoleFixtures($storageMock);
         \assert($this->roleFixtures instanceof RoleFixtures);
@@ -42,11 +42,11 @@ class FeatureRolloutsTest extends ApiTestCase
 
     protected function tearDown(): void
     {
-        assert($this->userFixtures instanceof UserFixtures);
+        \assert($this->userFixtures instanceof UserFixtures);
         $this->userFixtures->unload();
         $this->userFixtures = null;
 
-        assert($this->roleFixtures instanceof RoleFixtures);
+        \assert($this->roleFixtures instanceof RoleFixtures);
         $this->roleFixtures->unload();
         $this->roleFixtures = null;
 

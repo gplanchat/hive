@@ -48,15 +48,15 @@ final readonly class DatabaseUserRepository implements UserRepositoryInterface
         }
 
         $user = $result->fetchAssociative();
-        if ($user === false) {
+        if (false === $user) {
             throw new NotFoundException();
         }
 
-        assert(array_key_exists('uuid', $user) && is_string($user['uuid']));
-        assert(array_key_exists('realm_id', $user) && is_string($user['realm_id']));
-        assert(array_key_exists('organization_id', $user) && is_string($user['organization_id']));
-        assert(array_key_exists('enabled', $user) && is_bool($user['enabled']));
-        assert(array_key_exists('version', $user) && is_int($user['version']));
+        \assert(\array_key_exists('uuid', $user) && \is_string($user['uuid']));
+        \assert(\array_key_exists('realm_id', $user) && \is_string($user['realm_id']));
+        \assert(\array_key_exists('organization_id', $user) && \is_string($user['organization_id']));
+        \assert(\array_key_exists('enabled', $user) && \is_bool($user['enabled']));
+        \assert(\array_key_exists('version', $user) && \is_int($user['version']));
 
         return new User(
             UserId::fromString($user['uuid']),

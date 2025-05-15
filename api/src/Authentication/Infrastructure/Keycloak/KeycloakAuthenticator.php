@@ -43,7 +43,7 @@ final class KeycloakAuthenticator extends AbstractAuthenticator
     {
         // Get token from header
         $jwtToken = $request->headers->get('authorization');
-        if ($jwtToken === null || false === str_starts_with($jwtToken, 'Bearer ')) {
+        if (null === $jwtToken || false === str_starts_with($jwtToken, 'Bearer ')) {
             throw new AuthenticationException('Invalid token');
         }
 

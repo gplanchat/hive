@@ -62,7 +62,7 @@ final readonly class IdNormalizer implements NormalizerInterface, DenormalizerIn
                         Role::class => $resource->realmId->toString(),
                         User::class => $resource->realmId->toString(),
                         Workspace::class => $resource->realmId->toString(),
-                        default => throw new InvalidArgumentException('The provided data type is not supported for normalization.')
+                        default => throw new InvalidArgumentException('The provided data type is not supported for normalization.'),
                     } : null,
                     'uuid' => $data->toString(),
                 ],
@@ -74,7 +74,7 @@ final readonly class IdNormalizer implements NormalizerInterface, DenormalizerIn
                         Role::class => $resource->realmId->toString(),
                         User::class => $resource->realmId->toString(),
                         Workspace::class => $resource->realmId->toString(),
-                        default => throw new InvalidArgumentException('The provided data type is not supported for normalization.')
+                        default => throw new InvalidArgumentException('The provided data type is not supported for normalization.'),
                     } : null,
                     'uuid' => $data->toString(),
                 ],
@@ -86,7 +86,7 @@ final readonly class IdNormalizer implements NormalizerInterface, DenormalizerIn
                         Role::class => $resource->realmId->toString(),
                         User::class => $resource->realmId->toString(),
                         Workspace::class => $resource->realmId->toString(),
-                        default => throw new InvalidArgumentException('The provided data type is not supported for normalization.')
+                        default => throw new InvalidArgumentException('The provided data type is not supported for normalization.'),
                     } : null,
                     'uuid' => $data->toString(),
                 ],
@@ -98,15 +98,14 @@ final readonly class IdNormalizer implements NormalizerInterface, DenormalizerIn
                         Role::class => $resource->realmId->toString(),
                         User::class => $resource->realmId->toString(),
                         Workspace::class => $resource->realmId->toString(),
-                        default => throw new InvalidArgumentException('The provided data type is not supported for normalization.')
+                        default => throw new InvalidArgumentException('The provided data type is not supported for normalization.'),
                     } : null,
                     'uuid' => $data->toString(),
                 ],
             ]) ?: throw new InvalidArgumentException('The provided data type is not supported for normalization.'),
-            default => throw new InvalidArgumentException('The provided data type is not supported for normalization.')
+            default => throw new InvalidArgumentException('The provided data type is not supported for normalization.'),
         };
     }
-
 
     /**
      * @param array{} $context
@@ -118,7 +117,7 @@ final readonly class IdNormalizer implements NormalizerInterface, DenormalizerIn
 
     /**
      * @param class-string<IdInterface> $type
-     * @param array{} $context
+     * @param array{}                   $context
      */
     public function denormalize($data, string $type, ?string $format = null, array $context = []): IdInterface
     {

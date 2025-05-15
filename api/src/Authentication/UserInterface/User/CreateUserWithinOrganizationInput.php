@@ -22,8 +22,8 @@ final readonly class CreateUserWithinOrganizationInput
             schema: ['type' => 'string'],
         )]
         #[Assert\Length(min: 3, max: 255)]
-        #[Assert\Regex('/[A-Za-z0-9]+(?:[-.][A-Za-z0-9]+)*/')]
         #[Assert\NotBlank()]
+        #[Assert\Regex('/[A-Za-z0-9]+(?:[-.][A-Za-z0-9]+)*/')]
         public string $username,
         #[ApiProperty(
             description: 'List of workspaces in which the User has access',

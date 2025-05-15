@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Authentication\Infrastructure\Keycloak;
 
-use App\Authentication\Domain\IdInterface;
 use App\Authentication\Domain\InvalidUuidFormatException;
 
 final class KeycloakUserId
@@ -40,7 +39,6 @@ final class KeycloakUserId
 
     /**
      * @param self|non-empty-string $other
-     * @return bool
      */
     public function equals(self|string $other): bool
     {

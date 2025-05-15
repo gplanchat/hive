@@ -15,7 +15,6 @@ final readonly class KeycloakAuthorization implements AuthorizationInterface
 
     /**
      * @param array{keycloakUserId: non-empty-string} $normalized
-     * @return self
      */
     public static function fromNormalized(array $normalized): self
     {

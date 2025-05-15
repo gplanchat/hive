@@ -90,7 +90,7 @@ final class User
 
     /**
      * @param WorkspaceId[] $workspaceIds
-     * @param RoleId[] $roleIds
+     * @param RoleId[]      $roleIds
      */
     public static function declareDisabled(
         UserId $uuid,

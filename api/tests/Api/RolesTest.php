@@ -37,7 +37,7 @@ class RolesTest extends ApiTestCase
         $this->clock = $clock;
 
         $storageMock = self::getContainer()->get(StorageMock::class);
-        assert($storageMock instanceof StorageMock);
+        \assert($storageMock instanceof StorageMock);
 
         $this->roleFixtures = new RoleFixtures($storageMock);
         \assert($this->roleFixtures instanceof RoleFixtures);
@@ -54,15 +54,15 @@ class RolesTest extends ApiTestCase
 
     protected function tearDown(): void
     {
-        assert($this->organizationFixtures instanceof OrganizationFixtures);
+        \assert($this->organizationFixtures instanceof OrganizationFixtures);
         $this->organizationFixtures->unload();
         $this->organizationFixtures = null;
 
-        assert($this->roleFixtures instanceof RoleFixtures);
+        \assert($this->roleFixtures instanceof RoleFixtures);
         $this->roleFixtures->unload();
         $this->roleFixtures = null;
 
-        assert($this->userFixtures instanceof UserFixtures);
+        \assert($this->userFixtures instanceof UserFixtures);
         $this->userFixtures->unload();
         $this->userFixtures = null;
 

@@ -27,7 +27,7 @@ final class AddFeatureRolloutsToOrganizationInputDenormalizer implements Denorma
 
     /**
      * @param array{featureRolloutIds: list<string>} $data
-     * @param array{} $context
+     * @param array{}                                $context
      */
     public function denormalize(mixed $data, string $type, ?string $format = null, array $context = []): AddFeatureRolloutsToOrganizationInput
     {

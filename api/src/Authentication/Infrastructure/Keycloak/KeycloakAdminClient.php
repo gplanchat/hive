@@ -33,7 +33,7 @@ final class KeycloakAdminClient implements KeycloakAdminClientInterface
         $token = $this->authenticateWithAccessToken();
 
         $options = array_merge($options, [
-            'headers' => array_merge($options['headers'] ?? [], $token !== null ?
+            'headers' => array_merge($options['headers'] ?? [], null !== $token ?
                 [
                     'authorization' => "Bearer {$this->authenticateWithAccessToken()}",
                 ] : []
