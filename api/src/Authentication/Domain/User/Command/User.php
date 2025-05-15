@@ -14,20 +14,12 @@ use App\Authentication\Domain\Workspace\WorkspaceId;
 final class User
 {
     /**
-     * @param WorkspaceId[] $workspaceIds
-     * @param RoleId[]      $roleIds
-     * @param object[]      $events
+     * @param object[] $events
      */
     public function __construct(
         public readonly UserId $uuid,
         public readonly RealmId $realmId,
         public readonly OrganizationId $organizationId,
-        private array $workspaceIds = [],
-        private array $roleIds = [],
-        private ?string $username = null,
-        private ?string $firstName = null,
-        private ?string $lastName = null,
-        private ?string $email = null,
         private bool $enabled = true,
         private bool $deleted = false,
         private array $events = [],
@@ -50,6 +42,9 @@ final class User
         $this->apply($event);
     }
 
+    /**
+     * @return object[]
+     */
     public function releaseEvents(): array
     {
         $releasedEvents = $this->events;
@@ -93,6 +88,10 @@ final class User
         return $instance;
     }
 
+    /**
+     * @param WorkspaceId[] $workspaceIds
+     * @param RoleId[] $roleIds
+     */
     public static function declareDisabled(
         UserId $uuid,
         RealmId $realmId,
@@ -126,11 +125,6 @@ final class User
 
     private function applyDeclaredEvent(DeclaredEvent $event): void
     {
-        $this->workspaceIds = $event->workspaceIds;
-        $this->roleIds = $event->roleIds;
-        $this->firstName = $event->firstName;
-        $this->lastName = $event->lastName;
-        $this->email = $event->email;
         $this->enabled = $event->enabled;
     }
 

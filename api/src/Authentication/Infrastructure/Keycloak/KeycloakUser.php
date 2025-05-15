@@ -26,6 +26,9 @@ final readonly class KeycloakUser implements UserInterface
     {
     }
 
+    /**
+     * @return non-empty-string
+     */
     public function getUserIdentifier(): string
     {
         return $this->keycloakUserId->toString();

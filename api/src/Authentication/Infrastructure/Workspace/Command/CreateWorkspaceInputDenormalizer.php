@@ -24,6 +24,9 @@ final class CreateWorkspaceInputDenormalizer implements DenormalizerInterface, D
         ] : [];
     }
 
+    /**
+     * @param array{} $context
+     */
     public function denormalize(mixed $data, string $type, ?string $format = null, array $context = []): CreateWorkspaceInput
     {
         if (!\array_key_exists('name', $data) || !\is_string($data['name'])
@@ -44,6 +47,9 @@ final class CreateWorkspaceInputDenormalizer implements DenormalizerInterface, D
         );
     }
 
+    /**
+     * @param array{} $context
+     */
     public function supportsDenormalization(mixed $data, string $type, ?string $format = null, array $context = []): bool
     {
         return CreateWorkspaceInput::class === $type;

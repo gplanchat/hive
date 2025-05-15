@@ -23,9 +23,12 @@ final readonly class Keycloak implements KeycloakInterface
         private UriInterface $baseUri,
         RealmId ...$allowedRealmIds,
     ) {
-        $this->allowedRealmIds = $allowedRealmIds;
+        $this->allowedRealmIds = array_values($allowedRealmIds);
     }
 
+    /**
+     * @param RealmId[] $allowedRealmIds
+     */
     public static function createFromUri(
         KeycloakAdminClientInterface $httpClient,
         string $baseUri,
@@ -34,7 +37,7 @@ final readonly class Keycloak implements KeycloakInterface
         return new self(
             $httpClient,
             Psr17FactoryDiscovery::findUriFactory()->createUri($baseUri),
-            ...array_map(fn (string $realmId) => RealmId::fromString($realmId), $allowedRealmIds),
+            ...array_values($allowedRealmIds),
         );
     }
 
@@ -113,11 +116,11 @@ final readonly class Keycloak implements KeycloakInterface
             ],
             'body' => json_encode([
                 'id' => $realm->code->toString(),
-                'realm' => $realm->slug,
+                'realm' => $realm->code,
                 'notBefore' => 0,
                 'revokeRefreshToken' => false,
-                'displayName' => $realm->name,
-                'enabled' => $realm->enabled,
+                'displayName' => $realm->code->toString(),
+                'enabled' => true,
                 'sslRequired' => 'external',
                 'registrationAllowed' => false,
                 'loginWithEmailAllowed' => true,

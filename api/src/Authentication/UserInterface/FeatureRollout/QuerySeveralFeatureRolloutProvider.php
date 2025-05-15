@@ -9,6 +9,7 @@ use ApiPlatform\State\Pagination\Pagination;
 use ApiPlatform\State\Pagination\PaginatorInterface;
 use ApiPlatform\State\Pagination\TraversablePaginator;
 use ApiPlatform\State\ProviderInterface;
+use App\Authentication\Domain\FeatureRollout\FeatureRollout;
 use App\Authentication\Domain\FeatureRollout\UseCases\FeatureRolloutPage;
 use App\Authentication\Domain\FeatureRollout\UseCases\QuerySeveralFeatureRollout;
 use App\Authentication\Domain\QueryBusInterface;
@@ -17,6 +18,9 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 use Symfony\Component\Messenger\Exception\HandlerFailedException;
 
+/**
+ * @implements ProviderInterface<FeatureRollout>
+ */
 final readonly class QuerySeveralFeatureRolloutProvider implements ProviderInterface
 {
     public function __construct(
@@ -25,6 +29,9 @@ final readonly class QuerySeveralFeatureRolloutProvider implements ProviderInter
     ) {
     }
 
+    /**
+     * @return PaginatorInterface<FeatureRollout>|TraversablePaginator
+     */
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): PaginatorInterface
     {
         try {

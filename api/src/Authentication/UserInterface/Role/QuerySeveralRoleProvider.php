@@ -11,6 +11,7 @@ use ApiPlatform\State\Pagination\TraversablePaginator;
 use ApiPlatform\State\ProviderInterface;
 use App\Authentication\Domain\QueryBusInterface;
 use App\Authentication\Domain\Realm\RealmId;
+use App\Authentication\Domain\Role\Query\Role;
 use App\Authentication\Domain\Role\Query\UseCases\QuerySeveralRole;
 use App\Authentication\Domain\Role\Query\UseCases\RolePage;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
@@ -18,6 +19,9 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 use Symfony\Component\Messenger\Exception\HandlerFailedException;
 
+/**
+ * @implements ProviderInterface<Role>
+ */
 final readonly class QuerySeveralRoleProvider implements ProviderInterface
 {
     public function __construct(
@@ -26,6 +30,9 @@ final readonly class QuerySeveralRoleProvider implements ProviderInterface
     ) {
     }
 
+    /**
+     * @return PaginatorInterface<Role>|TraversablePaginator
+     */
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): PaginatorInterface
     {
         try {

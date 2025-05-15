@@ -17,6 +17,9 @@ use Symfony\Component\HttpFoundation\Exception\LogicException;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
+/**
+ * @implements ProcessorInterface<CreateRoleInput, Role>
+ */
 final readonly class CreateRoleProcessor implements ProcessorInterface
 {
     public function __construct(

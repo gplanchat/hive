@@ -18,6 +18,9 @@ use App\Authentication\Domain\User\UserId;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
+/**
+ * @implements ProcessorInterface<CreateUserInput|CreateUserWithinOrganizationInput, User>
+ */
 final readonly class CreateUserProcessor implements ProcessorInterface
 {
     public function __construct(

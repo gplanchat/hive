@@ -16,6 +16,9 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 use Symfony\Component\Messenger\Exception\HandlerFailedException;
 
+/**
+ * @implements ProviderInterface<Organization>
+ */
 final readonly class QueryOneOrganizationProvider implements ProviderInterface
 {
     public function __construct(

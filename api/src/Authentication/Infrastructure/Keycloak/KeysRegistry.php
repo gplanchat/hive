@@ -13,15 +13,15 @@ use Firebase\JWT\Key;
 final readonly class KeysRegistry
 {
     /**
-     * @var list<array{0: \OpenSSLAsymmetricKey, 1: Key}>
+     * @var list<array{0: Key, 1: Key}>
      */
     private array $keys;
 
-    /** @param list<array{0: \OpenSSLAsymmetricKey, 1: Key}> $keys */
+    /** @param array{0: Key, 1: Key} ...$keys */
     private function __construct(
         array ...$keys,
     ) {
-        $this->keys = $keys;
+        $this->keys = array_values($keys);
     }
 
     public static function create(): self
@@ -38,7 +38,7 @@ final readonly class KeysRegistry
         return Collection::fromArray(array_column($this->keys, 1));
     }
 
-    /** @return Collection<\OpenSSLAsymmetricKey|string> */
+    /** @return Collection<Key> */
     public function privateKeys(): Collection
     {
         return Collection::fromArray(array_column($this->keys, 0));

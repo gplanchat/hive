@@ -6,8 +6,14 @@ namespace App\Authentication\Domain\User\Query\UseCases;
 
 use App\Authentication\Domain\User\Query\User;
 
+/**
+ * @implements \IteratorAggregate<mixed, User>
+ */
 final readonly class UserPage implements \IteratorAggregate, \Countable
 {
+    /**
+     * @var User[]
+     */
     private array $users;
 
     public function __construct(
@@ -19,6 +25,9 @@ final readonly class UserPage implements \IteratorAggregate, \Countable
         $this->users = $users;
     }
 
+    /**
+     * @return \Traversable<mixed, User>
+     */
     public function getIterator(): \Traversable
     {
         yield from $this->users;

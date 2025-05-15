@@ -25,6 +25,9 @@ final class CreateUserWithinOrganizationInputDenormalizer implements Denormalize
         ] : [];
     }
 
+    /**
+     * @param array{} $context
+     */
     public function denormalize(mixed $data, string $type, ?string $format = null, array $context = []): CreateUserWithinOrganizationInput
     {
         if (!\array_key_exists('username', $data) || !\is_string($data['username'])
@@ -46,6 +49,9 @@ final class CreateUserWithinOrganizationInputDenormalizer implements Denormalize
         );
     }
 
+    /**
+     * @param array{} $context
+     */
     public function supportsDenormalization(mixed $data, string $type, ?string $format = null, array $context = []): bool
     {
         return CreateUserWithinOrganizationInput::class === $type;

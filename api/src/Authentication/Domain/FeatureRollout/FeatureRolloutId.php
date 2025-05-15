@@ -21,7 +21,7 @@ final class FeatureRolloutId implements IdInterface
         }
     }
 
-    public static function fromUri(string $uri): IdInterface
+    public static function fromUri(string $uri): self
     {
         if (!preg_match(self::PARSE, $uri, $matches)) {
             throw new \InvalidArgumentException(\sprintf('<%s> is not a valid Feature Rollout code.', $uri));

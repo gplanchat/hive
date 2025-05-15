@@ -17,6 +17,9 @@ use Symfony\Component\HttpFoundation\Exception\LogicException;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
+/**
+ * @implements ProcessorInterface<CreateOrganizationInput, Organization>
+ */
 final readonly class CreateOrganizationProcessor implements ProcessorInterface
 {
     public function __construct(

@@ -10,13 +10,13 @@ use App\Authentication\Domain\Workspace\WorkspaceId;
 
 final class Workspace
 {
+    /**
+     * @param object[] $events
+     */
     public function __construct(
         public readonly WorkspaceId $uuid,
         public readonly RealmId $realmId,
         public readonly OrganizationId $organizationId,
-        private ?string $name = null,
-        private ?string $slug = null,
-        private ?\DateTimeInterface $validUntil = null,
         private bool $enabled = false,
         private bool $deleted = false,
         private array $events = [],
@@ -39,6 +39,9 @@ final class Workspace
         $this->apply($event);
     }
 
+    /**
+     * @return object[]
+     */
     public function releaseEvents(): array
     {
         $releasedEvents = $this->events;
@@ -94,9 +97,6 @@ final class Workspace
 
     private function applyDeclaredEvent(DeclaredEvent $event): void
     {
-        $this->name = $event->name;
-        $this->slug = $event->slug;
-        $this->validUntil = $event->validUntil;
         $this->enabled = $event->enabled;
     }
 

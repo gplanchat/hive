@@ -14,6 +14,9 @@ use App\Authentication\Domain\Organization\Query\Organization;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
+/**
+ * @implements ProcessorInterface<Organization, void>
+ */
 final readonly class DeleteOrganizationProcessor implements ProcessorInterface
 {
     public function __construct(

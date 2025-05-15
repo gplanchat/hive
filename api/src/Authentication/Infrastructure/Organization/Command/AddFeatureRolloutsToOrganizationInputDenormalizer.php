@@ -25,6 +25,10 @@ final class AddFeatureRolloutsToOrganizationInputDenormalizer implements Denorma
         ] : [];
     }
 
+    /**
+     * @param array{featureRolloutIds: list<string>} $data
+     * @param array{} $context
+     */
     public function denormalize(mixed $data, string $type, ?string $format = null, array $context = []): AddFeatureRolloutsToOrganizationInput
     {
         if (!\array_key_exists('featureRolloutIds', $data)
@@ -36,11 +40,14 @@ final class AddFeatureRolloutsToOrganizationInputDenormalizer implements Denorma
 
         return new AddFeatureRolloutsToOrganizationInput(
             featureRolloutIds: Collection::fromArray($data['featureRolloutIds'])
-                ->map(fn (string $uri) => FeatureRolloutId::fromUri($uri))
+                ->map(fn (string $uri): FeatureRolloutId => FeatureRolloutId::fromUri($uri))
                 ->toArray(),
         );
     }
 
+    /**
+     * @param array{} $context
+     */
     public function supportsDenormalization(mixed $data, string $type, ?string $format = null, array $context = []): bool
     {
         return AddFeatureRolloutsToOrganizationInput::class === $type;

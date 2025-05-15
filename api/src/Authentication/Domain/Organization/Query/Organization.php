@@ -155,6 +155,9 @@ use Symfony\Component\Serializer\Attribute\Context;
 )]
 final readonly class Organization
 {
+    /**
+     * @param FeatureRolloutId[] $featureRolloutIds
+     */
     public function __construct(
         #[ApiProperty(
             description: 'Identifier of the Organization',

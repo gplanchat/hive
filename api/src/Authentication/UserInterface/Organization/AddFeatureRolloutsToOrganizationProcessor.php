@@ -19,6 +19,9 @@ use App\Shared\Infrastructure\Collection\Collection;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
+/**
+ * @implements ProcessorInterface<AddFeatureRolloutsToOrganizationInput, Organization>
+ */
 final readonly class AddFeatureRolloutsToOrganizationProcessor implements ProcessorInterface
 {
     public function __construct(

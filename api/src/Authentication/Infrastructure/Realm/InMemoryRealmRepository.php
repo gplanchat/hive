@@ -13,6 +13,9 @@ use App\Shared\Infrastructure\Collection\Collection;
 
 final class InMemoryRealmRepository implements RealmRepositoryInterface
 {
+    /**
+     * @var Realm[]
+     */
     private array $storage = [];
 
     public function __construct(

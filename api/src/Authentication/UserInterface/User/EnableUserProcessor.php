@@ -17,6 +17,9 @@ use App\Authentication\Domain\User\UserId;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
+/**
+ * @implements ProcessorInterface<EnableUserInput, User>
+ */
 final readonly class EnableUserProcessor implements ProcessorInterface
 {
     public function __construct(

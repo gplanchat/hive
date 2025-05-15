@@ -4,10 +4,14 @@ declare(strict_types=1);
 
 namespace App\Authentication\Infrastructure\Keycloak;
 
+use App\Authentication\Domain\IdInterface;
 use App\Authentication\Domain\InvalidUuidFormatException;
 
 final class KeycloakUserId
 {
+    /**
+     * @param non-empty-string $reference
+     */
     private function __construct(
         private readonly string $reference,
     ) {
@@ -26,22 +30,29 @@ final class KeycloakUserId
         return new self(uuid_create(UUID_TYPE_NULL));
     }
 
+    /**
+     * @param non-empty-string $reference
+     */
     public static function fromString(string $reference): self
     {
         return new self($reference);
     }
 
+    /**
+     * @param self|non-empty-string $other
+     * @return bool
+     */
     public function equals(self|string $other): bool
     {
         if (\is_string($other)) {
-            return 0 === uuid_compare($this->reference, $other);
+            return 0 === strcmp($this->reference, $other);
         }
 
         if (!$other instanceof self) {
             return false;
         }
 
-        return 0 === uuid_compare($this->reference, $other->reference);
+        return 0 === strcmp($this->reference, $other->reference);
     }
 
     public function isNil(): bool
@@ -54,6 +65,9 @@ final class KeycloakUserId
         return $this->reference;
     }
 
+    /**
+     * @return non-empty-string
+     */
     public function toString(): string
     {
         return $this->reference;

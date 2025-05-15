@@ -9,6 +9,7 @@ use ApiPlatform\State\Pagination\Pagination;
 use ApiPlatform\State\Pagination\PaginatorInterface;
 use ApiPlatform\State\Pagination\TraversablePaginator;
 use ApiPlatform\State\ProviderInterface;
+use App\Authentication\Domain\Organization\Query\Organization;
 use App\Authentication\Domain\Organization\Query\UseCases\OrganizationPage;
 use App\Authentication\Domain\Organization\Query\UseCases\QuerySeveralOrganization;
 use App\Authentication\Domain\QueryBusInterface;
@@ -18,6 +19,9 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 use Symfony\Component\Messenger\Exception\HandlerFailedException;
 
+/**
+ * @implements ProviderInterface<Organization>
+ */
 final readonly class QuerySeveralOrganizationProvider implements ProviderInterface
 {
     public function __construct(
@@ -26,6 +30,9 @@ final readonly class QuerySeveralOrganizationProvider implements ProviderInterfa
     ) {
     }
 
+    /**
+     * @return PaginatorInterface<Organization>|TraversablePaginator
+     */
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): PaginatorInterface
     {
         try {

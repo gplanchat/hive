@@ -14,6 +14,9 @@ use App\Authentication\Domain\Workspace\Query\Workspace;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
+/**
+ * @implements ProcessorInterface<Workspace, void>
+ */
 final readonly class DeleteWorkspaceProcessor implements ProcessorInterface
 {
     public function __construct(

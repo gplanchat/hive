@@ -4,8 +4,19 @@ declare(strict_types=1);
 
 namespace App\Shared\Infrastructure\Collection;
 
+use Temporal\Workflow\ReturnType;
+
+/**
+ * @template Type
+ * @template ReturnType
+ *
+ * @implements \Iterator<mixed, ReturnType>
+ */
 final readonly class MapIterator implements \Iterator
 {
+    /**
+     * @param \Iterator<mixed, Type> $decorated
+     */
     public function __construct(
         private \Iterator $decorated,
         private \Closure $map,

@@ -17,6 +17,9 @@ use App\Authentication\Domain\Workspace\WorkspaceId;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
+/**
+ * @implements ProcessorInterface<EnableWorkspaceInput, Workspace>
+ */
 final readonly class EnableWorkspaceProcessor implements ProcessorInterface
 {
     public function __construct(

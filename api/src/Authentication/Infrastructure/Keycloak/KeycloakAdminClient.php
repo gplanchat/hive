@@ -25,12 +25,19 @@ final class KeycloakAdminClient implements KeycloakAdminClientInterface
     ) {
     }
 
+    /**
+     * @param array{} $options
+     */
     public function request(string $method, string $url, array $options = []): ResponseInterface
     {
+        $token = $this->authenticateWithAccessToken();
+
         $options = array_merge($options, [
-            'headers' => array_merge($options['headers'] ?? [], [
-                'authorization' => "bearer {$this->authenticateWithAccessToken()}",
-            ]),
+            'headers' => array_merge($options['headers'] ?? [], $token !== null ?
+                [
+                    'authorization' => "Bearer {$this->authenticateWithAccessToken()}",
+                ] : []
+            ),
         ]);
 
         return $this->decorated->request($method, $url, $options);
@@ -41,7 +48,7 @@ final class KeycloakAdminClient implements KeycloakAdminClientInterface
         return $this->decorated->stream($responses, $timeout);
     }
 
-    private function authenticateWithAccessToken(): string
+    private function authenticateWithAccessToken(): ?string
     {
         if (null !== $this->expiration && $this->clock->now() < $this->expiration) {
             return $this->accessToken;
@@ -100,12 +107,12 @@ final class KeycloakAdminClient implements KeycloakAdminClientInterface
         $this->refreshExpiration = $this->expiration($now, $result['refresh_expires_in']);
     }
 
-    private function expiration(\DateTimeInterface $now, int $seconds): ?\DateTimeInterface
+    private function expiration(\DateTimeInterface $now, int $seconds): \DateTimeInterface
     {
         if ($seconds <= 0) {
             return $now;
         }
 
-        return $now->add(new \DateInterval("PT{$seconds}S"));
+        return \DateTimeImmutable::createFromInterface($now)->add(new \DateInterval("PT{$seconds}S"));
     }
 }

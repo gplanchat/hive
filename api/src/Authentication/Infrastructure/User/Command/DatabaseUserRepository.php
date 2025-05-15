@@ -30,7 +30,7 @@ final readonly class DatabaseUserRepository implements UserRepositoryInterface
     ) {
     }
 
-    public function get(UserId $userId, $realmId): User
+    public function get(UserId $userId, RealmId $realmId): User
     {
         $sql = <<<'SQL'
             SELECT uuid, realm_id, organization_id, workspace_ids, role_ids, username, firstname, lastname, email, enabled, version
@@ -48,23 +48,20 @@ final readonly class DatabaseUserRepository implements UserRepositoryInterface
         }
 
         $user = $result->fetchAssociative();
+        if ($user === false) {
+            throw new NotFoundException();
+        }
+
+        assert(array_key_exists('uuid', $user) && is_string($user['uuid']));
+        assert(array_key_exists('realm_id', $user) && is_string($user['realm_id']));
+        assert(array_key_exists('organization_id', $user) && is_string($user['organization_id']));
+        assert(array_key_exists('enabled', $user) && is_bool($user['enabled']));
+        assert(array_key_exists('version', $user) && is_int($user['version']));
 
         return new User(
             UserId::fromString($user['uuid']),
             RealmId::fromString($user['realm_id']),
             OrganizationId::fromString($user['organization_id']),
-            workspaceIds: array_map(
-                fn (string $workspaceIds): WorkspaceId => WorkspaceId::fromString($workspaceIds),
-                json_decode($user['workspace_ids'], true, \JSON_THROW_ON_ERROR)
-            ),
-            roleIds: array_map(
-                fn (string $roleId): RoleId => RoleId::fromString($roleId),
-                json_decode($user['role_ids'], true, \JSON_THROW_ON_ERROR)
-            ),
-            username: $user['username'],
-            firstName: $user['firstname'],
-            lastName: $user['lastname'],
-            email: $user['email'],
             enabled: $user['enabled'],
             version: $user['version'],
         );

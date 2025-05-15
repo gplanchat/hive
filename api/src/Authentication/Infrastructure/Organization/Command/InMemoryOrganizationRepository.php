@@ -48,9 +48,6 @@ final readonly class InMemoryOrganizationRepository implements OrganizationRepos
         return new Organization(
             uuid: $value->uuid,
             realmId: $value->realmId,
-            name: $value->name,
-            slug: $value->slug,
-            validUntil: $value->validUntil,
             featureRolloutIds: $value->featureRolloutIds,
             enabled: $value->enabled,
         );

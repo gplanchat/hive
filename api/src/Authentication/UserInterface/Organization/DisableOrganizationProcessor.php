@@ -17,6 +17,9 @@ use App\Authentication\Domain\Realm\RealmId;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
+/**
+ * @implements ProcessorInterface<DisableOrganizationInput, Organization>
+ */
 final readonly class DisableOrganizationProcessor implements ProcessorInterface
 {
     public function __construct(

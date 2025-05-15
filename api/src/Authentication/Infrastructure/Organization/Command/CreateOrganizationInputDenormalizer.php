@@ -24,6 +24,9 @@ final class CreateOrganizationInputDenormalizer implements DenormalizerInterface
         ] : [];
     }
 
+    /**
+     * @param array{} $context
+     */
     public function denormalize(mixed $data, string $type, ?string $format = null, array $context = []): CreateOrganizationInput
     {
         if (!\array_key_exists('name', $data) || !\is_string($data['name'])
@@ -38,11 +41,14 @@ final class CreateOrganizationInputDenormalizer implements DenormalizerInterface
             \array_key_exists('validUntil', $data) && null != $data['validUntil']
                 ? (\DateTimeImmutable::createFromFormat('Y-m-d', $data['validUntil'], new \DateTimeZone('UTC')) ?: null)
                 : null,
-            array_map(fn (string $current) => FeatureRolloutId::fromUri($current), $data['featureRolloutIds'] ?? []),
+            array_map(fn (string $current): FeatureRolloutId => FeatureRolloutId::fromUri($current), $data['featureRolloutIds'] ?? []),
             (bool) ($data['enabled'] ?? false),
         );
     }
 
+    /**
+     * @param array{} $context
+     */
     public function supportsDenormalization(mixed $data, string $type, ?string $format = null, array $context = []): bool
     {
         return CreateOrganizationInput::class === $type;

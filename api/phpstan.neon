@@ -1,0 +1,9 @@
+parameters:
+    level: 7
+    paths:
+        - src/
+        - tests/
+    excludePaths:
+        - src/Shared/Infrastructure/ApiPlatform/
+    treatPhpDocTypesAsCertain: false
+    tmpDir: var/phpstan/tmp

@@ -6,8 +6,8 @@ namespace App\Authentication\Domain\Organization\Command\UseCases;
 
 use App\Authentication\Domain\FeatureRollout\FeatureRolloutRepositoryInterface;
 use App\Authentication\Domain\FeatureRollout\Targets;
+use App\Authentication\Domain\NotFoundException;
 use App\Authentication\Domain\Organization\Command\OrganizationRepositoryInterface;
-use Http\Discovery\Exception\NotFoundException;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 

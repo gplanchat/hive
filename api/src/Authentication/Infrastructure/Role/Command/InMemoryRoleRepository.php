@@ -43,9 +43,6 @@ final readonly class InMemoryRoleRepository implements RoleRepositoryInterface
             uuid: $value->uuid,
             realmId: $value->realmId,
             organizationId: $value->organizationId,
-            identifier: $value->identifier,
-            label: $value->label,
-            resourceAccesses: $value->resourceAccesses,
         );
     }
 

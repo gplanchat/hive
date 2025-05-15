@@ -32,8 +32,8 @@ final class CollectionTest extends TestCase
     /** @test */
     public function itChecksAllValues(): void
     {
-        $this->assertTrue(Collection::fromArray(['lorem', 'ipsum', 'dolor'])->all(fn (string $current) => \is_string($current)));
-        $this->assertFalse(Collection::fromArray(['lorem', 'ipsum', 'dolor'])->all(fn (string $current) => \is_int($current)));
+        $this->assertTrue(Collection::fromArray(['lorem', 'ipsum', 'dolor'])->all(fn (string $current) => true));
+        $this->assertFalse(Collection::fromArray(['lorem', 'ipsum', 'dolor'])->all(fn (string $current) => false));
         $this->assertFalse(Collection::fromArray(['lorem', 'ipsum', 'dolor'])->all(fn (string $current) => 0 === strcmp($current, 'lorem')));
     }
 

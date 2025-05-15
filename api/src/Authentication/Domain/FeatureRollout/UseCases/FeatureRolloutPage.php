@@ -6,6 +6,9 @@ namespace App\Authentication\Domain\FeatureRollout\UseCases;
 
 use App\Authentication\Domain\FeatureRollout\FeatureRollout;
 
+/**
+ * @implements \IteratorAggregate<int, FeatureRollout>
+ */
 final readonly class FeatureRolloutPage implements \IteratorAggregate, \Countable
 {
     /** @var FeatureRollout[] */

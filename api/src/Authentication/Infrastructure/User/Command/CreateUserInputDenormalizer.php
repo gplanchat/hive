@@ -26,6 +26,9 @@ final class CreateUserInputDenormalizer implements DenormalizerInterface, Denorm
         ] : [];
     }
 
+    /**
+     * @param array{} $context
+     */
     public function denormalize(mixed $data, string $type, ?string $format = null, array $context = []): CreateUserInput
     {
         if (!\array_key_exists('username', $data) || !\is_string($data['username'])
@@ -49,6 +52,9 @@ final class CreateUserInputDenormalizer implements DenormalizerInterface, Denorm
         );
     }
 
+    /**
+     * @param array{} $context
+     */
     public function supportsDenormalization(mixed $data, string $type, ?string $format = null, array $context = []): bool
     {
         return CreateUserInput::class === $type;

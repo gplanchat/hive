@@ -150,6 +150,9 @@ final readonly class Role
     /** @var ResourceAccess[] */
     public array $resourceAccesses;
 
+    /**
+     * @param ResourceAccess[] $resourceAccesses
+     */
     public function __construct(
         #[ApiProperty(
             description: 'Identifier of the Role',

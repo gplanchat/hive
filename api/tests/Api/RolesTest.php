@@ -30,27 +30,24 @@ class RolesTest extends ApiTestCase
     protected function setUp(): void
     {
         parent::setUp();
-        self::bootKernel();
+        static::bootKernel();
 
-        $this->clock = self::getContainer()->get(ClockInterface::class);
-        \assert($this->clock instanceof ClockInterface);
+        $clock = self::getContainer()->get(ClockInterface::class);
+        \assert($clock instanceof ClockInterface);
+        $this->clock = $clock;
 
-        $this->roleFixtures = new RoleFixtures(
-            self::getContainer()->get(StorageMock::class)
-        );
+        $storageMock = self::getContainer()->get(StorageMock::class);
+        assert($storageMock instanceof StorageMock);
+
+        $this->roleFixtures = new RoleFixtures($storageMock);
         \assert($this->roleFixtures instanceof RoleFixtures);
         $this->roleFixtures->load();
 
-        $this->userFixtures = new UserFixtures(
-            self::getContainer()->get(StorageMock::class)
-        );
+        $this->userFixtures = new UserFixtures($storageMock);
         \assert($this->userFixtures instanceof UserFixtures);
         $this->userFixtures->load();
 
-        $this->organizationFixtures = new OrganizationFixtures(
-            $this->clock,
-            self::getContainer()->get(StorageMock::class)
-        );
+        $this->organizationFixtures = new OrganizationFixtures($this->clock, $storageMock);
         \assert($this->organizationFixtures instanceof OrganizationFixtures);
         $this->organizationFixtures->load();
     }
@@ -60,11 +57,11 @@ class RolesTest extends ApiTestCase
         $this->organizationFixtures->unload();
         $this->organizationFixtures = null;
 
-        $this->userFixtures->unload();
-        $this->userFixtures = null;
-
         $this->roleFixtures->unload();
         $this->roleFixtures = null;
+
+        $this->userFixtures->unload();
+        $this->userFixtures = null;
 
         $this->clock = null;
 

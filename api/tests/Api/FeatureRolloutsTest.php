@@ -28,15 +28,14 @@ class FeatureRolloutsTest extends ApiTestCase
         parent::setUp();
         static::bootKernel();
 
-        $this->roleFixtures = new RoleFixtures(
-            self::getContainer()->get(StorageMock::class)
-        );
+        $storageMock = self::getContainer()->get(StorageMock::class);
+        assert($storageMock instanceof StorageMock);
+
+        $this->roleFixtures = new RoleFixtures($storageMock);
         \assert($this->roleFixtures instanceof RoleFixtures);
         $this->roleFixtures->load();
 
-        $this->userFixtures = new UserFixtures(
-            self::getContainer()->get(StorageMock::class)
-        );
+        $this->userFixtures = new UserFixtures($storageMock);
         \assert($this->userFixtures instanceof UserFixtures);
         $this->userFixtures->load();
     }

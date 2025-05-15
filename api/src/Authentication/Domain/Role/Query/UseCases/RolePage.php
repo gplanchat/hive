@@ -6,8 +6,14 @@ namespace App\Authentication\Domain\Role\Query\UseCases;
 
 use App\Authentication\Domain\Role\Query\Role;
 
+/**
+ * @implements \IteratorAggregate<mixed, Role>
+ */
 final readonly class RolePage implements \IteratorAggregate, \Countable
 {
+    /**
+     * @var Role[]
+     */
     private array $roles;
 
     public function __construct(
@@ -19,6 +25,9 @@ final readonly class RolePage implements \IteratorAggregate, \Countable
         $this->roles = $roles;
     }
 
+    /**
+     * @return \Traversable<mixed, Role>
+     */
     public function getIterator(): \Traversable
     {
         yield from $this->roles;

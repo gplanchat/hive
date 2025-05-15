@@ -14,6 +14,9 @@ use App\Authentication\Domain\User\Query\User;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
+/**
+ * @implements ProcessorInterface<User, void>
+ */
 final readonly class DeleteUserProcessor implements ProcessorInterface
 {
     public function __construct(

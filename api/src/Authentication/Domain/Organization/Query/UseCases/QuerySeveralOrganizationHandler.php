@@ -17,7 +17,7 @@ final readonly class QuerySeveralOrganizationHandler
     ) {
     }
 
-    public function __invoke(QuerySeveralOrganization $query): organizationPage
+    public function __invoke(QuerySeveralOrganization $query): OrganizationPage
     {
         try {
             return $this->organizationRepository->list($query->realmId, $query->currentPage, $query->itemsPerPage);

@@ -6,11 +6,17 @@ namespace App\Authentication\Domain\User\Command;
 
 use App\Authentication\Domain\Organization\OrganizationId;
 use App\Authentication\Domain\Realm\RealmId;
+use App\Authentication\Domain\Role\RoleId;
 use App\Authentication\Domain\User\AuthorizationInterface;
 use App\Authentication\Domain\User\UserId;
+use App\Authentication\Domain\Workspace\WorkspaceId;
 
 final readonly class DeclaredEvent
 {
+    /**
+     * @param WorkspaceId[] $workspaceIds
+     * @param RoleId[] $roleIds
+     */
     public function __construct(
         public UserId $uuid,
         public int $version,

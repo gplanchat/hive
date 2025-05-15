@@ -6,6 +6,9 @@ namespace App\Authentication\Domain\Realm\Query\UseCases;
 
 use App\Authentication\Domain\Realm\Query\Realm;
 
+/**
+ * @implements \IteratorAggregate<mixed, Realm>
+ */
 final readonly class RealmPage implements \IteratorAggregate, \Countable
 {
     /** @var Realm[] */
@@ -17,9 +20,12 @@ final readonly class RealmPage implements \IteratorAggregate, \Countable
         public int $totalItems,
         Realm ...$realms,
     ) {
-        $this->realms = $realms;
+        $this->realms = array_values($realms);
     }
 
+    /**
+     * @implements \IteratorAggregate<mixed, Realm>
+     */
     public function getIterator(): \Traversable
     {
         yield from $this->realms;

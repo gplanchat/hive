@@ -45,12 +45,6 @@ final readonly class InMemoryUserRepository implements UserRepositoryInterface
             uuid: $value->uuid,
             realmId: $value->realmId,
             organizationId: $value->organizationId,
-            workspaceIds: $value->workspaceIds,
-            roleIds: $value->roleIds,
-            username: $value->username,
-            firstName: $value->firstName,
-            lastName: $value->lastName,
-            email: $value->email,
             enabled: $value->enabled,
         );
     }

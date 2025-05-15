@@ -50,14 +50,13 @@ final class DatabaseOrganizationRepository implements OrganizationRepositoryInte
         }
 
         $organization = $result->fetchAssociative();
+        if (false === $organization) {
+            throw new NotFoundException();
+        }
 
         return new Organization(
             OrganizationId::fromString($organization['uuid']),
             realmId: RealmId::fromString($organization['realm_id']),
-            name: $organization['name'],
-            validUntil: null !== $organization['valid_until']
-                ? \DateTimeImmutable::createFromFormat('Y-m-d', $organization['valid_until'], new \DateTimeZone('UTC'))
-                : null,
             featureRolloutIds: array_map(
                 fn (string $featureRolloutId): FeatureRolloutId => FeatureRolloutId::fromString($featureRolloutId),
                 json_decode($organization['feature_rollout_ids'], true, \JSON_THROW_ON_ERROR)

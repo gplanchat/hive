@@ -32,25 +32,22 @@ class OrganizationsTest extends ApiTestCase
         parent::setUp();
         static::bootKernel();
 
-        $this->clock = self::getContainer()->get(ClockInterface::class);
-        \assert($this->clock instanceof ClockInterface);
+        $clock = self::getContainer()->get(ClockInterface::class);
+        \assert($clock instanceof ClockInterface);
+        $this->clock = $clock;
 
-        $this->roleFixtures = new RoleFixtures(
-            self::getContainer()->get(StorageMock::class)
-        );
+        $storageMock = self::getContainer()->get(StorageMock::class);
+        assert($storageMock instanceof StorageMock);
+
+        $this->roleFixtures = new RoleFixtures($storageMock);
         \assert($this->roleFixtures instanceof RoleFixtures);
         $this->roleFixtures->load();
 
-        $this->userFixtures = new UserFixtures(
-            self::getContainer()->get(StorageMock::class)
-        );
+        $this->userFixtures = new UserFixtures($storageMock);
         \assert($this->userFixtures instanceof UserFixtures);
         $this->userFixtures->load();
 
-        $this->organizationFixtures = new OrganizationFixtures(
-            $this->clock,
-            self::getContainer()->get(StorageMock::class)
-        );
+        $this->organizationFixtures = new OrganizationFixtures($this->clock, $storageMock);
         \assert($this->organizationFixtures instanceof OrganizationFixtures);
         $this->organizationFixtures->load();
     }
@@ -82,8 +79,6 @@ class OrganizationsTest extends ApiTestCase
     /** @test */
     public function itShouldListOrganizations(): void
     {
-        $this->organizationFixtures->load();
-
         static::createClient()->request('GET', '/authentication/acme-inc/organizations', [
             'headers' => [
                 'authorization' => 'Bearer '.self::getTokenFor('/authentication/acme-inc/users/01966c5a-10ef-7abd-9c88-52b075bcae99'),

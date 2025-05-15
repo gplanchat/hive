@@ -10,7 +10,7 @@ namespace App\Shared\Infrastructure\Collection;
 final class Collection
 {
     /**
-     * @param \Iterator<array-key, Type> $items
+     * @param \Iterator<mixed, Type> $items
      */
     private function __construct(
         private readonly \Iterator $items,
@@ -18,7 +18,9 @@ final class Collection
     }
 
     /**
-     * @param \Iterator<array-key, Type> $data
+     * @param \Iterator<mixed, Type> $data
+     *
+     * @return self<Type>
      */
     public static function fromIterator(\Iterator $data): self
     {
@@ -26,7 +28,9 @@ final class Collection
     }
 
     /**
-     * @param \Traversable<array-key, Type> $data
+     * @param \Traversable<mixed, Type> $data
+     *
+     * @return self<Type>
      */
     public static function fromTraversable(\Traversable $data): self
     {
@@ -34,7 +38,9 @@ final class Collection
     }
 
     /**
-     * @param array<array-key, Type> $data
+     * @param array<mixed, Type> $data
+     *
+     * @return self<Type>
      */
     public static function fromArray(array $data): self
     {
@@ -42,7 +48,7 @@ final class Collection
     }
 
     /**
-     * @return array<array-key, Type>
+     * @return array<mixed, Type>
      */
     public function toArray(): array
     {
@@ -52,7 +58,7 @@ final class Collection
     /**
      * @param callable(Type): bool $filter
      *
-     * @return Collection<array-key, Type>
+     * @return Collection<Type>
      */
     public function filter(callable $filter): self
     {
@@ -66,7 +72,7 @@ final class Collection
      *
      * @param callable(Type): ReturnType $map
      *
-     * @return Collection<array-key, ReturnType>
+     * @return Collection<ReturnType>
      */
     public function map(callable $map): self
     {
@@ -78,7 +84,7 @@ final class Collection
     /**
      * @param callable(Type $left, Type $right): bool $callable
      *
-     * @return Collection<array-key, Type>
+     * @return Collection<Type>
      */
     public function unique(callable $callable): self
     {
@@ -100,7 +106,7 @@ final class Collection
     }
 
     /**
-     * @return Collection<array-key, Type>
+     * @return Collection<Type>
      */
     public function offset(int $offset): self
     {
@@ -110,7 +116,7 @@ final class Collection
     }
 
     /**
-     * @return Collection<array-key, Type>
+     * @return Collection<Type>
      */
     public function limit(int $limit): self
     {

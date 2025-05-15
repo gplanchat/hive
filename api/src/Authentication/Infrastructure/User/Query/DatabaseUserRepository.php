@@ -46,7 +46,24 @@ final readonly class DatabaseUserRepository implements UserRepositoryInterface
             throw new NotFoundException();
         }
 
-        return $this->hydrateOne($result->fetchAssociative());
+        $user = $result->fetchAssociative();
+        if ($user === false) {
+            throw new NotFoundException();
+        }
+
+        assert(array_key_exists('uuid', $user) && is_string($user['uuid']));
+        assert(array_key_exists('realm_id', $user) && is_string($user['realm_id']));
+        assert(array_key_exists('authorization_context', $user) && is_string($user['authorization_context']));
+        assert(array_key_exists('organization_id', $user) && is_string($user['organization_id']));
+        assert(array_key_exists('workspace_ids', $user) && is_string($user['workspace_ids']));
+        assert(array_key_exists('role_ids', $user) && is_string($user['role_ids']));
+        assert(array_key_exists('username', $user) && is_string($user['username']));
+        assert(array_key_exists('firstname', $user) && is_string($user['firstname']));
+        assert(array_key_exists('lastname', $user) && is_string($user['lastname']));
+        assert(array_key_exists('email', $user) && is_string($user['email']));
+        assert(array_key_exists('enabled', $user) && is_bool($user['enabled']));
+
+        return $this->hydrateOne($user);
     }
 
     public function list(RealmId $realmId, int $currentPage = 1, int $pageSize = 25): UserPage
@@ -122,12 +139,28 @@ final readonly class DatabaseUserRepository implements UserRepositoryInterface
         return new UserPage(1, $pageSize, 0, ...$this->hydrateAll($result));
     }
 
+    /**
+     * @param array{
+     *     uuid: string,
+     *     realm_id: string,
+     *     authorization_context: string,
+     *     organization_id: string,
+     *     workspace_ids: string,
+     *     role_ids: string,
+     *     username: string,
+     *     firstname: string,
+     *     lastname: string,
+     *     email: string,
+     *     enabled: bool,
+     * } $user
+     * @return User
+     */
     private function hydrateOne(array $user): User
     {
         return new User(
             UserId::fromString($user['uuid']),
             RealmId::fromString($user['realm_id']),
-            KeycloakAuthorization::fromNormalized($user['authorization_context']),
+            KeycloakAuthorization::fromNormalized(json_decode($user['authorization_context'])),
             OrganizationId::fromString($user['organization_id']),
             workspaceIds: array_map(
                 fn (string $workspaceId): WorkspaceId => WorkspaceId::fromString($workspaceId),
@@ -145,9 +178,24 @@ final readonly class DatabaseUserRepository implements UserRepositoryInterface
         );
     }
 
+    /**
+     * @return \Traversable<User>
+     */
     private function hydrateAll(Result $result): \Traversable
     {
         foreach ($result->iterateAssociative() as $user) {
+            assert(array_key_exists('uuid', $user) && is_string($user['uuid']));
+            assert(array_key_exists('realm_id', $user) && is_string($user['realm_id']));
+            assert(array_key_exists('authorization_context', $user) && is_string($user['authorization_context']));
+            assert(array_key_exists('organization_id', $user) && is_string($user['organization_id']));
+            assert(array_key_exists('workspace_ids', $user) && is_string($user['workspace_ids']));
+            assert(array_key_exists('role_ids', $user) && is_string($user['role_ids']));
+            assert(array_key_exists('username', $user) && is_string($user['username']));
+            assert(array_key_exists('firstname', $user) && is_string($user['firstname']));
+            assert(array_key_exists('lastname', $user) && is_string($user['lastname']));
+            assert(array_key_exists('email', $user) && is_string($user['email']));
+            assert(array_key_exists('enabled', $user) && is_bool($user['enabled']));
+
             yield $this->hydrateOne($user);
         }
     }

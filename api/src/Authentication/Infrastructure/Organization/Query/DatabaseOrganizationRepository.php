@@ -12,6 +12,7 @@ use App\Authentication\Domain\Organization\Query\OrganizationRepositoryInterface
 use App\Authentication\Domain\Organization\Query\UseCases\OrganizationPage;
 use App\Authentication\Domain\Realm\RealmId;
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\ParameterType;
 use Doctrine\DBAL\Result;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
@@ -43,7 +44,20 @@ final readonly class DatabaseOrganizationRepository implements OrganizationRepos
             throw new NotFoundException();
         }
 
-        return $this->hydrateOne($result->fetchAssociative());
+        $organization = $result->fetchAssociative();
+        if ($organization === false) {
+            throw new NotFoundException();
+        }
+
+        assert(array_key_exists('uuid', $organization) && is_string($organization['uuid']));
+        assert(array_key_exists('realm_id', $organization) && is_string($organization['realm_id']));
+        assert(array_key_exists('name', $organization) && is_string($organization['name']));
+        assert(array_key_exists('slug', $organization) && is_string($organization['slug']));
+        assert(array_key_exists('valid_until', $organization) && is_string($organization['valid_until']));
+        assert(array_key_exists('feature_rollout_ids', $organization) && is_string($organization['feature_rollout_ids']));
+        assert(array_key_exists('enabled', $organization) && is_bool($organization['enabled']));
+
+        return $this->hydrateOne($organization);
     }
 
     public function list(RealmId $realmId, int $currentPage = 1, int $pageSize = 25): OrganizationPage
@@ -69,6 +83,18 @@ final readonly class DatabaseOrganizationRepository implements OrganizationRepos
         return new OrganizationPage(1, $pageSize, 0, ...$this->hydrateAll($result));
     }
 
+    /**
+     * @param array{
+     *     uuid: string,
+     *     realm_id: string,
+     *     name: string,
+     *     slug: string,
+     *     valid_until: string|null,
+     *     feature_rollout_ids: string,
+     *     enabled: bool,
+     * } $organization
+     * @return Organization
+     */
     private function hydrateOne(array $organization): Organization
     {
         return new Organization(
@@ -77,7 +103,7 @@ final readonly class DatabaseOrganizationRepository implements OrganizationRepos
             name: $organization['name'],
             slug: $organization['slug'],
             validUntil: null !== $organization['valid_until']
-                ? \DateTimeImmutable::createFromFormat('Y-m-d', $organization['valid_until'], new \DateTimeZone('UTC'))
+                ? \DateTimeImmutable::createFromFormat('Y-m-d', $organization['valid_until'], new \DateTimeZone('UTC')) ?: null
                 : null,
             featureRolloutIds: array_map(
                 fn (string $featureRolloutId): FeatureRolloutId => FeatureRolloutId::fromString($featureRolloutId),
@@ -87,9 +113,21 @@ final readonly class DatabaseOrganizationRepository implements OrganizationRepos
         );
     }
 
+    /**
+     * @return \Traversable<mixed, Organization>
+     * @throws Exception
+     */
     private function hydrateAll(Result $result): \Traversable
     {
         foreach ($result->iterateAssociative() as $organization) {
+            assert(array_key_exists('uuid', $organization) && is_string($organization['uuid']));
+            assert(array_key_exists('realm_id', $organization) && is_string($organization['realm_id']));
+            assert(array_key_exists('name', $organization) && is_string($organization['name']));
+            assert(array_key_exists('slug', $organization) && is_string($organization['slug']));
+            assert(array_key_exists('valid_until', $organization) && is_string($organization['valid_until']));
+            assert(array_key_exists('feature_rollout_ids', $organization) && is_string($organization['feature_rollout_ids']));
+            assert(array_key_exists('enabled', $organization) && is_bool($organization['enabled']));
+
             yield $this->hydrateOne($organization);
         }
     }

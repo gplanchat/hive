@@ -13,6 +13,9 @@ use App\Authentication\Domain\NotFoundException;
 
 final class InMemoryFeatureRolloutRepository implements FeatureRolloutRepositoryInterface
 {
+    /**
+     * @var FeatureRollout[]
+     */
     private array $storage = [];
 
     public function __construct(

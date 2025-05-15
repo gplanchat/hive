@@ -6,8 +6,14 @@ namespace App\Authentication\Domain\Organization\Query\UseCases;
 
 use App\Authentication\Domain\Organization\Query\Organization;
 
+/**
+ * @implements \IteratorAggregate<mixed, Organization>
+ */
 final readonly class OrganizationPage implements \IteratorAggregate, \Countable
 {
+    /**
+     * @var Organization[]
+     */
     private array $organizations;
 
     public function __construct(
@@ -16,9 +22,12 @@ final readonly class OrganizationPage implements \IteratorAggregate, \Countable
         public int $totalItems,
         Organization ...$organizations,
     ) {
-        $this->organizations = $organizations;
+        $this->organizations = array_values($organizations);
     }
 
+    /**
+     * @return \Traversable<mixed, Organization>
+     */
     public function getIterator(): \Traversable
     {
         yield from $this->organizations;

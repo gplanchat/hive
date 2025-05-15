@@ -14,11 +14,15 @@ use App\Authentication\Domain\QueryBusInterface;
 use App\Authentication\Domain\Realm\RealmId;
 use App\Authentication\Domain\User\Query\UseCases\QuerySeveralUserInOrganization;
 use App\Authentication\Domain\User\Query\UseCases\UserPage;
+use App\Authentication\Domain\User\Query\User;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 use Symfony\Component\Messenger\Exception\HandlerFailedException;
 
+/**
+ * @implements ProviderInterface<User>
+ */
 final readonly class QuerySeveralUserInOrganizationProvider implements ProviderInterface
 {
     public function __construct(
@@ -27,6 +31,9 @@ final readonly class QuerySeveralUserInOrganizationProvider implements ProviderI
     ) {
     }
 
+    /**
+     * @return PaginatorInterface<User>|TraversablePaginator
+     */
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): PaginatorInterface
     {
         try {

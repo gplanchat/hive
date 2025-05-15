@@ -67,6 +67,10 @@ final readonly class KeycloakMock implements KeycloakInterface
         return $this->keysRegistry->publicKeys()->toArray();
     }
 
+    /**
+     * @param array{} $payload
+     * @param array{} $headers
+     */
     public function generateJWT(string $subject, int $keyId = 0, array $payload = [], array $headers = [], \DateInterval $expiration = new \DateInterval('PT1H')): string
     {
         $certificates = $this->keysRegistry->privateKeys()->toArray();

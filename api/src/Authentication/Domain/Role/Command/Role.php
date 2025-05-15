@@ -11,14 +11,13 @@ use App\Authentication\Domain\Role\RoleId;
 
 final class Role
 {
-    /** @param ResourceAccess[] $resourceAccesses */
+    /**
+     * @param object[] $events
+     */
     public function __construct(
         public readonly RoleId $uuid,
         public readonly RealmId $realmId,
         public readonly OrganizationId $organizationId,
-        private ?string $identifier = null,
-        private ?string $label = null,
-        private array $resourceAccesses = [],
         private bool $deleted = false,
         private array $events = [],
         private int $version = 0,
@@ -40,6 +39,9 @@ final class Role
         $this->apply($event);
     }
 
+    /**
+     * @return object[]
+     */
     public function releaseEvents(): array
     {
         $releasedEvents = $this->events;
@@ -48,6 +50,9 @@ final class Role
         return $releasedEvents;
     }
 
+    /**
+     * @param ResourceAccess[] $resourceAccesses
+     */
     public static function declare(
         RoleId $uuid,
         RealmId $realmId,
@@ -72,8 +77,6 @@ final class Role
 
     private function applyDeclaredEvent(DeclaredEvent $event): void
     {
-        $this->label = $event->label;
-        $this->resourceAccesses = $event->resourceAccesses;
     }
 
     public function delete(): void

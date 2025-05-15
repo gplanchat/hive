@@ -16,7 +16,7 @@ interface RoleRepositoryInterface
     /** @throws NotFoundException */
     public function get(RoleId $roleId, RealmId $realmId): Role;
 
-    /** @return Role[] */
+    /** @return Collection<Role> */
     public function getAll(RealmId $realmId, RoleId ...$roleIds): Collection;
 
     public function list(RealmId $realmId, int $currentPage = 1, int $pageSize = 25): RolePage;

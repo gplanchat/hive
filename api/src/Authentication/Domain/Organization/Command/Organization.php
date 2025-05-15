@@ -19,9 +19,6 @@ final class Organization
     public function __construct(
         public readonly OrganizationId $uuid,
         public readonly RealmId $realmId,
-        private ?string $name = null,
-        private ?string $slug = null,
-        private ?\DateTimeInterface $validUntil = null,
         private array $featureRolloutIds = [],
         private bool $enabled = true,
         private bool $deleted = false,
@@ -45,6 +42,9 @@ final class Organization
         $this->apply($event);
     }
 
+    /**
+     * @return object[]
+     */
     public function releaseEvents(): array
     {
         $releasedEvents = $this->events;
@@ -109,9 +109,6 @@ final class Organization
 
     private function applyDeclaredEvent(DeclaredEvent $event): void
     {
-        $this->name = $event->name;
-        $this->slug = $event->slug;
-        $this->validUntil = $event->validUntil;
         $this->featureRolloutIds = $event->featureRolloutIds;
         $this->enabled = $event->enabled;
     }

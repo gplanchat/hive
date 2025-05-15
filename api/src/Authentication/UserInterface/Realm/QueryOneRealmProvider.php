@@ -15,6 +15,9 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 use Symfony\Component\Messenger\Exception\HandlerFailedException;
 
+/**
+ * @implements ProviderInterface<Realm>
+ */
 final class QueryOneRealmProvider implements ProviderInterface
 {
     public function __construct(

@@ -45,9 +45,6 @@ final class InMemoryWorkspaceRepository implements WorkspaceRepositoryInterface
             uuid: $value->uuid,
             realmId: $value->realmId,
             organizationId: $value->organizationId,
-            name: $value->name,
-            slug: $value->slug,
-            validUntil: $value->validUntil,
             enabled: $value->enabled,
         );
     }
