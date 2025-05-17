@@ -15,14 +15,17 @@ final readonly class CreateEnabledUserHandler
     public function __construct(
         private UserRepositoryInterface $userRepository,
         private OrganizationRepositoryInterface $organizationRepository,
-    ) {}
+    ) {
+    }
 
     public function __invoke(CreateEnabledUser $command): void
     {
-        $this->organizationRepository->get($command->organizationId);
+        $this->organizationRepository->get($command->organizationId, $command->realmId);
 
         $user = User::declareEnabled(
             $command->uuid,
+            $command->realmId,
+            $command->authorization,
             $command->organizationId,
             $command->workspaceIds,
             $command->roleIds,

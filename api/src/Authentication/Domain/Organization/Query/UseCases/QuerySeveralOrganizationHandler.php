@@ -17,10 +17,10 @@ final readonly class QuerySeveralOrganizationHandler
     ) {
     }
 
-    public function __invoke(QuerySeveralOrganization $query): organizationPage
+    public function __invoke(QuerySeveralOrganization $query): OrganizationPage
     {
         try {
-            return $this->organizationRepository->list($query->currentPage, $query->itemsPerPage);
+            return $this->organizationRepository->list($query->realmId, $query->currentPage, $query->itemsPerPage);
         } catch (NotFoundException $exception) {
             throw new UnrecoverableMessageHandlingException(previous: $exception);
         }

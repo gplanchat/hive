@@ -1,0 +1,77 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Cloud\Management\Domain\CloudProviderAccount;
+
+use App\Platform\Domain\IdInterface;
+use App\Platform\Domain\InvalidUuidFormatException;
+use App\Platform\Domain\UuidInterface;
+use Symfony\Component\Routing\Requirement\Requirement;
+
+final class CloudProviderAccountId implements UuidInterface
+{
+    public const string REQUIREMENT = Requirement::UUID_V7;
+    public const string URI_REQUIREMENT = '\/cloud\/cloud-provider-accounts\/'.Requirement::UUID_V7;
+    public const string PARSE = '/\/cloud\/cloud-provider-accounts\/(?<reference>'.Requirement::UUID.')/';
+
+    private function __construct(
+        private readonly string $reference,
+    ) {
+        if (!uuid_is_valid($this->reference)) {
+            throw new InvalidUuidFormatException(\sprintf('<%s> is not a valid UUID.', $reference));
+        }
+    }
+
+    public static function generateRandom(): self
+    {
+        return new self(uuid_create(UUID_TYPE_RANDOM));
+    }
+
+    public static function nil(): self
+    {
+        return new self(uuid_create(UUID_TYPE_NULL));
+    }
+
+    public static function fromUri(string $uri): self
+    {
+        if (!preg_match(self::PARSE, $uri, $matches)) {
+            throw new InvalidUuidFormatException(\sprintf('<%s> is not a valid URI.', $uri));
+        }
+
+        return new self($matches['reference']);
+    }
+
+    public static function fromString(string $reference): self
+    {
+        return new self($reference);
+    }
+
+    public function equals(IdInterface|string $other): bool
+    {
+        if (\is_string($other)) {
+            return 0 === uuid_compare($this->reference, $other);
+        }
+
+        if (!$other instanceof self) {
+            return false;
+        }
+
+        return 0 === uuid_compare($this->reference, $other->reference);
+    }
+
+    public function isNil(): bool
+    {
+        return uuid_is_null($this->reference);
+    }
+
+    public function __toString(): string
+    {
+        return $this->reference;
+    }
+
+    public function toString(): string
+    {
+        return $this->reference;
+    }
+}

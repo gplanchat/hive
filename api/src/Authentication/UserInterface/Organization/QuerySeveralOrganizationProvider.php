@@ -5,42 +5,54 @@ declare(strict_types=1);
 namespace App\Authentication\UserInterface\Organization;
 
 use ApiPlatform\Metadata\Operation;
+use ApiPlatform\State\Pagination\Pagination;
 use ApiPlatform\State\Pagination\PaginatorInterface;
 use ApiPlatform\State\Pagination\TraversablePaginator;
 use ApiPlatform\State\ProviderInterface;
-use App\Authentication\Domain\NotFoundException;
+use App\Authentication\Domain\Organization\Query\Organization;
 use App\Authentication\Domain\Organization\Query\UseCases\OrganizationPage;
-use App\Authentication\Domain\QueryBusInterface;
+use App\Authentication\Domain\Organization\Query\UseCases\QuerySeveralOrganization;
+use App\Authentication\Domain\Realm\RealmId;
+use App\Platform\Infrastructure\QueryBusInterface;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
+use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
+use Symfony\Component\Messenger\Exception\HandlerFailedException;
 
+/**
+ * @implements ProviderInterface<Organization>
+ */
 final readonly class QuerySeveralOrganizationProvider implements ProviderInterface
 {
     public function __construct(
-        private DenormalizerInterface $denormalizer,
         private QueryBusInterface $queryBus,
+        private Pagination $pagination,
     ) {
     }
 
+    /**
+     * @return PaginatorInterface<Organization>|TraversablePaginator
+     */
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): PaginatorInterface
     {
-        $type = $operation->getInput()['class'];
-        $request = $context['request'];
-        if (!$this->denormalizer->supportsDenormalization($context, $type, $request->getRequestFormat())) {
-            throw new BadRequestHttpException();
+        try {
+            $query = new QuerySeveralOrganization(
+                RealmId::fromString($uriVariables['realm']),
+                $this->pagination->getPage($context),
+                $this->pagination->getLimit($operation, $context),
+            );
+        } catch (\InvalidArgumentException $exception) {
+            throw new BadRequestHttpException($exception->getMessage(), previous: $exception);
         }
 
-        $input = $this->denormalizer->denormalize($context, $type, $request->getRequestFormat());
-
         try {
-            $result = $this->queryBus->query($input);
-        } catch (NotFoundException $exception) {
+            $result = $this->queryBus->query($query);
+        } catch (HandlerFailedException $exception) {
             throw new NotFoundHttpException($exception->getMessage(), previous: $exception);
         }
 
         if (!$result instanceof OrganizationPage) {
-            throw new BadRequestHttpException();
+            throw new UnprocessableEntityHttpException();
         }
 
         return new TraversablePaginator(

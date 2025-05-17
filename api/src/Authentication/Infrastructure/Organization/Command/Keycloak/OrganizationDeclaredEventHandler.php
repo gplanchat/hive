@@ -20,8 +20,8 @@ final readonly class OrganizationDeclaredEventHandler
 
     public function __invoke(DeclaredEvent $event): void
     {
-        $organization = $this->organizationRepository->get($event->uuid);
+        $organization = $this->organizationRepository->get($event->uuid, $event->realmId);
 
-        $this->keycloak->createRealmFromOrganization($organization);
+        $this->keycloak->createOrganizationInsideRealm($event->realmId, $organization);
     }
 }

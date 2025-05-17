@@ -5,24 +5,48 @@ declare(strict_types=1);
 namespace App\Authentication\Domain\Workspace\Query;
 
 use ApiPlatform\Metadata\ApiProperty;
+use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
-use ApiPlatform\Metadata\QueryParameter;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Post;
 use ApiPlatform\OpenApi\Model\Operation;
 use ApiPlatform\OpenApi\Model\Parameter;
 use App\Authentication\Domain\Organization\OrganizationId;
-use App\Authentication\Domain\Workspace\Query\UseCases\QueryOneWorkspace;
-use App\Authentication\Domain\Workspace\Query\UseCases\QuerySeveralWorkspace;
-use App\Authentication\Domain\Workspace\Query\UseCases\QuerySeveralWorkspaceInOrganization;
+use App\Authentication\Domain\Realm\RealmId;
+use App\Authentication\Domain\Workspace\Query\Workspace as QueryWorkspace;
 use App\Authentication\Domain\Workspace\WorkspaceId;
+use App\Authentication\UserInterface\Workspace\CreateWorkspaceInput;
+use App\Authentication\UserInterface\Workspace\CreateWorkspaceProcessor;
+use App\Authentication\UserInterface\Workspace\CreateWorkspaceWithinOrganizationInput;
+use App\Authentication\UserInterface\Workspace\DeleteWorkspaceProcessor;
+use App\Authentication\UserInterface\Workspace\DisableWorkspaceInput;
+use App\Authentication\UserInterface\Workspace\DisableWorkspaceProcessor;
+use App\Authentication\UserInterface\Workspace\EnableWorkspaceInput;
+use App\Authentication\UserInterface\Workspace\EnableWorkspaceProcessor;
 use App\Authentication\UserInterface\Workspace\QueryOneWorkspaceProvider;
+use App\Authentication\UserInterface\Workspace\QuerySeveralWorkspaceInOrganizationProvider;
 use App\Authentication\UserInterface\Workspace\QuerySeveralWorkspaceProvider;
-use Symfony\Component\Routing\Requirement\Requirement;
 use Symfony\Component\Serializer\Attribute\Context;
 
+#[Delete(
+    uriTemplate: '/authentication/{realm}/workspaces/{uuid}',
+    uriVariables: [
+        'realm' => 'realmId',
+        'uuid',
+    ],
+    security: 'is_granted("IS_AUTHENTICATED")',
+    input: false,
+    output: false,
+    provider: QueryOneWorkspaceProvider::class,
+    processor: DeleteWorkspaceProcessor::class,
+)]
 #[Get(
-    uriTemplate: '/authentication/workspaces/{uuid}',
-    uriVariables: ['uuid'],
+    uriTemplate: '/authentication/{realm}/workspaces/{uuid}',
+    uriVariables: [
+        'realm' => 'realmId',
+        'uuid',
+    ],
     openapi: new Operation(
         parameters: [
             new Parameter(
@@ -32,30 +56,47 @@ use Symfony\Component\Serializer\Attribute\Context;
                 required: true,
                 schema: ['pattern' => WorkspaceId::REQUIREMENT],
             ),
+            new Parameter(
+                name: 'realm',
+                in: 'path',
+                description: 'Code of the Realm',
+                required: true,
+                schema: ['pattern' => RealmId::REQUIREMENT],
+            ),
         ],
     ),
-    input: QueryOneWorkspace::class,
-    provider: QueryOneWorkspaceProvider::class
+    security: 'is_granted("IS_AUTHENTICATED")',
+    provider: QueryOneWorkspaceProvider::class,
 )]
 #[GetCollection(
-    uriTemplate: '/authentication/workspaces',
-    openapi: new Operation(),
+    uriTemplate: '/authentication/{realm}/workspaces',
+    uriVariables: [
+        'realm' => 'realmId',
+    ],
+    openapi: new Operation(
+        parameters: [
+            new Parameter(
+                name: 'realm',
+                in: 'path',
+                description: 'Code of the Realm',
+                required: true,
+                schema: ['pattern' => RealmId::REQUIREMENT],
+            ),
+        ],
+    ),
     paginationEnabled: true,
     paginationItemsPerPage: 25,
     paginationMaximumItemsPerPage: 100,
     paginationPartial: true,
     order: ['uuid' => 'ASC'],
-    input: QuerySeveralWorkspace::class,
+    security: 'is_granted("IS_AUTHENTICATED")',
     provider: QuerySeveralWorkspaceProvider::class,
-    parameters: [
-        'page' => new QueryParameter(schema: ['type' => 'integer', 'min' => 1]),
-        'itemsPerPage' => new QueryParameter(schema: ['type' => 'integer', 'min' => 10, 'max' => 100]),
-    ],
+    itemUriTemplate: '/authentication/{realm}/workspace/{uuid}',
 )]
 #[GetCollection(
-    uriTemplate: '/authentication/organizations/{organizationId}/workspaces',
+    uriTemplate: '/authentication/{realm}/organizations/{organizationId}/workspaces',
     uriVariables: [
-//        'organizationId' => new Link('organizationId', fromClass: self::class, toClass: Organization::class),
+        'realm' => 'realmId',
         'organizationId',
     ],
     openapi: new Operation(
@@ -67,6 +108,13 @@ use Symfony\Component\Serializer\Attribute\Context;
                 required: true,
                 schema: ['pattern' => OrganizationId::REQUIREMENT],
             ),
+            new Parameter(
+                name: 'realm',
+                in: 'path',
+                description: 'Code of the Realm',
+                required: true,
+                schema: ['pattern' => RealmId::REQUIREMENT],
+            ),
         ],
     ),
     paginationEnabled: true,
@@ -74,12 +122,57 @@ use Symfony\Component\Serializer\Attribute\Context;
     paginationMaximumItemsPerPage: 100,
     paginationPartial: true,
     order: ['uuid' => 'ASC'],
-    input: QuerySeveralWorkspaceInOrganization::class,
-    provider: QuerySeveralWorkspaceProvider::class,
-    parameters: [
-        'page' => new QueryParameter(schema: ['type' => 'integer', 'min' => 1]),
-        'itemsPerPage' => new QueryParameter(schema: ['type' => 'integer', 'min' => 10, 'max' => 100]),
+    security: 'is_granted("IS_AUTHENTICATED")',
+    provider: QuerySeveralWorkspaceInOrganizationProvider::class,
+    itemUriTemplate: '/authentication/{realm}/workspace/{uuid}',
+)]
+#[Patch(
+    uriTemplate: '/authentication/{realm}/workspaces/{uuid}/enable',
+    uriVariables: [
+        'realm' => 'realmId',
+        'uuid',
     ],
+    security: 'is_granted("IS_AUTHENTICATED")',
+    input: EnableWorkspaceInput::class,
+    output: QueryWorkspace::class,
+    provider: QueryOneWorkspaceProvider::class,
+    processor: EnableWorkspaceProcessor::class,
+)]
+#[Patch(
+    uriTemplate: '/authentication/{realm}/workspaces/{uuid}/disable',
+    uriVariables: [
+        'realm' => 'realmId',
+        'uuid',
+    ],
+    security: 'is_granted("IS_AUTHENTICATED")',
+    input: DisableWorkspaceInput::class,
+    output: QueryWorkspace::class,
+    provider: QueryOneWorkspaceProvider::class,
+    processor: DisableWorkspaceProcessor::class,
+)]
+#[Post(
+    uriTemplate: '/authentication/{realm}/workspaces',
+    uriVariables: [
+        'realm' => 'realmId',
+    ],
+    class: QueryWorkspace::class,
+    security: 'is_granted("IS_AUTHENTICATED")',
+    input: CreateWorkspaceInput::class,
+    output: QueryWorkspace::class,
+    processor: CreateWorkspaceProcessor::class,
+    itemUriTemplate: '/authentication/{realm}/workspaces/{uuid}',
+)]
+#[Post(
+    uriTemplate: '/authentication/{realm}/organizations/{organizationId}/workspaces',
+    uriVariables: [
+        'realm' => 'realmId',
+        'organizationId',
+    ],
+    security: 'is_granted("IS_AUTHENTICATED")',
+    input: CreateWorkspaceWithinOrganizationInput::class,
+    output: QueryWorkspace::class,
+    processor: CreateWorkspaceProcessor::class,
+    itemUriTemplate: '/authentication/{realm}/workspaces/{uuid}',
 )]
 final readonly class Workspace
 {
@@ -90,6 +183,12 @@ final readonly class Workspace
             schema: ['type' => 'string', 'pattern' => WorkspaceId::REQUIREMENT],
         )]
         public WorkspaceId $uuid,
+        #[ApiProperty(
+            description: 'Realm of the Workspace',
+            identifier: true,
+            schema: ['type' => 'string', 'pattern' => RealmId::REQUIREMENT],
+        )]
+        public RealmId $realmId,
         #[ApiProperty(
             description: 'Identifier of the Owning Organization',
             schema: ['type' => 'string', 'pattern' => OrganizationId::URI_REQUIREMENT],
@@ -117,5 +216,6 @@ final readonly class Workspace
             schema: ['type' => 'boolean'],
         )]
         public bool $enabled = true,
-    ) {}
+    ) {
+    }
 }

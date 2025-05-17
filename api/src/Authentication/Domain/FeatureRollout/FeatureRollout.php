@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Authentication\Domain\FeatureRollout;
 
-use ApiPlatform\JsonLd\ContextBuilder;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
@@ -16,7 +15,7 @@ use App\Authentication\UserInterface\FeatureRollout\QueryOneFeatureRolloutProvid
 use App\Authentication\UserInterface\FeatureRollout\QuerySeveralFeatureRolloutProvider;
 
 #[Get(
-    uriTemplate: '/authentication/feature-rollouts/{code}',
+    uriTemplate: '/feature-rollouts/{code}',
     uriVariables: ['code'],
     openapi: new Operation(
         summary: 'Get feature rollout',
@@ -30,18 +29,20 @@ use App\Authentication\UserInterface\FeatureRollout\QuerySeveralFeatureRolloutPr
             ),
         ],
     ),
+    security: 'is_granted("IS_AUTHENTICATED")',
     input: QueryOneFeatureRollout::class,
     output: FeatureRollout::class,
     validate: true,
     provider: QueryOneFeatureRolloutProvider::class,
 )]
 #[GetCollection(
-    uriTemplate: '/authentication/feature-rollouts',
+    uriTemplate: '/feature-rollouts',
     paginationEnabled: true,
     paginationItemsPerPage: 25,
     paginationMaximumItemsPerPage: 100,
     paginationPartial: true,
     order: ['code' => 'ASC'],
+    security: 'is_granted("IS_AUTHENTICATED")',
     validate: true,
     provider: QuerySeveralFeatureRolloutProvider::class,
     parameters: [
@@ -51,6 +52,7 @@ use App\Authentication\UserInterface\FeatureRollout\QuerySeveralFeatureRolloutPr
 )]
 final readonly class FeatureRollout
 {
+    /** @param Targets[] $targets */
     public function __construct(
         #[ApiProperty(
             description: 'Code of the Feature Rollout',
@@ -65,6 +67,17 @@ final readonly class FeatureRollout
             ],
         )]
         public FeatureRolloutId $code,
+        #[ApiProperty(
+            description: 'Applicable target types of the Feature Rollout',
+            writable: true,
+            required: true,
+            identifier: true,
+            schema: [
+                'type' => 'string',
+                'enum' => [Targets::Global->value, Targets::Organization->value],
+            ],
+        )]
+        public array $targets,
     ) {
     }
 }

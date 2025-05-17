@@ -18,6 +18,6 @@ final readonly class QueryOneRoleHandler
 
     public function __invoke(QueryOneRole $query): Role
     {
-        return $this->roleRepository->get($query->uuid);
+        return $this->roleRepository->get($query->uuid, $query->realmId);
     }
 }

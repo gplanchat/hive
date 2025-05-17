@@ -17,7 +17,7 @@ final class DeleteOrganizationHandler
 
     public function __invoke(DeleteOrganization $command): void
     {
-        $organization = $this->organizationRepository->get($command->uuid);
+        $organization = $this->organizationRepository->get($command->uuid, $command->realmId);
         $organization->delete();
         $this->organizationRepository->save($organization);
     }

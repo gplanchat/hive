@@ -4,53 +4,20 @@ declare(strict_types=1);
 
 namespace App\Authentication\Domain\Role\Command;
 
-use ApiPlatform\Metadata\Delete;
-use ApiPlatform\Metadata\Post;
 use App\Authentication\Domain\Organization\OrganizationId;
+use App\Authentication\Domain\Realm\RealmId;
 use App\Authentication\Domain\Role\ResourceAccess;
 use App\Authentication\Domain\Role\RoleId;
-use App\Authentication\Domain\Role\Query\Role as QueryRole;
-use App\Authentication\UserInterface\Role\CreateRoleInput;
-use App\Authentication\UserInterface\Role\CreateRoleProcessor;
-use App\Authentication\UserInterface\Role\CreateRoleWithinOrganizationInput;
-use App\Authentication\UserInterface\Role\DeleteRoleProcessor;
-use App\Authentication\UserInterface\Role\QueryOneRoleProvider;
 
-#[Post(
-    uriTemplate: '/authentication/organizations/{organizationId}/roles',
-    uriVariables: ['organizationId'],
-    class: QueryRole::class,
-    input: CreateRoleWithinOrganizationInput::class,
-    output: QueryRole::class,
-    processor: CreateRoleProcessor::class,
-    itemUriTemplate: '/authentication/roles/{uuid}',
-)]
-#[Post(
-    uriTemplate: '/authentication/roles',
-    class: QueryRole::class,
-    input: CreateRoleInput::class,
-    output: QueryRole::class,
-    processor: CreateRoleProcessor::class,
-    itemUriTemplate: '/authentication/roles/{uuid}',
-)]
-#[Delete(
-    uriTemplate: '/authentication/roles/{uuid}',
-    uriVariables: ['uuid'],
-    class: QueryRole::class,
-    input: false,
-    output: false,
-    provider: QueryOneRoleProvider::class,
-    processor: DeleteRoleProcessor::class,
-)]
 final class Role
 {
-    /** @param ResourceAccess[] $resourceAccesses */
+    /**
+     * @param object[] $events
+     */
     public function __construct(
         public readonly RoleId $uuid,
+        public readonly RealmId $realmId,
         public readonly OrganizationId $organizationId,
-        private ?string $identifier = null,
-        private ?string $label = null,
-        private array $resourceAccesses = [],
         private bool $deleted = false,
         private array $events = [],
         private int $version = 0,
@@ -59,7 +26,7 @@ final class Role
 
     private function apply(object $event): void
     {
-        $methodName = 'apply'.substr(__CLASS__, strrpos(__CLASS__, '\\') + 1);
+        $methodName = 'apply'.substr($event::class, strrpos($event::class, '\\') + 1);
         if (method_exists($this, $methodName)) {
             $this->{$methodName}($event);
         }
@@ -68,28 +35,37 @@ final class Role
     private function recordThat(object $event): void
     {
         $this->events[] = $event;
-        $this->version++;
+        ++$this->version;
         $this->apply($event);
     }
 
+    /**
+     * @return object[]
+     */
     public function releaseEvents(): array
     {
         $releasedEvents = $this->events;
         $this->events = [];
+
         return $releasedEvents;
     }
 
+    /**
+     * @param ResourceAccess[] $resourceAccesses
+     */
     public static function declare(
         RoleId $uuid,
+        RealmId $realmId,
         OrganizationId $organizationId,
         string $identifier,
         string $label,
         array $resourceAccesses = [],
     ): self {
-        $instance = new self($uuid, $organizationId);
+        $instance = new self($uuid, $realmId, $organizationId);
         $instance->recordThat(new DeclaredEvent(
             $uuid,
             1,
+            $realmId,
             $organizationId,
             $identifier,
             $label,
@@ -101,8 +77,6 @@ final class Role
 
     private function applyDeclaredEvent(DeclaredEvent $event): void
     {
-        $this->label = $event->label;
-        $this->resourceAccesses = $event->resourceAccesses;
     }
 
     public function delete(): void
@@ -111,7 +85,7 @@ final class Role
             throw new InvalidRoleStateException('Cannot delete an already deleted Role.');
         }
 
-        $this->recordThat(new DeletedEvent($this->uuid, $this->version + 1));
+        $this->recordThat(new DeletedEvent($this->uuid, $this->version + 1, $this->realmId, $this->organizationId));
     }
 
     private function applyDeletedEvent(DeletedEvent $event): void

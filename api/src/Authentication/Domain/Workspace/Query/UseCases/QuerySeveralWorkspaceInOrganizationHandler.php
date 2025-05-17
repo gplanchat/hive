@@ -17,6 +17,6 @@ final readonly class QuerySeveralWorkspaceInOrganizationHandler
 
     public function __invoke(QuerySeveralWorkspaceInOrganization $query): WorkspacePage
     {
-        return $this->workspaceRepository->listFromOrganization($query->organizationId, $query->currentPage, $query->itemsPerPage);
+        return $this->workspaceRepository->listFromOrganization($query->realmId, $query->organizationId, $query->currentPage, $query->itemsPerPage);
     }
 }

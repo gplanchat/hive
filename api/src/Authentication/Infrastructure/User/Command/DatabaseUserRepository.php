@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Authentication\Infrastructure\User\Command;
 
-use App\Authentication\Domain\EventBusInterface;
 use App\Authentication\Domain\NotFoundException;
 use App\Authentication\Domain\Organization\OrganizationId;
+use App\Authentication\Domain\Realm\RealmId;
 use App\Authentication\Domain\Role\RoleId;
 use App\Authentication\Domain\User\Command\DeclaredEvent;
 use App\Authentication\Domain\User\Command\DeletedEvent;
@@ -16,6 +16,7 @@ use App\Authentication\Domain\User\Command\User;
 use App\Authentication\Domain\User\Command\UserRepositoryInterface;
 use App\Authentication\Domain\User\UserId;
 use App\Authentication\Domain\Workspace\WorkspaceId;
+use App\Platform\Infrastructure\EventBusInterface;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\ParameterType;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
@@ -26,12 +27,13 @@ final readonly class DatabaseUserRepository implements UserRepositoryInterface
         #[Autowire('@db.connection')]
         private Connection $connection,
         private EventBusInterface $eventBus,
-    ) {}
+    ) {
+    }
 
-    public function get(UserId $userId): User
+    public function get(UserId $userId, RealmId $realmId): User
     {
-        $sql = <<<SQL
-            SELECT uuid, organization_id, workspace_ids, role_ids, username, firstname, lastname, email, enabled, version
+        $sql = <<<'SQL'
+            SELECT uuid, realm_id, organization_id, workspace_ids, role_ids, username, firstname, lastname, email, enabled, version
             FROM users
             WHERE uuid = :uuid
             LIMIT 1
@@ -46,22 +48,20 @@ final readonly class DatabaseUserRepository implements UserRepositoryInterface
         }
 
         $user = $result->fetchAssociative();
+        if (false === $user) {
+            throw new NotFoundException();
+        }
+
+        \assert(\array_key_exists('uuid', $user) && \is_string($user['uuid']) && \strlen($user['uuid']) > 0);
+        \assert(\array_key_exists('realm_id', $user) && \is_string($user['realm_id']) && \strlen($user['realm_id']) > 0);
+        \assert(\array_key_exists('organization_id', $user) && \is_string($user['organization_id']) && \strlen($user['organization_id']) > 0);
+        \assert(\array_key_exists('enabled', $user) && \is_bool($user['enabled']));
+        \assert(\array_key_exists('version', $user) && \is_int($user['version']));
 
         return new User(
             UserId::fromString($user['uuid']),
+            RealmId::fromString($user['realm_id']),
             OrganizationId::fromString($user['organization_id']),
-            workspaceIds: array_map(
-                fn (string $workspaceIds): WorkspaceId => WorkspaceId::fromString($workspaceIds),
-                json_decode($user['workspace_ids'], true, JSON_THROW_ON_ERROR)
-            ),
-            roleIds: array_map(
-                fn (string $roleId): RoleId => RoleId::fromString($roleId),
-                json_decode($user['role_ids'], true, JSON_THROW_ON_ERROR)
-            ),
-            username: $user['username'],
-            firstName: $user['firstname'],
-            lastName: $user['lastname'],
-            email: $user['email'],
             enabled: $user['enabled'],
             version: $user['version'],
         );
@@ -87,7 +87,7 @@ final readonly class DatabaseUserRepository implements UserRepositoryInterface
 
     private function saveEvent(object $event): void
     {
-        $methodName = 'apply'.substr(get_class($event), strrpos(get_class($event), '\\') + 1);
+        $methodName = 'apply'.substr($event::class, strrpos($event::class, '\\') + 1);
         if (method_exists($this, $methodName)) {
             $this->{$methodName}($event);
         }
@@ -95,21 +95,22 @@ final readonly class DatabaseUserRepository implements UserRepositoryInterface
 
     private function applyDeclaredEvent(DeclaredEvent $event): void
     {
-        $statement = $this->connection->prepare(<<<SQL
-            INSERT INTO users (uuid, organization_id, workspace_ids, role_ids, username, firstname, lastname, email, enabled, version)
-            VALUES (:uuid, :organization_id, :workspace_ids, :role_ids, :username, :firstname, :lastname, :email, :enabled, 1)
+        $statement = $this->connection->prepare(<<<'SQL'
+            INSERT INTO users (uuid, realm_id, organization_id, workspace_ids, role_ids, username, firstname, lastname, email, enabled, version)
+            VALUES (:uuid, :realm_id :organization_id, :workspace_ids, :role_ids, :username, :firstname, :lastname, :email, :enabled, 1)
             SQL
         );
 
         $statement->bindValue(':uuid', $event->uuid->toString(), ParameterType::STRING);
+        $statement->bindValue(':realm_id', $event->realmId->toString(), ParameterType::STRING);
         $statement->bindValue(':organization_id', $event->organizationId->toString(), ParameterType::STRING);
         $statement->bindValue(':workspace_ids', json_encode(
             array_map(fn (WorkspaceId $workspaceId) => $workspaceId->toString(), $event->workspaceIds),
-            JSON_THROW_ON_ERROR,
+            \JSON_THROW_ON_ERROR,
         ), ParameterType::STRING);
         $statement->bindValue(':role_ids', json_encode(
             array_map(fn (RoleId $roleId) => $roleId->toString(), $event->roleIds),
-            JSON_THROW_ON_ERROR,
+            \JSON_THROW_ON_ERROR,
         ), ParameterType::STRING);
         $statement->bindValue(':username', $event->username, ParameterType::STRING);
         $statement->bindValue(':firstname', $event->firstName, ParameterType::STRING);
@@ -119,65 +120,74 @@ final readonly class DatabaseUserRepository implements UserRepositoryInterface
 
         $result = $statement->executeQuery();
 
-        if ($result->rowCount() !== 1) {
+        if (1 !== $result->rowCount()) {
             throw new \RuntimeException('Version mismatch. This happens in case of concurrency between several processes.');
         }
     }
 
     private function applyEnabledEvent(EnabledEvent $event): void
     {
-        $statement = $this->connection->prepare(<<<SQL
+        $statement = $this->connection->prepare(<<<'SQL'
             UPDATE users
             SET enabled = true,
                 version = :version
-            WHERE uuid = :uuid AND version=(:version - 1)
+            WHERE uuid = :uuid
+              AND version=(:version - 1)
+              AND realm_id = :realm_id
             SQL
         );
 
         $statement->bindValue(':uuid', $event->uuid->toString(), ParameterType::STRING);
         $statement->bindValue(':version', $event->version, ParameterType::INTEGER);
+        $statement->bindValue(':realm_id', $event->realmId->toString(), ParameterType::STRING);
 
         $result = $statement->executeQuery();
 
-        if ($result->rowCount() !== 1) {
+        if (1 !== $result->rowCount()) {
             throw new \RuntimeException('Version mismatch. This happens in case of concurrency between several processes.');
         }
     }
 
     private function applyDisabledEvent(DisabledEvent $event): void
     {
-        $statement = $this->connection->prepare(<<<SQL
+        $statement = $this->connection->prepare(<<<'SQL'
             UPDATE users
             SET enabled = false,
                 version = :version
-            WHERE uuid = :uuid AND version=(:version - 1)
+            WHERE uuid = :uuid
+              AND version=(:version - 1)
+              AND realm_id = :realm_id
             SQL
         );
 
         $statement->bindValue(':uuid', $event->uuid->toString(), ParameterType::STRING);
         $statement->bindValue(':version', $event->version, ParameterType::INTEGER);
+        $statement->bindValue(':realm_id', $event->realmId->toString(), ParameterType::STRING);
 
         $result = $statement->executeQuery();
 
-        if ($result->rowCount() !== 1) {
+        if (1 !== $result->rowCount()) {
             throw new \RuntimeException('Version mismatch. This happens in case of concurrency between several processes.');
         }
     }
 
     private function applyDeletedEvent(DeletedEvent $event): void
     {
-        $statement = $this->connection->prepare(<<<SQL
+        $statement = $this->connection->prepare(<<<'SQL'
             DELETE FROM users
-            WHERE uuid = :uuid AND version=(:version - 1)
+            WHERE uuid = :uuid
+              AND version=(:version - 1)
+              AND realm_id = :realm_id
             SQL
         );
 
         $statement->bindValue(':uuid', $event->uuid->toString(), ParameterType::STRING);
         $statement->bindValue(':version', $event->version, ParameterType::INTEGER);
+        $statement->bindValue(':realm_id', $event->realmId->toString(), ParameterType::STRING);
 
         $result = $statement->executeQuery();
 
-        if ($result->rowCount() !== 1) {
+        if (1 !== $result->rowCount()) {
             throw new \RuntimeException('Version mismatch. This happens in case of concurrency between several processes.');
         }
     }

@@ -1,0 +1,60 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Authentication\Domain\Realm;
+
+use App\Platform\Domain\CodeInterface;
+use App\Platform\Domain\IdInterface;
+
+final class RealmId implements CodeInterface
+{
+    public const string REQUIREMENT = '[A-Za-z0-9]+(?:[-.][A-Za-z0-9]+)*';
+    public const string URI_REQUIREMENT = '\/authentication\/realm\/[A-Za-z0-9]+(?:[-.][A-Za-z0-9]+)*';
+    public const string PARSE = '/\/authentication\/realm\/(?<reference>[A-Za-z0-9]+(?:[-.][A-Za-z0-9]+)*)/';
+
+    private function __construct(
+        private readonly string $reference,
+    ) {
+        if (!preg_match('/[A-Za-z0-9]+(?:[-.][A-Za-z0-9]+)*/', $this->reference)) {
+            throw new \InvalidArgumentException(\sprintf('<%s> is not a valid Realm code.', $reference));
+        }
+    }
+
+    public static function fromUri(string $uri): self
+    {
+        if (!preg_match(self::PARSE, $uri, $matches)) {
+            throw new \InvalidArgumentException(\sprintf('<%s> is not a valid Realm code.', $uri));
+        }
+
+        return new self($matches['reference']);
+    }
+
+    public static function fromString(string $reference): self
+    {
+        return new self($reference);
+    }
+
+    public function equals(IdInterface|string $other): bool
+    {
+        if (\is_string($other)) {
+            return 0 === strcmp($this->reference, $other);
+        }
+
+        if (!$other instanceof self) {
+            return false;
+        }
+
+        return 0 === strcmp($this->reference, $other->reference);
+    }
+
+    public function __toString(): string
+    {
+        return $this->reference;
+    }
+
+    public function toString(): string
+    {
+        return $this->reference;
+    }
+}

@@ -13,10 +13,11 @@ final class QueryOneFeatureRolloutHandler
 {
     public function __construct(
         private FeatureRolloutRepositoryInterface $featureRolloutRepository,
-    ) {}
+    ) {
+    }
 
     public function __invoke(QueryOneFeatureRollout $query): FeatureRollout
     {
-        return $this->featureRolloutRepository->get($query->uuid);
+        return $this->featureRolloutRepository->get($query->code);
     }
 }

@@ -6,14 +6,17 @@ namespace App\Authentication\UserInterface\Role;
 
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
-use App\Authentication\Domain\CommandBusInterface;
 use App\Authentication\Domain\NotFoundException;
 use App\Authentication\Domain\Role\Command\InvalidRoleStateException;
 use App\Authentication\Domain\Role\Command\UseCases\DeleteRole;
 use App\Authentication\Domain\Role\Query\Role;
+use App\Platform\Infrastructure\CommandBusInterface;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
+/**
+ * @implements ProcessorInterface<Role, void>
+ */
 final readonly class DeleteRoleProcessor implements ProcessorInterface
 {
     public function __construct(
@@ -28,7 +31,7 @@ final readonly class DeleteRoleProcessor implements ProcessorInterface
         }
 
         try {
-            $command = new DeleteRole($data->uuid);
+            $command = new DeleteRole($data->uuid, $data->realmId);
             $this->commandBus->apply($command);
         } catch (InvalidRoleStateException $exception) {
             throw new BadRequestHttpException($exception->getMessage(), previous: $exception);

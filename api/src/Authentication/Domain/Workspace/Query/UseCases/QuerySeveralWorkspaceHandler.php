@@ -17,6 +17,6 @@ final readonly class QuerySeveralWorkspaceHandler
 
     public function __invoke(QuerySeveralWorkspace $query): WorkspacePage
     {
-        return $this->workspaceRepository->list($query->currentPage, $query->itemsPerPage);
+        return $this->workspaceRepository->list($query->realmId, $query->currentPage, $query->itemsPerPage);
     }
 }

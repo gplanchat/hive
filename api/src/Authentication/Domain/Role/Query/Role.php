@@ -5,25 +5,44 @@ declare(strict_types=1);
 namespace App\Authentication\Domain\Role\Query;
 
 use ApiPlatform\Metadata\ApiProperty;
+use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
-use ApiPlatform\Metadata\QueryParameter;
+use ApiPlatform\Metadata\Post;
 use ApiPlatform\OpenApi\Model\Operation;
 use ApiPlatform\OpenApi\Model\Parameter;
 use App\Authentication\Domain\Organization\OrganizationId;
-use App\Authentication\Domain\Role\Query\UseCases\QueryOneRole;
-use App\Authentication\Domain\Role\Query\UseCases\QuerySeveralRole;
-use App\Authentication\Domain\Role\Query\UseCases\QuerySeveralRoleInOrganization;
+use App\Authentication\Domain\Realm\RealmId;
 use App\Authentication\Domain\Role\ResourceAccess;
 use App\Authentication\Domain\Role\RoleId;
+use App\Authentication\UserInterface\Role\CreateRoleInput;
+use App\Authentication\UserInterface\Role\CreateRoleProcessor;
+use App\Authentication\UserInterface\Role\CreateRoleWithinOrganizationInput;
+use App\Authentication\UserInterface\Role\DeleteRoleProcessor;
 use App\Authentication\UserInterface\Role\QueryOneRoleProvider;
+use App\Authentication\UserInterface\Role\QuerySeveralRoleInOrganizationProvider;
 use App\Authentication\UserInterface\Role\QuerySeveralRoleProvider;
 use Symfony\Component\Routing\Requirement\Requirement;
 use Symfony\Component\Serializer\Attribute\Context;
 
+#[Delete(
+    uriTemplate: '/authentication/{realm}/roles/{uuid}',
+    uriVariables: [
+        'realm' => 'realmId',
+        'uuid',
+    ],
+    security: 'is_granted("IS_AUTHENTICATED")',
+    input: false,
+    output: false,
+    provider: QueryOneRoleProvider::class,
+    processor: DeleteRoleProcessor::class,
+)]
 #[Get(
-    uriTemplate: '/authentication/roles/{uuid}',
-    uriVariables: ['uuid'],
+    uriTemplate: '/authentication/{realm}/roles/{uuid}',
+    uriVariables: [
+        'realm' => 'realmId',
+        'uuid',
+    ],
     openapi: new Operation(
         parameters: [
             new Parameter(
@@ -33,29 +52,47 @@ use Symfony\Component\Serializer\Attribute\Context;
                 required: true,
                 schema: ['pattern' => RoleId::REQUIREMENT],
             ),
+            new Parameter(
+                name: 'realm',
+                in: 'path',
+                description: 'Code of the Realm',
+                required: true,
+                schema: ['pattern' => RealmId::REQUIREMENT],
+            ),
         ],
     ),
-    input: QueryOneRole::class,
-    provider: QueryOneRoleProvider::class
+    security: 'is_granted("IS_AUTHENTICATED")',
+    provider: QueryOneRoleProvider::class,
 )]
 #[GetCollection(
-    uriTemplate: '/authentication/roles',
-    openapi: new Operation(),
+    uriTemplate: '/authentication/{realm}/roles',
+    uriVariables: [
+        'realm' => 'realmId',
+    ],
+    openapi: new Operation(
+        parameters: [
+            new Parameter(
+                name: 'realm',
+                in: 'path',
+                description: 'Code of the Realm',
+                required: true,
+                schema: ['pattern' => RealmId::REQUIREMENT],
+            ),
+        ],
+    ),
     paginationEnabled: true,
     paginationItemsPerPage: 25,
     paginationMaximumItemsPerPage: 100,
     paginationPartial: true,
-    input: QuerySeveralRole::class,
+    order: ['uuid' => 'ASC'],
+    security: 'is_granted("IS_AUTHENTICATED")',
     provider: QuerySeveralRoleProvider::class,
-    parameters: [
-        'page' => new QueryParameter(schema: ['type' => 'integer', 'min' => 1]),
-        'itemsPerPage' => new QueryParameter(schema: ['type' => 'integer', 'min' => 10, 'max' => 100]),
-    ],
+    itemUriTemplate: '/authentication/{realm}/roles/{uuid}',
 )]
 #[GetCollection(
-    uriTemplate: '/authentication/organizations/{organizationId}/roles',
+    uriTemplate: '/authentication/{realm}/organizations/{organizationId}/roles',
     uriVariables: [
-//        'organizationId' => new Link('organizationId', fromClass: self::class, toClass: Organization::class),
+        'realm' => 'realmId',
         'organizationId',
     ],
     openapi: new Operation(
@@ -67,24 +104,55 @@ use Symfony\Component\Serializer\Attribute\Context;
                 required: true,
                 schema: ['pattern' => Requirement::UUID_V7],
             ),
+            new Parameter(
+                name: 'realm',
+                in: 'path',
+                description: 'Code of the Realm',
+                required: true,
+                schema: ['pattern' => RealmId::REQUIREMENT],
+            ),
         ],
     ),
     paginationEnabled: true,
     paginationItemsPerPage: 25,
     paginationMaximumItemsPerPage: 100,
     paginationPartial: true,
-    input: QuerySeveralRoleInOrganization::class,
-    provider: QuerySeveralRoleProvider::class,
-    parameters: [
-        'page' => new QueryParameter(schema: ['type' => 'integer', 'min' => 1]),
-        'itemsPerPage' => new QueryParameter(schema: ['type' => 'integer', 'min' => 10, 'max' => 100]),
+    order: ['uuid' => 'ASC'],
+    security: 'is_granted("IS_AUTHENTICATED")',
+    provider: QuerySeveralRoleInOrganizationProvider::class,
+    itemUriTemplate: '/authentication/{realm}/roles/{uuid}',
+)]
+#[Post(
+    uriTemplate: '/authentication/{realm}/organizations/{organizationId}/roles',
+    uriVariables: [
+        'realm' => 'realmId',
+        'organizationId',
     ],
+    security: 'is_granted("IS_AUTHENTICATED")',
+    input: CreateRoleWithinOrganizationInput::class,
+    output: self::class,
+    processor: CreateRoleProcessor::class,
+    itemUriTemplate: '/authentication/{realm}/roles/{uuid}',
+)]
+#[Post(
+    uriTemplate: '/authentication/{realm}/roles',
+    uriVariables: [
+        'realm' => 'realmId',
+    ],
+    security: 'is_granted("IS_AUTHENTICATED")',
+    input: CreateRoleInput::class,
+    output: self::class,
+    processor: CreateRoleProcessor::class,
+    itemUriTemplate: '/authentication/{realm}/roles/{uuid}',
 )]
 final readonly class Role
 {
     /** @var ResourceAccess[] */
     public array $resourceAccesses;
 
+    /**
+     * @param ResourceAccess[] $resourceAccesses
+     */
     public function __construct(
         #[ApiProperty(
             description: 'Identifier of the Role',
@@ -92,6 +160,12 @@ final readonly class Role
             schema: ['type' => 'string', 'pattern' => RoleId::REQUIREMENT],
         )]
         public RoleId $uuid,
+        #[ApiProperty(
+            description: 'Realm of the Role',
+            identifier: true,
+            schema: ['type' => 'string', 'pattern' => RealmId::REQUIREMENT],
+        )]
+        public RealmId $realmId,
         #[ApiProperty(
             description: 'Identifier of the Owning Organization',
             schema: ['type' => 'string', 'pattern' => OrganizationId::URI_REQUIREMENT],
@@ -112,7 +186,7 @@ final readonly class Role
             description: 'Resource accesses specifications',
             schema: ['type' => 'string', 'minLength' => 3, 'maxLength' => 150],
         )]
-        array $resourceAccesses = []
+        array $resourceAccesses = [],
     ) {
         $this->resourceAccesses = $resourceAccesses;
     }

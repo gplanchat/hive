@@ -6,15 +6,19 @@ namespace App\Authentication\Domain\FeatureRollout\UseCases;
 
 use App\Authentication\Domain\FeatureRollout\FeatureRollout;
 
+/**
+ * @implements \IteratorAggregate<int, FeatureRollout>
+ */
 final readonly class FeatureRolloutPage implements \IteratorAggregate, \Countable
 {
+    /** @var FeatureRollout[] */
     private array $featureRollouts;
 
     public function __construct(
         public int $page,
         public int $pageSize,
         public int $totalItems,
-        FeatureRollout ...$featureRollouts
+        FeatureRollout ...$featureRollouts,
     ) {
         $this->featureRollouts = $featureRollouts;
     }
@@ -26,6 +30,6 @@ final readonly class FeatureRolloutPage implements \IteratorAggregate, \Countabl
 
     public function count(): int
     {
-        return count($this->featureRollouts);
+        return \count($this->featureRollouts);
     }
 }

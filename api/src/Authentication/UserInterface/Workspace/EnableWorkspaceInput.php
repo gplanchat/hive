@@ -16,5 +16,6 @@ final readonly class EnableWorkspaceInput
         )]
         #[Context(['datetime_format' => 'Y-m-d'])]
         public ?\DateTimeInterface $validUntil = null,
-    ) {}
+    ) {
+    }
 }

@@ -6,14 +6,17 @@ namespace App\Authentication\UserInterface\Organization;
 
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
-use App\Authentication\Domain\CommandBusInterface;
 use App\Authentication\Domain\NotFoundException;
 use App\Authentication\Domain\Organization\Command\InvalidOrganizationStateException;
 use App\Authentication\Domain\Organization\Command\UseCases\DeleteOrganization;
 use App\Authentication\Domain\Organization\Query\Organization;
+use App\Platform\Infrastructure\CommandBusInterface;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
+/**
+ * @implements ProcessorInterface<Organization, void>
+ */
 final readonly class DeleteOrganizationProcessor implements ProcessorInterface
 {
     public function __construct(
@@ -28,7 +31,7 @@ final readonly class DeleteOrganizationProcessor implements ProcessorInterface
         }
 
         try {
-            $command = new DeleteOrganization($data->uuid);
+            $command = new DeleteOrganization($data->uuid, $data->realmId);
             $this->commandBus->apply($command);
         } catch (InvalidOrganizationStateException $exception) {
             throw new BadRequestHttpException($exception->getMessage(), previous: $exception);

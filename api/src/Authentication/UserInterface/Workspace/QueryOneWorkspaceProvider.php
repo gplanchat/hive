@@ -6,37 +6,39 @@ namespace App\Authentication\UserInterface\Workspace;
 
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
-use App\Authentication\Domain\QueryBusInterface;
+use App\Authentication\Domain\Realm\RealmId;
 use App\Authentication\Domain\Workspace\Query\UseCases\QueryOneWorkspace;
 use App\Authentication\Domain\Workspace\Query\Workspace;
 use App\Authentication\Domain\Workspace\WorkspaceId;
-use Symfony\Component\HttpFoundation\Exception\BadRequestException;
+use App\Platform\Infrastructure\QueryBusInterface;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 use Symfony\Component\Messenger\Exception\HandlerFailedException;
-use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
-final class QueryOneWorkspaceProvider implements ProviderInterface
+/**
+ * @implements ProviderInterface<Workspace>
+ */
+final readonly class QueryOneWorkspaceProvider implements ProviderInterface
 {
     public function __construct(
-        private readonly DenormalizerInterface $denormalizer,
-        private readonly QueryBusInterface $queryBus,
+        private QueryBusInterface $queryBus,
     ) {
     }
 
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): Workspace
     {
-        $request = $context['request'];
-        if (!$this->denormalizer->supportsDenormalization($uriVariables['uuid'], WorkspaceId::class, $request->getRequestFormat())) {
-            throw new BadRequestException();
+        try {
+            $query = new QueryOneWorkspace(
+                WorkspaceId::fromString($uriVariables['uuid']),
+                RealmId::fromString($uriVariables['realm']),
+            );
+        } catch (\InvalidArgumentException $exception) {
+            throw new BadRequestHttpException($exception->getMessage(), previous: $exception);
         }
 
-        $input = new QueryOneWorkspace(
-            WorkspaceId::fromString($uriVariables['uuid']),
-        );
-
         try {
-            $result = $this->queryBus->query($input);
+            $result = $this->queryBus->query($query);
         } catch (HandlerFailedException $exception) {
             throw new NotFoundHttpException($exception->getMessage(), previous: $exception);
         }

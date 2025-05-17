@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace App\Authentication\Domain\FeatureRollout;
 
-use App\Authentication\Domain\IdInterface;
-use Symfony\Component\Routing\Requirement\Requirement;
+use App\Platform\Domain\CodeInterface;
+use App\Platform\Domain\IdInterface;
 
-final class FeatureRolloutId implements IdInterface
+final class FeatureRolloutId implements CodeInterface
 {
-    const string REQUIREMENT = '[A-Za-z0-9]+(?:[-.][A-Za-z0-9]+)*';
-    const string URI_REQUIREMENT = '\/authentication\/feature-rollouts\/[A-Za-z0-9]+(?:[-.][A-Za-z0-9]+)*';
-    const string PARSE = '/\/authentication\/feature-rollouts\/(?<reference>[A-Za-z0-9]+(?:[-.][A-Za-z0-9]+)*)/';
+    public const string REQUIREMENT = '[A-Za-z0-9]+(?:[-.][A-Za-z0-9]+)*';
+    public const string URI_REQUIREMENT = '\/feature-rollouts\/[A-Za-z0-9]+(?:[-.][A-Za-z0-9]+)*';
+    public const string PARSE = '/\/feature-rollouts\/(?<reference>[A-Za-z0-9]+(?:[-.][A-Za-z0-9]+)*)/';
 
     private function __construct(
         private readonly string $reference,
@@ -21,7 +21,7 @@ final class FeatureRolloutId implements IdInterface
         }
     }
 
-    public static function fromUri(string $uri): IdInterface
+    public static function fromUri(string $uri): self
     {
         if (!preg_match(self::PARSE, $uri, $matches)) {
             throw new \InvalidArgumentException(\sprintf('<%s> is not a valid Feature Rollout code.', $uri));
@@ -46,11 +46,6 @@ final class FeatureRolloutId implements IdInterface
         }
 
         return 0 === strcmp($this->reference, $other->reference);
-    }
-
-    public function isNil(): bool
-    {
-        return 0 === strcmp($this->reference, '');
     }
 
     public function __toString(): string

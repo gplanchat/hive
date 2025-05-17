@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Authentication\Infrastructure\Workspace\Command;
 
 use App\Authentication\Domain\ConflictException;
-use App\Authentication\Domain\EventBusInterface;
 use App\Authentication\Domain\NotFoundException;
+use App\Authentication\Domain\Realm\RealmId;
 use App\Authentication\Domain\Workspace\Command\DeclaredEvent;
 use App\Authentication\Domain\Workspace\Command\DeletedEvent;
 use App\Authentication\Domain\Workspace\Command\DisabledEvent;
@@ -17,6 +17,7 @@ use App\Authentication\Domain\Workspace\Query\Workspace as QueryWorkspace;
 use App\Authentication\Domain\Workspace\WorkspaceId;
 use App\Authentication\Infrastructure\StorageMock;
 use App\Authentication\Infrastructure\Workspace\DataFixtures\WorkspaceFixtures;
+use App\Platform\Infrastructure\EventBusInterface;
 use Symfony\Contracts\Cache\ItemInterface;
 
 final class InMemoryWorkspaceRepository implements WorkspaceRepositoryInterface
@@ -27,9 +28,9 @@ final class InMemoryWorkspaceRepository implements WorkspaceRepositoryInterface
     ) {
     }
 
-    public function get(WorkspaceId $workspaceId): Workspace
+    public function get(WorkspaceId $workspaceId, RealmId $realmId): Workspace
     {
-        $item = $this->storage->getItem("tests.data-fixtures.workspace.{$workspaceId->toString()}");
+        $item = $this->storage->getItem(WorkspaceFixtures::buildCacheKey($workspaceId, $realmId));
 
         if (!$item->isHit()) {
             throw new NotFoundException();
@@ -42,10 +43,8 @@ final class InMemoryWorkspaceRepository implements WorkspaceRepositoryInterface
 
         return new Workspace(
             uuid: $value->uuid,
+            realmId: $value->realmId,
             organizationId: $value->organizationId,
-            name: $value->name,
-            slug: $value->slug,
-            validUntil: $value->validUntil,
             enabled: $value->enabled,
         );
     }
@@ -67,7 +66,7 @@ final class InMemoryWorkspaceRepository implements WorkspaceRepositoryInterface
 
     private function saveEvent(object $event): void
     {
-        $methodName = 'apply'.substr(get_class($event), strrpos(get_class($event), '\\') + 1);
+        $methodName = 'apply'.substr($event::class, strrpos($event::class, '\\') + 1);
         if (method_exists($this, $methodName)) {
             $this->{$methodName}($event);
         }
@@ -75,7 +74,7 @@ final class InMemoryWorkspaceRepository implements WorkspaceRepositoryInterface
 
     private function applyDeclaredEvent(DeclaredEvent $event): void
     {
-        $this->storage->get("tests.data-fixtures.workspace.{$event->uuid->toString()}", function (ItemInterface $item) use ($event): QueryWorkspace {
+        $this->storage->get(WorkspaceFixtures::buildCacheKey($event->uuid, $event->realmId), function (ItemInterface $item) use ($event): QueryWorkspace {
             if ($item->isHit()) {
                 throw new ConflictException();
             }
@@ -84,6 +83,7 @@ final class InMemoryWorkspaceRepository implements WorkspaceRepositoryInterface
 
             return new QueryWorkspace(
                 uuid: $event->uuid,
+                realmId: $event->realmId,
                 organizationId: $event->organizationId,
                 name: $event->name,
                 slug: $event->slug,
@@ -95,7 +95,7 @@ final class InMemoryWorkspaceRepository implements WorkspaceRepositoryInterface
 
     private function applyEnabledEvent(EnabledEvent $event): void
     {
-        $item = $this->storage->getItem("tests.data-fixtures.workspace.{$event->uuid->toString()}");
+        $item = $this->storage->getItem(WorkspaceFixtures::buildCacheKey($event->uuid, $event->realmId));
 
         if (!$item->isHit()) {
             throw new NotFoundException();
@@ -108,6 +108,7 @@ final class InMemoryWorkspaceRepository implements WorkspaceRepositoryInterface
 
         $item->set(new QueryWorkspace(
             uuid: $current->uuid,
+            realmId: $current->realmId,
             organizationId: $current->organizationId,
             name: $current->name,
             slug: $current->slug,
@@ -120,32 +121,33 @@ final class InMemoryWorkspaceRepository implements WorkspaceRepositoryInterface
 
     private function applyDisabledEvent(DisabledEvent $event): void
     {
-        $item = $this->storage->getItem("tests.data-fixtures.workspace.{$event->uuid->toString()}");
+        $item = $this->storage->getItem(WorkspaceFixtures::buildCacheKey($event->uuid, $event->realmId));
 
-            if (!$item->isHit()) {
-                throw new NotFoundException();
-            }
+        if (!$item->isHit()) {
+            throw new NotFoundException();
+        }
 
-            $current = $item->get();
-            if (!$current instanceof QueryWorkspace) {
-                throw new NotFoundException();
-            }
+        $current = $item->get();
+        if (!$current instanceof QueryWorkspace) {
+            throw new NotFoundException();
+        }
 
-            $item->set(new QueryWorkspace(
-                uuid: $current->uuid,
-                organizationId: $current->organizationId,
-                name: $current->name,
-                slug: $current->slug,
-                validUntil: $current->validUntil,
-                enabled: false,
-            ));
+        $item->set(new QueryWorkspace(
+            uuid: $current->uuid,
+            realmId: $current->realmId,
+            organizationId: $current->organizationId,
+            name: $current->name,
+            slug: $current->slug,
+            validUntil: $current->validUntil,
+            enabled: false,
+        ));
 
-            $this->storage->save($item);
+        $this->storage->save($item);
     }
 
     private function applyDeletedEvent(DeletedEvent $event): void
     {
-        if (!$this->storage->deleteItem("tests.data-fixtures.workspace.{$event->uuid->toString()}")) {
+        if (!$this->storage->deleteItem(WorkspaceFixtures::buildCacheKey($event->uuid, $event->realmId))) {
             throw new NotFoundException();
         }
     }

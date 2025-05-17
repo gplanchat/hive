@@ -6,15 +6,14 @@ namespace App\Authentication\Infrastructure\Role\Query;
 
 use App\Authentication\Domain\NotFoundException;
 use App\Authentication\Domain\Organization\OrganizationId;
-use App\Authentication\Domain\Role\Actions;
+use App\Authentication\Domain\Realm\RealmId;
 use App\Authentication\Domain\Role\Query\Role;
 use App\Authentication\Domain\Role\Query\RoleRepositoryInterface;
 use App\Authentication\Domain\Role\Query\UseCases\RolePage;
-use App\Authentication\Domain\Role\ResourceAccess;
-use App\Authentication\Domain\Role\Resources;
 use App\Authentication\Domain\Role\RoleId;
+use App\Authentication\Infrastructure\Role\DataFixtures\RoleFixtures;
 use App\Authentication\Infrastructure\StorageMock;
-
+use App\Platform\Infrastructure\Collection\Collection;
 
 final class InMemoryRoleRepository implements RoleRepositoryInterface
 {
@@ -23,12 +22,12 @@ final class InMemoryRoleRepository implements RoleRepositoryInterface
     ) {
     }
 
-    public function get(RoleId $roleId): Role
+    public function get(RoleId $roleId, RealmId $realmId): Role
     {
-        $item = $this->storage->getItem("tests.data-fixtures.role.{$roleId->toString()}");
+        $item = $this->storage->getItem(RoleFixtures::buildCacheKey($roleId, $realmId));
 
         if (!$item->isHit()) {
-            throw new NotFoundException();
+            throw new NotFoundException(strtr('Role ID %roleId% does not exist in the database.', ['%roleId%' => $roleId->toString()]));
         }
 
         $value = $item->get();
@@ -39,40 +38,43 @@ final class InMemoryRoleRepository implements RoleRepositoryInterface
         return $value;
     }
 
-    public function list(int $currentPage = 1, int $pageSize = 25): RolePage
+    public function getAll(RealmId $realmId, RoleId ...$roleIds): Collection
     {
-        $result = array_filter(
-            $this->storage->getValues(),
-            function (mixed $value): bool {
-                return $value instanceof Role;
-            }
-        );
+        return Collection::fromArray($roleIds)
+            ->map(fn (RoleId $roleId) => $this->get($roleId, $realmId))
+        ;
+    }
+
+    public function list(RealmId $realmId, int $currentPage = 1, int $pageSize = 25): RolePage
+    {
+        $result = $this->storage->getValues()
+            ->filter(fn (mixed $value): bool => $value instanceof Role)
+            ->filter(fn (Role $role): bool => $role->realmId->equals($realmId))
+            ->toArray()
+        ;
 
         return new RolePage(
             $currentPage,
             $pageSize,
-            count($result),
-            ...array_slice($result, ($currentPage - 1) * $pageSize, $pageSize)
+            \count($result),
+            ...\array_slice($result, ($currentPage - 1) * $pageSize, $pageSize)
         );
     }
 
-    public function listFromOrganization(OrganizationId $organizationId, int $currentPage = 1, int $pageSize = 25): RolePage
+    public function listFromOrganization(RealmId $realmId, OrganizationId $organizationId, int $currentPage = 1, int $pageSize = 25): RolePage
     {
-        $result = array_filter(
-            array_filter(
-                $this->storage->getValues(),
-                function (mixed $value): bool {
-                    return $value instanceof Role;
-                }
-            ),
-            fn (Role $role) => $role->organizationId->equals($organizationId),
-        );
+        $result = $this->storage->getValues()
+            ->filter(fn (mixed $value): bool => $value instanceof Role)
+            ->filter(fn (Role $role): bool => $role->realmId->equals($realmId))
+            ->filter(fn (Role $role) => $role->organizationId->equals($organizationId))
+            ->toArray()
+        ;
 
         return new RolePage(
             $currentPage,
             $pageSize,
-            count($result),
-            ...array_slice($result, ($currentPage - 1) * $pageSize, $pageSize)
+            \count($result),
+            ...\array_slice($result, ($currentPage - 1) * $pageSize, $pageSize)
         );
     }
 }

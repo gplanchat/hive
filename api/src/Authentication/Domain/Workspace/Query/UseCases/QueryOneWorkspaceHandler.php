@@ -18,6 +18,6 @@ final readonly class QueryOneWorkspaceHandler
 
     public function __invoke(QueryOneWorkspace $query): Workspace
     {
-        return $this->workspaceRepository->get($query->uuid);
+        return $this->workspaceRepository->get($query->uuid, $query->realmId);
     }
 }

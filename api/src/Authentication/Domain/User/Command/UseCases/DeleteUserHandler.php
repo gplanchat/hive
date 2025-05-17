@@ -12,11 +12,12 @@ final readonly class DeleteUserHandler
 {
     public function __construct(
         private UserRepositoryInterface $userRepository,
-    ) {}
+    ) {
+    }
 
     public function __invoke(DeleteUser $command): void
     {
-        $user = $this->userRepository->get($command->uuid);
+        $user = $this->userRepository->get($command->uuid, $command->realmId);
         $user->delete();
         $this->userRepository->save($user);
     }

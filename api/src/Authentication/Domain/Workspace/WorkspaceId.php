@@ -4,15 +4,17 @@ declare(strict_types=1);
 
 namespace App\Authentication\Domain\Workspace;
 
-use App\Authentication\Domain\IdInterface;
-use App\Authentication\Domain\InvalidUuidFormatException;
+use App\Authentication\Domain\Realm\RealmId;
+use App\Platform\Domain\IdInterface;
+use App\Platform\Domain\InvalidUuidFormatException;
+use App\Platform\Domain\UuidInterface;
 use Symfony\Component\Routing\Requirement\Requirement;
 
-final class WorkspaceId implements IdInterface
+final class WorkspaceId implements UuidInterface
 {
-    const string REQUIREMENT = Requirement::UUID_V7;
-    const string URI_REQUIREMENT = '\/authentication\/workspaces\/('.Requirement::UUID_V7.')';
-    const string PARSE = '/\/authentication\/workspaces\/(?<reference>'.Requirement::UUID.')/';
+    public const string REQUIREMENT = Requirement::UUID_V7;
+    public const string URI_REQUIREMENT = '\/authentication\/'.RealmId::REQUIREMENT.'\/workspaces\/('.Requirement::UUID_V7.')';
+    public const string PARSE = '/\/authentication\/'.RealmId::REQUIREMENT.'\/workspaces\/(?<reference>'.Requirement::UUID.')/';
 
     private function __construct(
         private readonly string $reference,
@@ -27,7 +29,7 @@ final class WorkspaceId implements IdInterface
         return new self(uuid_create(UUID_TYPE_RANDOM));
     }
 
-    public static function nil(): IdInterface
+    public static function nil(): self
     {
         return new self(uuid_create(UUID_TYPE_NULL));
     }

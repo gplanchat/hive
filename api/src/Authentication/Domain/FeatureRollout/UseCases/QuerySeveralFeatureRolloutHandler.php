@@ -12,7 +12,8 @@ final class QuerySeveralFeatureRolloutHandler
 {
     public function __construct(
         private FeatureRolloutRepositoryInterface $featureRolloutRepository,
-    ) {}
+    ) {
+    }
 
     public function __invoke(QuerySeveralFeatureRollout $query): FeatureRolloutPage
     {

@@ -20,6 +20,7 @@ final readonly class CreateRoleHandler
     {
         $role = Role::declare(
             $command->uuid,
+            $command->realmId,
             $command->organizationId,
             $command->identifier,
             $command->label,

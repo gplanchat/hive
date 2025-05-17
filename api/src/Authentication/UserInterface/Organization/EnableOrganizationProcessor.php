@@ -6,16 +6,20 @@ namespace App\Authentication\UserInterface\Organization;
 
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
-use App\Authentication\Domain\CommandBusInterface;
 use App\Authentication\Domain\NotFoundException;
 use App\Authentication\Domain\Organization\Command\InvalidOrganizationStateException;
 use App\Authentication\Domain\Organization\Command\UseCases\EnableOrganization;
 use App\Authentication\Domain\Organization\OrganizationId;
 use App\Authentication\Domain\Organization\Query\Organization;
 use App\Authentication\Domain\Organization\Query\OrganizationRepositoryInterface;
+use App\Authentication\Domain\Realm\RealmId;
+use App\Platform\Infrastructure\CommandBusInterface;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
+/**
+ * @implements ProcessorInterface<EnableOrganizationInput, Organization>
+ */
 final readonly class EnableOrganizationProcessor implements ProcessorInterface
 {
     public function __construct(
@@ -24,7 +28,7 @@ final readonly class EnableOrganizationProcessor implements ProcessorInterface
     ) {
     }
 
-    public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []):Organization
+    public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): Organization
     {
         if (!$data instanceof EnableOrganizationInput) {
             throw new BadRequestHttpException();
@@ -33,6 +37,7 @@ final readonly class EnableOrganizationProcessor implements ProcessorInterface
         try {
             $command = new EnableOrganization(
                 OrganizationId::fromString($uriVariables['uuid']),
+                RealmId::fromString($uriVariables['realm']),
                 $data->validUntil,
             );
             $this->commandBus->apply($command);
@@ -42,6 +47,6 @@ final readonly class EnableOrganizationProcessor implements ProcessorInterface
             throw new NotFoundHttpException($exception->getMessage(), previous: $exception);
         }
 
-        return $this->organizationRepository->get($command->uuid);
+        return $this->organizationRepository->get($command->uuid, $command->realmId);
     }
 }

@@ -21,27 +21,42 @@ final class CreateUserInputDenormalizer implements DenormalizerInterface, Denorm
 
     public function getSupportedTypes(?string $format): array
     {
-        return in_array($format, ['json', 'jsonld'], true) ? [
+        return \in_array($format, ['json', 'jsonld'], true) ? [
             CreateUserInput::class => false,
         ] : [];
     }
 
+    /**
+     * @param array{} $context
+     */
     public function denormalize(mixed $data, string $type, ?string $format = null, array $context = []): CreateUserInput
     {
-        if (!array_key_exists('username', $data) || !is_string($data['username'])
-            || !array_key_exists('firstName', $data) || !is_string($data['firstName'])
-            || !array_key_exists('lastName', $data) || !is_string($data['lastName'])
-            || !array_key_exists('email', $data) || !is_string($data['email'])
-            || !array_key_exists('organizationId', $data) || !is_string($data['organizationId'])
+        if (!\array_key_exists('username', $data) || !\is_string($data['username'])
+            || !\array_key_exists('firstName', $data) || !\is_string($data['firstName'])
+            || !\array_key_exists('lastName', $data) || !\is_string($data['lastName'])
+            || !\array_key_exists('email', $data) || !\is_string($data['email'])
+            || !\array_key_exists('organizationId', $data) || !\is_string($data['organizationId'])
         ) {
             throw new UnexpectedValueException();
         }
 
         return new CreateUserInput(
-            OrganizationId::fromUri($data['organizationId']),
-            workspaceIds: array_map(fn (string $current) => WorkspaceId::fromUri($current), $data['workspaceIds']),
-            roleIds: array_map(fn (string $current) => RoleId::fromUri($current), $data['roleIds']),
+            organizationId: \strlen($data['organizationId']) > 0
+                ? OrganizationId::fromUri($data['organizationId'])
+                : throw new UnexpectedValueException('Organization id can\'t be empty'),
             username: $data['username'],
+            workspaceIds: array_map(
+                fn (string $current) => \strlen($current) > 0
+                    ? WorkspaceId::fromUri($current)
+                    : throw new \UnexpectedValueException('Workspace id can\'t be empty'),
+                $data['workspaceIds']
+            ),
+            roleIds: array_map(
+                fn (string $current) => \strlen($current) > 0
+                    ? RoleId::fromUri($current)
+                    : throw new \UnexpectedValueException('Role id can\'t be empty'),
+                $data['roleIds']
+            ),
             firstName: $data['firstName'],
             lastName: $data['lastName'],
             email: $data['email'],
@@ -49,8 +64,11 @@ final class CreateUserInputDenormalizer implements DenormalizerInterface, Denorm
         );
     }
 
+    /**
+     * @param array{} $context
+     */
     public function supportsDenormalization(mixed $data, string $type, ?string $format = null, array $context = []): bool
     {
-        return $type === CreateUserInput::class;
+        return CreateUserInput::class === $type;
     }
 }

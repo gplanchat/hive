@@ -1,3 +1,11 @@
 /.env
 /helm/api-platform/charts/*
 !/helm/api-platform/charts/.gitignore
+/.idea/.gitignore
+/.idea/dataSources.xml
+/.idea/hive.iml
+/.idea/modules.xml
+/.idea/php.xml
+/.idea/phpunit.xml
+/.idea/sqldialects.xml
+/.idea/vcs.xml
