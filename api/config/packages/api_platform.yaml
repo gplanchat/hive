@@ -29,6 +29,7 @@ api_platform:
             - '%kernel.project_dir%/src/Authentication/Domain/Realm'
             - '%kernel.project_dir%/src/Authentication/Domain/Role'
             - '%kernel.project_dir%/src/Authentication/Domain/Workspace'
+            - '%kernel.project_dir%/src/Cloud/Management/Domain/CloudProviderAccount'
     
     doctrine:
         enabled: false

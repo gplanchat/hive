@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Authentication\Infrastructure\Keycloak;
 
-use App\Authentication\Domain\InvalidUuidFormatException;
+use App\Platform\Domain\InvalidUuidFormatException;
 
 final class KeycloakUserId
 {

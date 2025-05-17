@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace App\Authentication\Domain\Realm;
 
-use App\Authentication\Domain\IdInterface;
+use App\Platform\Domain\CodeInterface;
+use App\Platform\Domain\IdInterface;
 
-final class RealmId implements IdInterface
+final class RealmId implements CodeInterface
 {
     public const string REQUIREMENT = '[A-Za-z0-9]+(?:[-.][A-Za-z0-9]+)*';
     public const string URI_REQUIREMENT = '\/authentication\/realm\/[A-Za-z0-9]+(?:[-.][A-Za-z0-9]+)*';
@@ -20,7 +21,7 @@ final class RealmId implements IdInterface
         }
     }
 
-    public static function fromUri(string $uri): IdInterface
+    public static function fromUri(string $uri): self
     {
         if (!preg_match(self::PARSE, $uri, $matches)) {
             throw new \InvalidArgumentException(\sprintf('<%s> is not a valid Realm code.', $uri));
@@ -45,11 +46,6 @@ final class RealmId implements IdInterface
         }
 
         return 0 === strcmp($this->reference, $other->reference);
-    }
-
-    public function isNil(): bool
-    {
-        return 0 === strcmp($this->reference, '');
     }
 
     public function __toString(): string

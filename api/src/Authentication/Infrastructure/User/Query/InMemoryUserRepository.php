@@ -14,7 +14,7 @@ use App\Authentication\Domain\User\UserId;
 use App\Authentication\Domain\Workspace\WorkspaceId;
 use App\Authentication\Infrastructure\StorageMock;
 use App\Authentication\Infrastructure\User\DataFixtures\UserFixtures;
-use App\Shared\Infrastructure\Collection\Collection;
+use App\Platform\Infrastructure\Collection\Collection;
 
 final class InMemoryUserRepository implements UserRepositoryInterface
 {

@@ -13,7 +13,7 @@ use App\Authentication\Domain\Role\Query\UseCases\RolePage;
 use App\Authentication\Domain\Role\RoleId;
 use App\Authentication\Infrastructure\Role\DataFixtures\RoleFixtures;
 use App\Authentication\Infrastructure\StorageMock;
-use App\Shared\Infrastructure\Collection\Collection;
+use App\Platform\Infrastructure\Collection\Collection;
 
 final class InMemoryRoleRepository implements RoleRepositoryInterface
 {
@@ -27,7 +27,7 @@ final class InMemoryRoleRepository implements RoleRepositoryInterface
         $item = $this->storage->getItem(RoleFixtures::buildCacheKey($roleId, $realmId));
 
         if (!$item->isHit()) {
-            throw new NotFoundException();
+            throw new NotFoundException(strtr('Role ID %roleId% does not exist in the database.', ['%roleId%' => $roleId->toString()]));
         }
 
         $value = $item->get();

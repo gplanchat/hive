@@ -1,0 +1,29 @@
+services:
+    # default configuration for services in *this* file
+    _defaults:
+        autowire: true      # Automatically injects dependencies in your services.
+        autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
+
+    # makes classes in src/ available to be used as services
+    # this creates a service per class whose id is the fully-qualified class name
+    App\Platform\:
+        resource: '../../src/Platform'
+        exclude:
+            - '../../src/Platform/Domain/'
+    
+    App\Platform\Infrastructure\ApiPlatform\DomainResourceNameCollectionFactory:
+        decorates: api_platform.metadata.resource.name_collection_factory.attributes
+        arguments:
+            - '%api_platform.resource_class_directories%'
+            - '@.inner'
+    
+    App\Platform\Infrastructure\QueryBusInterface: '@App\Platform\Infrastructure\Messenger\QueryBus'
+    App\Platform\Infrastructure\CommandBusInterface: '@App\Platform\Infrastructure\Messenger\CommandBus'
+    App\Platform\Infrastructure\EventBusInterface: '@App\Platform\Infrastructure\Messenger\EventBus'
+
+    App\Platform\Domain\Vault\Cipher\RandomNonceGenerator:
+    App\Platform\Domain\Vault\Cipher\NonceGeneratorInterface: '@App\Platform\Domain\Vault\Cipher\RandomNonceGenerator'
+
+    App\Platform\Domain\Vault\Cipher\SodiumSecretBox:
+        arguments:
+            $key: '@=opaqueBase64KeyFromEnv("string:CIPHER_SECRETBOX_KEY")'

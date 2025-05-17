@@ -49,8 +49,8 @@ final readonly class DatabaseOrganizationRepository implements OrganizationRepos
             throw new NotFoundException();
         }
 
-        \assert(\array_key_exists('uuid', $organization) && \is_string($organization['uuid']));
-        \assert(\array_key_exists('realm_id', $organization) && \is_string($organization['realm_id']));
+        \assert(\array_key_exists('uuid', $organization) && \is_string($organization['uuid']) && \strlen($organization['uuid']) > 0);
+        \assert(\array_key_exists('realm_id', $organization) && \is_string($organization['realm_id']) && \strlen($organization['realm_id']) > 0);
         \assert(\array_key_exists('name', $organization) && \is_string($organization['name']));
         \assert(\array_key_exists('slug', $organization) && \is_string($organization['slug']));
         \assert(\array_key_exists('valid_until', $organization) && \is_string($organization['valid_until']));
@@ -85,8 +85,8 @@ final readonly class DatabaseOrganizationRepository implements OrganizationRepos
 
     /**
      * @param array{
-     *     uuid: string,
-     *     realm_id: string,
+     *     uuid: non-empty-string,
+     *     realm_id: non-empty-string,
      *     name: string,
      *     slug: string,
      *     valid_until: string|null,
@@ -105,7 +105,9 @@ final readonly class DatabaseOrganizationRepository implements OrganizationRepos
                 ? \DateTimeImmutable::createFromFormat('Y-m-d', $organization['valid_until'], new \DateTimeZone('UTC')) ?: null
                 : null,
             featureRolloutIds: array_map(
-                fn (string $featureRolloutId): FeatureRolloutId => FeatureRolloutId::fromString($featureRolloutId),
+                fn (string $featureRolloutId): FeatureRolloutId => \strlen($featureRolloutId) > 0
+                    ? FeatureRolloutId::fromString($featureRolloutId)
+                    : throw new \UnexpectedValueException('Feature rollout ids are empty'),
                 json_decode($organization['feature_rollout_ids'], true, \JSON_THROW_ON_ERROR)
             ),
             enabled: $organization['enabled'] ?? false,
@@ -120,8 +122,8 @@ final readonly class DatabaseOrganizationRepository implements OrganizationRepos
     private function hydrateAll(Result $result): \Traversable
     {
         foreach ($result->iterateAssociative() as $organization) {
-            \assert(\array_key_exists('uuid', $organization) && \is_string($organization['uuid']));
-            \assert(\array_key_exists('realm_id', $organization) && \is_string($organization['realm_id']));
+            \assert(\array_key_exists('uuid', $organization) && \is_string($organization['uuid']) && \strlen($organization['uuid']) > 0);
+            \assert(\array_key_exists('realm_id', $organization) && \is_string($organization['realm_id']) && \strlen($organization['realm_id']) > 0);
             \assert(\array_key_exists('name', $organization) && \is_string($organization['name']));
             \assert(\array_key_exists('slug', $organization) && \is_string($organization['slug']));
             \assert(\array_key_exists('valid_until', $organization) && \is_string($organization['valid_until']));

@@ -41,7 +41,7 @@ final class CreateOrganizationInputDenormalizer implements DenormalizerInterface
             \array_key_exists('validUntil', $data) && null != $data['validUntil']
                 ? (\DateTimeImmutable::createFromFormat('Y-m-d', $data['validUntil'], new \DateTimeZone('UTC')) ?: null)
                 : null,
-            array_map(fn (string $current): FeatureRolloutId => FeatureRolloutId::fromUri($current), $data['featureRolloutIds'] ?? []),
+            array_map(fn (string $current): FeatureRolloutId => \strlen($current) > 0 ? FeatureRolloutId::fromUri($current) : throw new \InvalidArgumentException(), $data['featureRolloutIds'] ?? []),
             (bool) ($data['enabled'] ?? false),
         );
     }

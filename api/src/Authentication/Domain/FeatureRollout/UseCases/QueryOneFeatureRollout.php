@@ -9,7 +9,7 @@ use ApiPlatform\OpenApi\Model\Parameter;
 use App\Authentication\Domain\FeatureRollout\FeatureRollout;
 use App\Authentication\Domain\FeatureRollout\FeatureRolloutId;
 use App\Authentication\UserInterface\FeatureRollout\QueryOneFeatureRolloutProvider;
-use App\Shared\Infrastructure\ApiPlatform\QueryOne;
+use App\Platform\Infrastructure\ApiPlatform\QueryOne;
 
 #[QueryOne(
     uriTemplate: '/feature-rollouts/{code}',

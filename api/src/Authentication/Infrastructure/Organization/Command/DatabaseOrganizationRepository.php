@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Authentication\Infrastructure\Organization\Command;
 
-use App\Authentication\Domain\EventBusInterface;
 use App\Authentication\Domain\FeatureRollout\FeatureRolloutId;
 use App\Authentication\Domain\NotFoundException;
 use App\Authentication\Domain\Organization\Command\AddedFeatureRolloutsEvent;
@@ -17,9 +16,11 @@ use App\Authentication\Domain\Organization\Command\OrganizationRepositoryInterfa
 use App\Authentication\Domain\Organization\Command\RemovedFeatureRolloutsEvent;
 use App\Authentication\Domain\Organization\OrganizationId;
 use App\Authentication\Domain\Realm\RealmId;
+use App\Platform\Infrastructure\EventBusInterface;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\ParameterType;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 
 final class DatabaseOrganizationRepository implements OrganizationRepositoryInterface
 {
@@ -58,7 +59,9 @@ final class DatabaseOrganizationRepository implements OrganizationRepositoryInte
             OrganizationId::fromString($organization['uuid']),
             realmId: RealmId::fromString($organization['realm_id']),
             featureRolloutIds: array_map(
-                fn (string $featureRolloutId): FeatureRolloutId => FeatureRolloutId::fromString($featureRolloutId),
+                fn (string $featureRolloutId): FeatureRolloutId => \strlen($featureRolloutId) > 0
+                    ? FeatureRolloutId::fromString($featureRolloutId)
+                    : throw new UnexpectedValueException('Feature Rollout ID was empty'),
                 json_decode($organization['feature_rollout_ids'], true, \JSON_THROW_ON_ERROR)
             ),
             enabled: $organization['enabled'],

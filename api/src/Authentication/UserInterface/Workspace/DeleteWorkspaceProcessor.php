@@ -6,11 +6,11 @@ namespace App\Authentication\UserInterface\Workspace;
 
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
-use App\Authentication\Domain\CommandBusInterface;
 use App\Authentication\Domain\NotFoundException;
 use App\Authentication\Domain\Workspace\Command\InvalidWorkspaceStateException;
 use App\Authentication\Domain\Workspace\Command\UseCases\DeleteWorkspace;
 use App\Authentication\Domain\Workspace\Query\Workspace;
+use App\Platform\Infrastructure\CommandBusInterface;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 

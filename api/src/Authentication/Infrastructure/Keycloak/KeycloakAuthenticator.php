@@ -80,6 +80,10 @@ final class KeycloakAuthenticator extends AbstractAuthenticator
 
         return new SelfValidatingPassport(
             new UserBadge($decodedToken->sub, function (string $userId) use ($realmId) {
+                if (\strlen($userId) <= 0) {
+                    throw new AuthenticationException('Provided userId is missing');
+                }
+
                 $userId = UserId::fromUri($userId);
                 try {
                     $user = $this->userRepository->get($userId, $realmId);
@@ -92,6 +96,7 @@ final class KeycloakAuthenticator extends AbstractAuthenticator
                 } catch (NotFoundException $exception) {
                     // We are not providing access if the User repository does not return a User instance
                     // This should be reviewed in the case we are using the database to store users or Keycloak itself
+                    $this->logger->error($exception->getMessage());
                     $this->logger->info(strtr(
                         'User with ID %userId% was not found in the %realmId% Realm.',
                         [

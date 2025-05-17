@@ -6,7 +6,6 @@ namespace App\Authentication\UserInterface\User;
 
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
-use App\Authentication\Domain\CommandBusInterface;
 use App\Authentication\Domain\Organization\OrganizationId;
 use App\Authentication\Domain\Realm\RealmId;
 use App\Authentication\Domain\SecurityContextInterface;
@@ -15,6 +14,7 @@ use App\Authentication\Domain\User\Command\UseCases\CreatePendingUser;
 use App\Authentication\Domain\User\Query\User;
 use App\Authentication\Domain\User\Query\UserRepositoryInterface;
 use App\Authentication\Domain\User\UserId;
+use App\Platform\Infrastructure\CommandBusInterface;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 

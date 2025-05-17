@@ -4,12 +4,13 @@ declare(strict_types=1);
 
 namespace App\Authentication\Domain\Organization;
 
-use App\Authentication\Domain\IdInterface;
-use App\Authentication\Domain\InvalidUuidFormatException;
 use App\Authentication\Domain\Realm\RealmId;
+use App\Platform\Domain\IdInterface;
+use App\Platform\Domain\InvalidUuidFormatException;
+use App\Platform\Domain\UuidInterface;
 use Symfony\Component\Routing\Requirement\Requirement;
 
-final class OrganizationId implements IdInterface
+final class OrganizationId implements UuidInterface
 {
     public const string REQUIREMENT = Requirement::UUID_V7;
     public const string URI_REQUIREMENT = '\/authentication\/'.RealmId::REQUIREMENT.'\/organizations\/'.Requirement::UUID_V7;
@@ -28,7 +29,7 @@ final class OrganizationId implements IdInterface
         return new self(uuid_create(UUID_TYPE_RANDOM));
     }
 
-    public static function nil(): IdInterface
+    public static function nil(): self
     {
         return new self(uuid_create(UUID_TYPE_NULL));
     }

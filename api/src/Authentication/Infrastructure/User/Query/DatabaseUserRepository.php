@@ -51,10 +51,10 @@ final readonly class DatabaseUserRepository implements UserRepositoryInterface
             throw new NotFoundException();
         }
 
-        \assert(\array_key_exists('uuid', $user) && \is_string($user['uuid']));
-        \assert(\array_key_exists('realm_id', $user) && \is_string($user['realm_id']));
+        \assert(\array_key_exists('uuid', $user) && \is_string($user['uuid']) && \strlen($user['uuid']) > 0);
+        \assert(\array_key_exists('realm_id', $user) && \is_string($user['realm_id']) && \strlen($user['realm_id']) > 0);
         \assert(\array_key_exists('authorization_context', $user) && \is_string($user['authorization_context']));
-        \assert(\array_key_exists('organization_id', $user) && \is_string($user['organization_id']));
+        \assert(\array_key_exists('organization_id', $user) && \is_string($user['organization_id']) && \strlen($user['organization_id']) > 0);
         \assert(\array_key_exists('workspace_ids', $user) && \is_string($user['workspace_ids']));
         \assert(\array_key_exists('role_ids', $user) && \is_string($user['role_ids']));
         \assert(\array_key_exists('username', $user) && \is_string($user['username']));
@@ -157,16 +157,26 @@ final readonly class DatabaseUserRepository implements UserRepositoryInterface
     private function hydrateOne(array $user): User
     {
         return new User(
-            UserId::fromString($user['uuid']),
-            RealmId::fromString($user['realm_id']),
+            \strlen($user['uuid']) > 0
+                ? UserId::fromString($user['uuid'])
+                : throw new \InvalidArgumentException('User id cannot be empty.'),
+            \strlen($user['realm_id']) > 0
+                ? RealmId::fromString($user['realm_id'])
+                : throw new \InvalidArgumentException('Realm id cannot be empty.'),
             KeycloakAuthorization::fromNormalized(json_decode($user['authorization_context'])),
-            OrganizationId::fromString($user['organization_id']),
+            \strlen($user['organization_id']) > 0
+                ? OrganizationId::fromString($user['organization_id'])
+                : throw new \InvalidArgumentException('Organization id cannot be empty.'),
             workspaceIds: array_map(
-                fn (string $workspaceId): WorkspaceId => WorkspaceId::fromString($workspaceId),
+                fn (string $workspaceId): WorkspaceId => \strlen($workspaceId) > 0
+                        ? WorkspaceId::fromString($workspaceId)
+                        : throw new \InvalidArgumentException('Workspace id cannot be empty.'),
                 json_decode($user['workspace_ids'], true, \JSON_THROW_ON_ERROR)
             ),
             roleIds: array_map(
-                fn (string $roleId): RoleId => RoleId::fromString($roleId),
+                fn (string $roleId): RoleId => \strlen($roleId) > 0
+                        ? RoleId::fromString($roleId)
+                        : throw new \UnexpectedValueException('Role id cannot be empty.'),
                 json_decode($user['role_ids'], true, \JSON_THROW_ON_ERROR)
             ),
             username: $user['username'],
@@ -183,12 +193,12 @@ final readonly class DatabaseUserRepository implements UserRepositoryInterface
     private function hydrateAll(Result $result): \Traversable
     {
         foreach ($result->iterateAssociative() as $user) {
-            \assert(\array_key_exists('uuid', $user) && \is_string($user['uuid']));
-            \assert(\array_key_exists('realm_id', $user) && \is_string($user['realm_id']));
+            \assert(\array_key_exists('uuid', $user) && \is_string($user['uuid']) && \strlen($user['uuid']) > 0);
+            \assert(\array_key_exists('realm_id', $user) && \is_string($user['realm_id']) && \strlen($user['realm_id']) > 0);
             \assert(\array_key_exists('authorization_context', $user) && \is_string($user['authorization_context']));
-            \assert(\array_key_exists('organization_id', $user) && \is_string($user['organization_id']));
+            \assert(\array_key_exists('organization_id', $user) && \is_string($user['organization_id']) && \strlen($user['organization_id']) > 0);
             \assert(\array_key_exists('workspace_ids', $user) && \is_string($user['workspace_ids']));
-            \assert(\array_key_exists('role_ids', $user) && \is_string($user['role_ids']));
+            \assert(\array_key_exists('role_ids', $user) && \is_string($user['role_ids']) && \strlen($user['role_ids']) > 0);
             \assert(\array_key_exists('username', $user) && \is_string($user['username']));
             \assert(\array_key_exists('firstname', $user) && \is_string($user['firstname']));
             \assert(\array_key_exists('lastname', $user) && \is_string($user['lastname']));

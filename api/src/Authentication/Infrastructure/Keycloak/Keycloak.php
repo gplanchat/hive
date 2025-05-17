@@ -27,7 +27,7 @@ final readonly class Keycloak implements KeycloakInterface
     }
 
     /**
-     * @param RealmId[] $allowedRealmIds
+     * @param non-empty-string[] $allowedRealmIds
      */
     public static function createFromUri(
         KeycloakAdminClientInterface $httpClient,
@@ -37,7 +37,12 @@ final readonly class Keycloak implements KeycloakInterface
         return new self(
             $httpClient,
             Psr17FactoryDiscovery::findUriFactory()->createUri($baseUri),
-            ...array_values($allowedRealmIds),
+            ...array_map(
+                fn (string $code) => \strlen($code) > 0
+                    ? RealmId::fromString($code)
+                    : throw new \UnexpectedValueException('Realm ID was empty'),
+                $allowedRealmIds
+            ),
         );
     }
 
@@ -55,7 +60,9 @@ final readonly class Keycloak implements KeycloakInterface
 
         $items = array_map(
             fn (array $current) => new Realm(
-                code: RealmId::fromString($current['realm']),
+                code: \array_key_exists('realm', $current) && \is_string($current['realm']) && \strlen($current['realm']) > 0
+                    ? RealmId::fromString($current['realm'])
+                    : throw new \UnexpectedValueException('The API provided an empty Realm code'),
                 displayName: $current['displayName'],
             ),
             array_filter(
@@ -102,7 +109,9 @@ final readonly class Keycloak implements KeycloakInterface
         $item = $response->toArray();
 
         return new Realm(
-            code: RealmId::fromString($item['realm']),
+            code: \array_key_exists('realm', $item) && \is_string($item['realm']) && \strlen($item['realm']) > 0
+                ? RealmId::fromString($item['realm'])
+                : throw new \UnexpectedValueException('The API provided an empty Realm code'),
             displayName: $item['displayName'],
         );
     }

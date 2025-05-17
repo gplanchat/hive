@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Authentication\Infrastructure;
 
-use App\Shared\Infrastructure\Collection\Collection;
+use App\Platform\Infrastructure\Collection\Collection;
 use Psr\Cache\CacheItemInterface;
 use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;

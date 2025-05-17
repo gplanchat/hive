@@ -7,6 +7,6 @@ parameters:
         - src/
         - tests/
     excludePaths:
-        - src/Shared/Infrastructure/ApiPlatform/
+        - src/Platform/Infrastructure/ApiPlatform/
     treatPhpDocTypesAsCertain: false
     tmpDir: var/phpstan/tmp

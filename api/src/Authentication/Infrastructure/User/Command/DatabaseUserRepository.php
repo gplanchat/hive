@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Authentication\Infrastructure\User\Command;
 
-use App\Authentication\Domain\EventBusInterface;
 use App\Authentication\Domain\NotFoundException;
 use App\Authentication\Domain\Organization\OrganizationId;
 use App\Authentication\Domain\Realm\RealmId;
@@ -17,6 +16,7 @@ use App\Authentication\Domain\User\Command\User;
 use App\Authentication\Domain\User\Command\UserRepositoryInterface;
 use App\Authentication\Domain\User\UserId;
 use App\Authentication\Domain\Workspace\WorkspaceId;
+use App\Platform\Infrastructure\EventBusInterface;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\ParameterType;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
@@ -52,9 +52,9 @@ final readonly class DatabaseUserRepository implements UserRepositoryInterface
             throw new NotFoundException();
         }
 
-        \assert(\array_key_exists('uuid', $user) && \is_string($user['uuid']));
-        \assert(\array_key_exists('realm_id', $user) && \is_string($user['realm_id']));
-        \assert(\array_key_exists('organization_id', $user) && \is_string($user['organization_id']));
+        \assert(\array_key_exists('uuid', $user) && \is_string($user['uuid']) && \strlen($user['uuid']) > 0);
+        \assert(\array_key_exists('realm_id', $user) && \is_string($user['realm_id']) && \strlen($user['realm_id']) > 0);
+        \assert(\array_key_exists('organization_id', $user) && \is_string($user['organization_id']) && \strlen($user['organization_id']) > 0);
         \assert(\array_key_exists('enabled', $user) && \is_bool($user['enabled']));
         \assert(\array_key_exists('version', $user) && \is_int($user['version']));
 

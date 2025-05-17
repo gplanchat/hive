@@ -9,7 +9,7 @@ use App\Authentication\Domain\Organization\OrganizationId;
 use App\Authentication\Domain\Realm\RealmId;
 use App\Authentication\Domain\Role\Query\UseCases\RolePage;
 use App\Authentication\Domain\Role\RoleId;
-use App\Shared\Infrastructure\Collection\Collection;
+use App\Platform\Infrastructure\Collection\Collection;
 
 interface RoleRepositoryInterface
 {

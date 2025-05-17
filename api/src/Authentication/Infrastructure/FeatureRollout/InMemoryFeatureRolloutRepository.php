@@ -10,6 +10,7 @@ use App\Authentication\Domain\FeatureRollout\FeatureRolloutRepositoryInterface;
 use App\Authentication\Domain\FeatureRollout\Targets;
 use App\Authentication\Domain\FeatureRollout\UseCases\FeatureRolloutPage;
 use App\Authentication\Domain\NotFoundException;
+use App\Platform\Infrastructure\Collection\Collection;
 
 final class InMemoryFeatureRolloutRepository implements FeatureRolloutRepositoryInterface
 {
@@ -26,7 +27,10 @@ final class InMemoryFeatureRolloutRepository implements FeatureRolloutRepository
 
     public function get(FeatureRolloutId $featureRolloutId): FeatureRollout
     {
-        $result = array_filter($this->storage, fn (FeatureRollout $featureRollout) => $featureRollout->code->equals($featureRolloutId));
+        $result = Collection::fromArray($this->storage)
+            ->filter(fn (FeatureRollout $featureRollout) => $featureRollout->code->equals($featureRolloutId))
+            ->toArray()
+        ;
 
         return array_shift($result) ?? throw new NotFoundException();
     }

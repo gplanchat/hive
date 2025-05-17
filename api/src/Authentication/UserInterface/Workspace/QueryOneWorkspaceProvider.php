@@ -6,11 +6,11 @@ namespace App\Authentication\UserInterface\Workspace;
 
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
-use App\Authentication\Domain\QueryBusInterface;
 use App\Authentication\Domain\Realm\RealmId;
 use App\Authentication\Domain\Workspace\Query\UseCases\QueryOneWorkspace;
 use App\Authentication\Domain\Workspace\Query\Workspace;
 use App\Authentication\Domain\Workspace\WorkspaceId;
+use App\Platform\Infrastructure\QueryBusInterface;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;

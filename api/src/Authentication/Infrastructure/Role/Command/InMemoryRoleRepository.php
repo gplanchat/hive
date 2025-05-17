@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Authentication\Infrastructure\Role\Command;
 
 use App\Authentication\Domain\ConflictException;
-use App\Authentication\Domain\EventBusInterface;
 use App\Authentication\Domain\NotFoundException;
 use App\Authentication\Domain\Realm\RealmId;
 use App\Authentication\Domain\Role\Command\DeclaredEvent;
@@ -16,6 +15,7 @@ use App\Authentication\Domain\Role\Query\Role as QueryRole;
 use App\Authentication\Domain\Role\RoleId;
 use App\Authentication\Infrastructure\Role\DataFixtures\RoleFixtures;
 use App\Authentication\Infrastructure\StorageMock;
+use App\Platform\Infrastructure\EventBusInterface;
 use Symfony\Contracts\Cache\ItemInterface;
 
 final readonly class InMemoryRoleRepository implements RoleRepositoryInterface

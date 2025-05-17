@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Authentication\Infrastructure\Workspace\Command;
 
 use App\Authentication\Domain\ConflictException;
-use App\Authentication\Domain\EventBusInterface;
 use App\Authentication\Domain\NotFoundException;
 use App\Authentication\Domain\Realm\RealmId;
 use App\Authentication\Domain\Workspace\Command\DeclaredEvent;
@@ -18,6 +17,7 @@ use App\Authentication\Domain\Workspace\Query\Workspace as QueryWorkspace;
 use App\Authentication\Domain\Workspace\WorkspaceId;
 use App\Authentication\Infrastructure\StorageMock;
 use App\Authentication\Infrastructure\Workspace\DataFixtures\WorkspaceFixtures;
+use App\Platform\Infrastructure\EventBusInterface;
 use Symfony\Contracts\Cache\ItemInterface;
 
 final class InMemoryWorkspaceRepository implements WorkspaceRepositoryInterface

@@ -1,0 +1,132 @@
+services:
+    # default configuration for services in *this* file
+    _defaults:
+        autowire: true      # Automatically injects dependencies in your services.
+        autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
+
+    # makes classes in src/ available to be used as services
+    # this creates a service per class whose id is the fully-qualified class name
+    App\Authentication\:
+        resource: '../../src/Authentication'
+        exclude:
+            - '../../src/Authentication/Domain/'
+            - '../../src/Authentication/Infrastructure/Organization/DataFixtures'
+            - '../../src/Authentication/Infrastructure/User/DataFixtures'
+            - '../../src/Authentication/Infrastructure/Role/DataFixtures'
+            - '../../src/Authentication/Infrastructure/Workspace/DataFixtures'
+
+    App\Authentication\Domain\FeatureRollout\UseCases\:
+        resource: '../../src/Authentication/Domain/FeatureRollout/UseCases/*{Handler}.php'
+
+    App\Authentication\Domain\Organization\Query\UseCases\:
+        resource: '../../src/Authentication/Domain/Organization/Query/UseCases/*{Handler}.php'
+
+    App\Authentication\Domain\Organization\Command\UseCases\:
+        resource: '../../src/Authentication/Domain/Organization/Command/UseCases/*{Handler}.php'
+
+    App\Authentication\Domain\User\Command\UseCases\:
+        resource: '../../src/Authentication/Domain/User/Command/UseCases/*{Handler}.php'
+
+    App\Authentication\Domain\User\Query\UseCases\:
+        resource: '../../src/Authentication/Domain/User/Query/UseCases/*{Handler}.php'
+
+    App\Authentication\Domain\Realm\Query\UseCases\:
+        resource: '../../src/Authentication/Domain/Realm/Query/UseCases/*{Handler}.php'
+    
+    App\Authentication\Domain\Role\Command\UseCases\:
+        resource: '../../src/Authentication/Domain/Role/Command/UseCases/*{Handler}.php'
+    
+    App\Authentication\Domain\Role\Query\UseCases\:
+        resource: '../../src/Authentication/Domain/Role/Query/UseCases/*{Handler}.php'
+
+    App\Authentication\Domain\Workspace\Command\UseCases\:
+        resource: '../../src/Authentication/Domain/Workspace/Command/UseCases/*{Handler}.php'
+
+    App\Authentication\Domain\Workspace\Query\UseCases\:
+        resource: '../../src/Authentication/Domain/Workspace/Query/UseCases/*{Handler}.php'
+
+    App\Authentication\Infrastructure\Keycloak\Keycloak:
+        factory: [ 'App\Authentication\Infrastructure\Keycloak\Keycloak', 'createFromUri' ]
+        arguments:
+            $baseUri: 'http://keycloak:7080'
+            $allowedRealmIds: ['master', 'acme-inc']
+        
+    App\Authentication\Infrastructure\Keycloak\KeycloakAdminClientInterface: '@App\Authentication\Infrastructure\Keycloak\KeycloakAdminClient'
+
+    App\Authentication\Infrastructure\Keycloak\KeycloakInterface: '@App\Authentication\Infrastructure\Keycloak\Keycloak'
+
+    App\Authentication\Domain\FeatureRollout\FeatureRolloutRepositoryInterface: '@App\Authentication\Infrastructure\FeatureRollout\InMemoryFeatureRolloutRepository'
+
+    App\Authentication\Infrastructure\FeatureRollout\InMemoryFeatureRolloutRepository:
+        factory: [ 'App\Authentication\Infrastructure\FeatureRollout\InMemoryFeatureRolloutRepository', 'buildTestRepository' ]
+
+    App\Authentication\Domain\Organization\Command\OrganizationRepositoryInterface: '@App\Authentication\Infrastructure\Organization\Command\DatabaseOrganizationRepository'
+
+    App\Authentication\Infrastructure\Organization\Command\DatabaseOrganizationRepository:
+
+    App\Authentication\Domain\Organization\Query\OrganizationRepositoryInterface: '@App\Authentication\Infrastructure\Organization\Query\DatabaseOrganizationRepository'
+
+    App\Authentication\Infrastructure\Organization\Query\DatabaseOrganizationRepository:
+
+    App\Authentication\Domain\User\Command\UserRepositoryInterface: '@App\Authentication\Infrastructure\User\Command\DatabaseUserRepository'
+
+    App\Authentication\Infrastructure\User\Command\DatabaseUserRepository:
+
+    App\Authentication\Domain\User\Query\UserRepositoryInterface: '@App\Authentication\Infrastructure\User\Query\DatabaseUserRepository'
+
+    App\Authentication\Infrastructure\User\Query\DatabaseUserRepository:
+
+    App\Authentication\Domain\Realm\Query\RealmRepositoryInterface: '@App\Authentication\Infrastructure\Realm\KeycloakRealmRepository'
+
+    App\Authentication\Infrastructure\Realm\KeycloakRealmRepository:
+
+    App\Authentication\Domain\Role\Command\RoleRepositoryInterface: '@App\Authentication\Infrastructure\Role\Command\InMemoryRoleRepository'
+
+    App\Authentication\Domain\Role\Query\RoleRepositoryInterface: '@App\Authentication\Infrastructure\Role\Query\InMemoryRoleRepository'
+
+    App\Authentication\Infrastructure\Role\Query\InMemoryRoleRepository:
+
+    App\Authentication\Domain\Workspace\Command\WorkspaceRepositoryInterface: '@App\Authentication\Infrastructure\Workspace\Command\InMemoryWorkspaceRepository'
+
+    App\Authentication\Domain\Workspace\Query\WorkspaceRepositoryInterface: '@App\Authentication\Infrastructure\Workspace\Query\InMemoryWorkspaceRepository'
+
+    App\Authentication\Infrastructure\Workspace\Query\InMemoryWorkspaceRepository:
+    
+    App\Authentication\Domain\SecurityContextInterface: '@App\Authentication\Infrastructure\Keycloak\KeycloakSecurityContext'
+
+when@test:
+    services:
+        App\Authentication\Infrastructure\Keycloak\KeycloakClientInterface: '@App\Authentication\Infrastructure\Keycloak\KeycloakClientMock'
+
+        App\Authentication\Infrastructure\Keycloak\KeycloakMock:
+            factory: [ App\Authentication\Infrastructure\Keycloak\KeycloakMock, create ]
+            arguments:
+                $clock: '@Psr\Clock\ClockInterface'
+        
+        App\Authentication\Infrastructure\Keycloak\KeycloakInterface: '@App\Authentication\Infrastructure\Keycloak\KeycloakMock'
+        
+        App\Authentication\Domain\Organization\Command\OrganizationRepositoryInterface: '@App\Authentication\Infrastructure\Organization\Command\InMemoryOrganizationRepository'
+
+        App\Authentication\Domain\Organization\Query\OrganizationRepositoryInterface: '@App\Authentication\Infrastructure\Organization\Query\InMemoryOrganizationRepository'
+
+        App\Authentication\Infrastructure\Organization\DataFixtures\OrganizationFixtures:
+            autowire: true
+            public: true
+
+        App\Authentication\Domain\User\Command\UserRepositoryInterface: '@App\Authentication\Infrastructure\User\Command\InMemoryUserRepository'
+
+        App\Authentication\Domain\User\Query\UserRepositoryInterface: '@App\Authentication\Infrastructure\User\Query\InMemoryUserRepository'
+        
+        App\Authentication\Infrastructure\User\DataFixtures\UserFixtures:
+            autowire: true
+            public: true
+
+        App\Authentication\Domain\Realm\Query\RealmRepositoryInterface: '@App\Authentication\Infrastructure\Realm\InMemoryRealmRepository'
+        
+        App\Authentication\Infrastructure\Realm\InMemoryRealmRepository:
+            factory: [ 'App\Authentication\Infrastructure\Realm\InMemoryRealmRepository', 'buildTestRepository' ]
+        
+        App\Authentication\Infrastructure\Workspace\DataFixtures\WorkspaceFixtures:
+            autowire: true
+            public: true
+

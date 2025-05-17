@@ -6,7 +6,6 @@ namespace App\Authentication\UserInterface\Organization;
 
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
-use App\Authentication\Domain\CommandBusInterface;
 use App\Authentication\Domain\FeatureRollout\FeatureRolloutId;
 use App\Authentication\Domain\NotFoundException;
 use App\Authentication\Domain\Organization\Command\InvalidOrganizationStateException;
@@ -15,7 +14,8 @@ use App\Authentication\Domain\Organization\OrganizationId;
 use App\Authentication\Domain\Organization\Query\Organization;
 use App\Authentication\Domain\Organization\Query\OrganizationRepositoryInterface;
 use App\Authentication\Domain\Realm\RealmId;
-use App\Shared\Infrastructure\Collection\Collection;
+use App\Platform\Infrastructure\Collection\Collection;
+use App\Platform\Infrastructure\CommandBusInterface;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 

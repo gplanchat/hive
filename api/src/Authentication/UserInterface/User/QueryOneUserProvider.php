@@ -6,11 +6,11 @@ namespace App\Authentication\UserInterface\User;
 
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
-use App\Authentication\Domain\QueryBusInterface;
 use App\Authentication\Domain\Realm\RealmId;
 use App\Authentication\Domain\User\Query\UseCases\QueryOneUser;
 use App\Authentication\Domain\User\Query\User;
 use App\Authentication\Domain\User\UserId;
+use App\Platform\Infrastructure\QueryBusInterface;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;

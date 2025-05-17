@@ -9,7 +9,7 @@ use App\Authentication\Domain\Realm\Query\Realm;
 use App\Authentication\Domain\Realm\Query\RealmRepositoryInterface;
 use App\Authentication\Domain\Realm\Query\UseCases\RealmPage;
 use App\Authentication\Domain\Realm\RealmId;
-use App\Shared\Infrastructure\Collection\Collection;
+use App\Platform\Infrastructure\Collection\Collection;
 
 final class InMemoryRealmRepository implements RealmRepositoryInterface
 {

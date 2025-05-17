@@ -6,11 +6,11 @@ namespace App\Authentication\UserInterface\User;
 
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
-use App\Authentication\Domain\CommandBusInterface;
 use App\Authentication\Domain\NotFoundException;
 use App\Authentication\Domain\User\Command\InvalidUserStateException;
 use App\Authentication\Domain\User\Command\UseCases\DeleteUser;
 use App\Authentication\Domain\User\Query\User;
+use App\Platform\Infrastructure\CommandBusInterface;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 

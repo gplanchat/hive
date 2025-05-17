@@ -37,7 +37,9 @@ final class CreateWorkspaceInputDenormalizer implements DenormalizerInterface, D
         }
 
         return new CreateWorkspaceInput(
-            OrganizationId::fromUri($data['organizationId']),
+            organizationId: \strlen($data['organizationId']) > 0
+                ? OrganizationId::fromUri($data['organizationId'])
+                : throw new UnexpectedValueException('Organization id can\'t be empty'),
             name: $data['name'],
             slug: $data['slug'],
             validUntil: \array_key_exists('validUntil', $data) && null != $data['validUntil']

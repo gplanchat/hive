@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Authentication\Infrastructure\User\Command;
 
 use App\Authentication\Domain\ConflictException;
-use App\Authentication\Domain\EventBusInterface;
 use App\Authentication\Domain\NotFoundException;
 use App\Authentication\Domain\Realm\RealmId;
 use App\Authentication\Domain\User\Command\DeclaredEvent;
@@ -18,6 +17,7 @@ use App\Authentication\Domain\User\Query\User as QueryUser;
 use App\Authentication\Domain\User\UserId;
 use App\Authentication\Infrastructure\StorageMock;
 use App\Authentication\Infrastructure\User\DataFixtures\UserFixtures;
+use App\Platform\Infrastructure\EventBusInterface;
 use Symfony\Contracts\Cache\ItemInterface;
 
 final readonly class InMemoryUserRepository implements UserRepositoryInterface

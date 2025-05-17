@@ -9,7 +9,7 @@ use ApiPlatform\State\ProviderInterface;
 use App\Authentication\Domain\FeatureRollout\FeatureRollout;
 use App\Authentication\Domain\FeatureRollout\FeatureRolloutId;
 use App\Authentication\Domain\FeatureRollout\UseCases\QueryOneFeatureRollout;
-use App\Authentication\Domain\QueryBusInterface;
+use App\Platform\Infrastructure\QueryBusInterface;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;

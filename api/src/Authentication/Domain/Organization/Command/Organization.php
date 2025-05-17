@@ -7,7 +7,7 @@ namespace App\Authentication\Domain\Organization\Command;
 use App\Authentication\Domain\FeatureRollout\FeatureRolloutId;
 use App\Authentication\Domain\Organization\OrganizationId;
 use App\Authentication\Domain\Realm\RealmId;
-use App\Shared\Infrastructure\Collection\Collection;
+use App\Platform\Infrastructure\Collection\Collection;
 use Webmozart\Assert\Assert;
 
 final class Organization

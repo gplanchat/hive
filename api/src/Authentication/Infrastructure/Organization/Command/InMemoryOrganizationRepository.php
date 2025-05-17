@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Authentication\Infrastructure\Organization\Command;
 
 use App\Authentication\Domain\ConflictException;
-use App\Authentication\Domain\EventBusInterface;
 use App\Authentication\Domain\FeatureRollout\FeatureRolloutId;
 use App\Authentication\Domain\NotFoundException;
 use App\Authentication\Domain\Organization\Command\AddedFeatureRolloutsEvent;
@@ -21,7 +20,8 @@ use App\Authentication\Domain\Organization\Query\Organization as QueryOrganizati
 use App\Authentication\Domain\Realm\RealmId;
 use App\Authentication\Infrastructure\Organization\DataFixtures\OrganizationFixtures;
 use App\Authentication\Infrastructure\StorageMock;
-use App\Shared\Infrastructure\Collection\Collection;
+use App\Platform\Infrastructure\Collection\Collection;
+use App\Platform\Infrastructure\EventBusInterface;
 use Symfony\Contracts\Cache\ItemInterface;
 
 final readonly class InMemoryOrganizationRepository implements OrganizationRepositoryInterface

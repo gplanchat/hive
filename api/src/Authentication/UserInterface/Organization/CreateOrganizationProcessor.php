@@ -6,13 +6,13 @@ namespace App\Authentication\UserInterface\Organization;
 
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
-use App\Authentication\Domain\CommandBusInterface;
 use App\Authentication\Domain\Organization\Command\UseCases\CreateEnabledOrganization;
 use App\Authentication\Domain\Organization\Command\UseCases\CreatePendingOrganization;
 use App\Authentication\Domain\Organization\OrganizationId;
 use App\Authentication\Domain\Organization\Query\Organization;
 use App\Authentication\Domain\Organization\Query\OrganizationRepositoryInterface;
 use App\Authentication\Domain\Realm\RealmId;
+use App\Platform\Infrastructure\CommandBusInterface;
 use Symfony\Component\HttpFoundation\Exception\LogicException;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;

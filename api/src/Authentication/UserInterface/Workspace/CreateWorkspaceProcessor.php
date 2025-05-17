@@ -6,7 +6,6 @@ namespace App\Authentication\UserInterface\Workspace;
 
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
-use App\Authentication\Domain\CommandBusInterface;
 use App\Authentication\Domain\Organization\OrganizationId;
 use App\Authentication\Domain\Realm\RealmId;
 use App\Authentication\Domain\Workspace\Command\UseCases\CreateEnabledWorkspace;
@@ -14,6 +13,7 @@ use App\Authentication\Domain\Workspace\Command\UseCases\CreatePendingWorkspace;
 use App\Authentication\Domain\Workspace\Query\Workspace;
 use App\Authentication\Domain\Workspace\Query\WorkspaceRepositoryInterface;
 use App\Authentication\Domain\Workspace\WorkspaceId;
+use App\Platform\Infrastructure\CommandBusInterface;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 

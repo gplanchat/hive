@@ -34,11 +34,12 @@ framework:
 
         routing:
             # Route your messages to the transports
-             'App\Authentication\Domain\FeatureRollout\Query\UseCases\*': sync
+             'App\Authentication\Domain\FeatureRollout\UseCases\*': sync
              'App\Authentication\Domain\Organization\Query\UseCases\*': sync
              'App\Authentication\Domain\User\Query\UseCases\*': sync
              'App\Authentication\Domain\Role\Query\UseCases\*': sync
              'App\Authentication\Domain\Workspace\Query\UseCases\*': sync
+             'App\Cloud\Management\Domain\CloudProviderAccount\Query\UseCases\*': sync
 
 when@test:
     framework:

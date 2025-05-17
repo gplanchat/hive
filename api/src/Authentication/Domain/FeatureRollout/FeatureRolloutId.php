@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace App\Authentication\Domain\FeatureRollout;
 
-use App\Authentication\Domain\IdInterface;
-use Symfony\Component\Routing\Requirement\Requirement;
+use App\Platform\Domain\CodeInterface;
+use App\Platform\Domain\IdInterface;
 
-final class FeatureRolloutId implements IdInterface
+final class FeatureRolloutId implements CodeInterface
 {
     public const string REQUIREMENT = '[A-Za-z0-9]+(?:[-.][A-Za-z0-9]+)*';
     public const string URI_REQUIREMENT = '\/feature-rollouts\/[A-Za-z0-9]+(?:[-.][A-Za-z0-9]+)*';
@@ -46,11 +46,6 @@ final class FeatureRolloutId implements IdInterface
         }
 
         return 0 === strcmp($this->reference, $other->reference);
-    }
-
-    public function isNil(): bool
-    {
-        return 0 === strcmp($this->reference, '');
     }
 
     public function __toString(): string

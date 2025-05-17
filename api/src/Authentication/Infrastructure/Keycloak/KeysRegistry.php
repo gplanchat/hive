@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Authentication\Infrastructure\Keycloak;
 
-use App\Shared\Infrastructure\Collection\Collection;
+use App\Platform\Infrastructure\Collection\Collection;
 use Firebase\JWT\Key;
 
 /**

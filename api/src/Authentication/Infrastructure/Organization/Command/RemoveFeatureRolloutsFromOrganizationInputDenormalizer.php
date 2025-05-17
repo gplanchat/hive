@@ -6,7 +6,7 @@ namespace App\Authentication\Infrastructure\Organization\Command;
 
 use App\Authentication\Domain\FeatureRollout\FeatureRolloutId;
 use App\Authentication\UserInterface\Organization\RemoveFeatureRolloutsFromOrganizationInput;
-use App\Shared\Infrastructure\Collection\Collection;
+use App\Platform\Infrastructure\Collection\Collection;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 use Symfony\Component\Serializer\Normalizer\DenormalizerAwareInterface;
@@ -26,7 +26,8 @@ final class RemoveFeatureRolloutsFromOrganizationInputDenormalizer implements De
     }
 
     /**
-     * @param array{} $context
+     * @param array{featureRolloutIds: list<string>} $data
+     * @param array{}                                $context
      */
     public function denormalize(mixed $data, string $type, ?string $format = null, array $context = []): RemoveFeatureRolloutsFromOrganizationInput
     {
@@ -39,7 +40,7 @@ final class RemoveFeatureRolloutsFromOrganizationInputDenormalizer implements De
 
         return new RemoveFeatureRolloutsFromOrganizationInput(
             featureRolloutIds: Collection::fromArray($data['featureRolloutIds'])
-                ->map(fn (string $uri): FeatureRolloutId => FeatureRolloutId::fromUri($uri))
+                ->map(fn (string $uri): FeatureRolloutId => \strlen($uri) > 0 ? FeatureRolloutId::fromUri($uri) : throw new UnexpectedValueException('Feature Rollout URI was empty'))
                 ->toArray(),
         );
     }
